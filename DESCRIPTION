@@ -1,0 +1,14 @@
+Package: stfuncs
+Version: 0.99.0
+Title: Spatial single-cell transcriptomics toolkit
+Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
+Description: Spatial single-cell transcriptomics toolkit
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 4.3.0), ggplot2, ggraph, igraph, tidygraph, SpatialExperiment
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+URL: https://github.com/noriakis/stfuncs
+BugReports: https://github.com/noriakis/stfuncs/issues
+Config/testthat/edition: 3
