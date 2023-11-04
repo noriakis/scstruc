@@ -11,7 +11,8 @@ globalStruc(
   exclude_label = NA,
   algorithm = "mmhc",
   reg = FALSE,
-  algorithm.args = list()
+  algorithm.args = list(),
+  return_bn = FALSE
 )
 }
 \description{

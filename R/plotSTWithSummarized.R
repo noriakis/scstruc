@@ -1,4 +1,4 @@
-#' plotSTNet
+#' plotSTWithSummarized
 #'
 #' Overlay igraph network on histology image
 #' 
@@ -22,7 +22,7 @@
 #' @export
 #' @return ggplot
 #' 
-plotVisiumWithNum <- function(spe, gsv, from_node, to_node, label="label",
+plotSTWithSummarized <- function(spe, gsv, from_node, to_node, label="label",
 	sample_id=NULL, image_id=NULL) {
 	stopifnot(
         is(spe, "SpatialExperiment")
