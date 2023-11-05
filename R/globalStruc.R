@@ -1,6 +1,6 @@
 #' globalStruc
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
-	reg=FALSE, algorithm.args=list(), return_bn=FALSE) {
+	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE) {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
     inc_cells <- meta[!meta[[label]] %in% exclude_label, ]$barcode_id
@@ -16,7 +16,11 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
         global_graph <- do.call(algorithm, algorithm.args)	
     }
     if (return_bn) {
-        return(global_graph)
+        if (return_data) {
+            return(list(global_graph, input))
+        } else {
+            return(global_graph)
+        }
     }
     global_tbl_graph <- global_graph |> 
         bnlearn::as.igraph() |>

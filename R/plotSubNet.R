@@ -16,8 +16,11 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     subset_graph <- df |> filter(
         from %in% candidate_node_id | to %in% candidate_node_id
     )
+    minc <- subset_graph$coefficient |> min()
+    maxc <- subset_graph$coefficient |> max()
 
     plot_subset_g <- tbl_graph(edges=subset_graph)
+
     labels <- plot_subset_g |>
         activate(edges) |>
         pull(group) |>
@@ -42,8 +45,8 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed"))+
-            scale_edge_color_gradient2(low="blue", high="red")+
-            scale_edge_width(range=c(0.5, 1.5))+
+            scale_edge_color_gradient2(low="blue", high="red", limits=c(minc, maxc))+
+            scale_edge_width(range=c(0.5, 1.5), limits=c(minc, maxc))+
             geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
             ggtitle(x)+ theme_graph()
         })

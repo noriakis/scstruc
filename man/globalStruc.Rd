@@ -12,7 +12,8 @@ globalStruc(
   algorithm = "mmhc",
   reg = FALSE,
   algorithm.args = list(),
-  return_bn = FALSE
+  return_bn = FALSE,
+  return_data = FALSE
 )
 }
 \description{
