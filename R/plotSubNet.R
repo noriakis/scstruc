@@ -16,10 +16,10 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     if (is.null(show)) {show <- df[[label]] |> unique()}
 
     subset_graph <- df |> 
-    filter(.data[[label]] %in% show) |>    
-    filter(
-        from %in% candidate_node_id | to %in% candidate_node_id
-    )
+        filter(.data[[label]] %in% show) |>    
+        filter(
+            from %in% candidate_node_id | to %in% candidate_node_id
+        )
     if (dim(subset_graph)[1]==0) {stop("No edges present")}
     minc <- subset_graph$coefficient |> min(na.rm=TRUE)
     maxc <- subset_graph$coefficient |> max(na.rm=TRUE)
