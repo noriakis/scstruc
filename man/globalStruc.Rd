@@ -13,7 +13,8 @@ globalStruc(
   reg = FALSE,
   algorithm.args = list(),
   return_bn = FALSE,
-  return_data = FALSE
+  return_data = FALSE,
+  debug = FALSE
 )
 }
 \description{

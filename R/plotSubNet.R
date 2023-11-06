@@ -13,21 +13,23 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
         alllabels <- factor(myst$data[[4]]) |> levels()
         colvec <- cols$fill |> setNames(alllabels[cols$group])
     }
+    if (is.null(show)) {show <- df[[label]] |> unique()}
 
-    subset_graph <- df |> filter(
+    subset_graph <- df |> 
+    filter(.data[[label]] %in% show) |>    
+    filter(
         from %in% candidate_node_id | to %in% candidate_node_id
     )
     if (dim(subset_graph)[1]==0) {stop("No edges present")}
-    minc <- subset_graph$coefficient |> min()
-    maxc <- subset_graph$coefficient |> max()
+    minc <- subset_graph$coefficient |> min(na.rm=TRUE)
+    maxc <- subset_graph$coefficient |> max(na.rm=TRUE)
 
     plot_subset_g <- tbl_graph(edges=subset_graph)
 
     labels <- plot_subset_g |>
         activate(edges) |>
-        pull(group) |>
+        pull(label) |>
         unique()
-    if (!is.null(show)) {labels <- show}
     if (sort) {labels <- labels |> sort()}
     plot_list <- lapply(labels,
         function (x) {
@@ -38,7 +40,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             }
             plot_subset_g |>
             activate(edges) |>
-            filter(.data$group == x) |>
+            filter(.data[[label]] == x) |>
             activate(nodes) |>
             mutate(group = x) |>
             ggraph(layout=layout) +

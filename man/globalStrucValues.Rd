@@ -7,7 +7,7 @@
 globalStrucValues(
   spe,
   global_tbl_graph = NULL,
-  label,
+  labels,
   exclude_label = NA,
   summarize_func = mean,
   variation_func = sd,

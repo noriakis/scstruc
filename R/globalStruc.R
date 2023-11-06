@@ -1,6 +1,6 @@
 #' globalStruc
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
-	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE) {
+	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE) {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
     if ("barcode_id" %in% (meta |> colnames())) {
@@ -15,9 +15,10 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
 
     if (reg) {
 	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
-	              penalty="glmnet", nFolds=5, debug=TRUE)
+	              penalty="glmnet", nFolds=5, debug=debug)
     } else {
     	algorithm.args[["x"]] <- input
+    	algorithm.args[["debug"]] <- debug
         global_graph <- do.call(algorithm, algorithm.args)	
     }
     if (return_bn) {

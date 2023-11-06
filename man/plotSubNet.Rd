@@ -11,7 +11,9 @@ plotSubNet(
   with_hist = FALSE,
   spe = NULL,
   label = "label",
-  node_size = 3
+  node_size = 3,
+  show = NULL,
+  layout = "kk"
 )
 }
 \arguments{
