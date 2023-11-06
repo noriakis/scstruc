@@ -1,7 +1,7 @@
 #' obtainSubNetMatrix
 #' 
 #' @param df the results of `globalStrucValues` (specifying the bn object)
-obtainSubNetMatrix <- function(df, spe) {
+obtainSubNetMatrix <- function(df, spe, func="sum") {
 	
 	
 	logc <- spe@assays@data$logcounts
@@ -16,7 +16,7 @@ obtainSubNetMatrix <- function(df, spe) {
 	    if (is.vector(in_net)) {
 	    	return(in_net)
 	    } else {
-    	    return(apply(in_net, 2, sum))
+    	    return(apply(in_net, 2, func))
 	    }
 	}))
 	row.names(mat) <- paste0(all_nodes, "_net")

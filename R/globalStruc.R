@@ -3,14 +3,19 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
 	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE) {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
-    inc_cells <- meta[!meta[[label]] %in% exclude_label, ]$barcode_id
+    if ("barcode_id" %in% (meta |> colnames())) {
+        inc_cells <- meta[!meta[[label]] %in% exclude_label, ]$barcode_id
+    } else {
+        inc_cells <- meta[!meta[[label]] %in% exclude_label, ] |> row.names()
+    }
     input <- logc[candidate_genes,
               intersect(colnames(logc), inc_cells)] |>
     as.matrix() |> t() |>
     data.frame(check.names=FALSE)
+
     if (reg) {
 	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
-	              penalty="glmnet", nFolds=5, debug=F)
+	              penalty="glmnet", nFolds=5, debug=TRUE)
     } else {
     	algorithm.args[["x"]] <- input
         global_graph <- do.call(algorithm, algorithm.args)	

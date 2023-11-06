@@ -3,7 +3,8 @@
 #' @param candidate_node_id candidate node id to subset
 #' @export
 plotSubNet <- function(df, candidate_node_id, sort=FALSE,
-    with_hist=FALSE, spe=NULL, label="label", node_size=3) {
+    with_hist=FALSE, spe=NULL, label="label", node_size=3, show=NULL,
+    layout="kk") {
     if (with_hist) {
         if (is.null(spe)) {stop("Please provide SpatialExperiment object")}
         myst <- plotST(spe, label=label)
@@ -16,6 +17,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     subset_graph <- df |> filter(
         from %in% candidate_node_id | to %in% candidate_node_id
     )
+    if (dim(subset_graph)[1]==0) {stop("No edges present")}
     minc <- subset_graph$coefficient |> min()
     maxc <- subset_graph$coefficient |> max()
 
@@ -25,6 +27,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
         activate(edges) |>
         pull(group) |>
         unique()
+    if (!is.null(show)) {labels <- show}
     if (sort) {labels <- labels |> sort()}
     plot_list <- lapply(labels,
         function (x) {
@@ -38,7 +41,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             filter(.data$group == x) |>
             activate(nodes) |>
             mutate(group = x) |>
-            ggraph(layout="kk") +
+            ggraph(layout=layout) +
             geom_node_point(color=curcol, size=node_size) +
             geom_edge_link(
                 aes(color=coefficient, width=coefficient),
@@ -50,7 +53,8 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
             ggtitle(x)+ theme_graph()
         })
-    wrapped <- patchwork::wrap_plots(plot_list)
+    names(plot_list) <- labels
+    wrapped <- patchwork::wrap_plots(plot_list, guides="collect")
     if (with_hist) {
         patchwork::wrap_plots(wrapped, myst+theme_graph())
     } else {
