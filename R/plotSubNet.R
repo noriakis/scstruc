@@ -1,10 +1,18 @@
 #' plotSubNet
 #' @param df the results of `globalStrucValues`
 #' @param candidate_node_id candidate node id to subset
+#' @param cell_label if you need to plot per cell basis, specify cell label,
+#' along with cell column
+#' @param cell_column if you need to plot per cell basis, specify cell column,
+#' along with cell label
 #' @export
 plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     with_hist=FALSE, spe=NULL, label="label", node_size=3, show=NULL,
-    layout="kk") {
+    layout="kk", cell_label=NULL, cell_column=NULL) {
+    # Probably better to split to sce and spatial experiment
+    flag <- is.null(cell_label)+is.null(cell_column)
+    if (flag==1) {stop("Please specify both of cell_label and cell_column")}
+
     if (with_hist) {
         if (is.null(spe)) {stop("Please provide SpatialExperiment object")}
         myst <- plotST(spe, label=label)
@@ -14,9 +22,16 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
         colvec <- cols$fill |> setNames(alllabels[cols$group])
     }
     if (is.null(show)) {show <- df[[label]] |> unique()}
-
     subset_graph <- df |> 
-        filter(.data[[label]] %in% show) |>    
+        filter(.data[[label]] %in% show)
+
+    if (!is.null(cell_label)) {
+        qqcat("Subsetting to @{cell_label}\n")
+        subset_graph <- subset_graph |> 
+            filter(.data[[cell_column]] %in% cell_label)
+    }
+
+    subset_graph <- subset_graph |>  
         filter(
             from %in% candidate_node_id | to %in% candidate_node_id
         )
@@ -28,9 +43,10 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
 
     labels <- plot_subset_g |>
         activate(edges) |>
-        pull(label) |>
+        pull(!!enquo(label)) |>
         unique()
     if (sort) {labels <- labels |> sort()}
+
     plot_list <- lapply(labels,
         function (x) {
             if (with_hist) {
@@ -38,14 +54,14 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             } else {
                 curcol <- "black"
             }
-            plot_subset_g |>
+            returnplot <- plot_subset_g |>
             activate(edges) |>
-            filter(.data[[label]] == x) |>
+            filter(.data[[label]] == !!enquo(x)) |>
             activate(nodes) |>
             mutate(group = x) |>
             ggraph(layout=layout) +
             geom_node_point(color=curcol, size=node_size) +
-            geom_edge_link(
+            geom_edge_parallel(
                 aes(color=coefficient, width=coefficient),
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
@@ -53,7 +69,11 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             scale_edge_color_gradient2(low="blue", high="red", limits=c(minc, maxc))+
             scale_edge_width(range=c(0.5, 1.5), limits=c(minc, maxc))+
             geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
-            ggtitle(x)+ theme_graph()
+            ggtitle(paste0(x))+ theme_graph()
+            if (!is.null(cell_label)) {
+                returnplot <- returnplot + labs(subtitle=paste0("(", cell_label,")"))
+            }
+            returnplot
         })
     names(plot_list) <- labels
     wrapped <- patchwork::wrap_plots(plot_list, guides="collect")

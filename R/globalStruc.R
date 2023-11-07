@@ -1,6 +1,8 @@
 #' globalStruc
+#' @param cluster_labels (experimental) aggregate to speed up computation
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
-	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE) {
+	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE,
+    cluster_label=NULL) {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
     if ("barcode_id" %in% (meta |> colnames())) {
@@ -8,10 +10,18 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
     } else {
         inc_cells <- meta[!meta[[label]] %in% exclude_label, ] |> row.names()
     }
-    input <- logc[candidate_genes,
-              intersect(colnames(logc), inc_cells)] |>
-    as.matrix() |> t() |>
-    data.frame(check.names=FALSE)
+    
+    if (!is.null(cluster_label)) {
+        agg <- aggregateAcrossCells(spe, cluster_label, use.assay.type="logcounts")
+        input <- agg@assays@data$logcounts[candidate_genes, ] |>
+        as.matrix() |> t() |> 
+        data.frame(check.names=FALSE)
+    } else {
+        input <- logc[candidate_genes,
+                  intersect(colnames(logc), inc_cells)] |>
+        as.matrix() |> t() |>
+        data.frame(check.names=FALSE)        
+    }
 
     if (reg) {
 	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
