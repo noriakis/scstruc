@@ -1,8 +1,9 @@
 #' globalStruc
+#' @param algorithm inference algorithm of BN, ignored if reg=TRUE
 #' @param cluster_labels (experimental) aggregate to speed up computation
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
 	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE,
-    cluster_label=NULL) {
+    cluster_label=NULL, penalty="glmnet") {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
     if ("barcode_id" %in% (meta |> colnames())) {
@@ -24,8 +25,9 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
     }
 
     if (reg) {
+    	cat(penalty, " selected")
 	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
-	              penalty="glmnet", nFolds=5, debug=debug)
+	              penalty=penalty, nFolds=5, debug=debug)
     } else {
     	algorithm.args[["x"]] <- input
     	algorithm.args[["debug"]] <- debug
