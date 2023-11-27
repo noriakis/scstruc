@@ -1,4 +1,4 @@
-## stfuncs
+## scstruc
 
-Useful functions for analysing spatial transcriptomics data.
-Work with `SpatialExperiment` and `SpatialFeatureExperiment`.
+Functions for analysing the structure of single-cell transcriptomics data.
+Work with `SpatialExperiment` and `SingleCellExperiment`.
