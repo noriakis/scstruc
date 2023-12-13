@@ -14,8 +14,16 @@ markerCoefs <- function(coef_mat, spe, classif_label="group",
     row.names(mydata) <- mydata$edge_name
     mydata$edge_name <- NULL
     mydata <- mydata |> t() |> data.frame(check.names=FALSE)
-    library(Boruta)
-    brt <- Boruta(classif_label ~ ., data=mydata)
+
+    group_dic <- coef_mat[,c(sample_column, classif_label)]
+    group_dic <- group_dic[!duplicated(group_dic),]
+
+    group_dic <- group_dic[[classif_label]] |> setNames(group_dic[[sample_column]])
+
+
+    mydata[["classif_label"]] <- group_dic[row.names(mydata)] |> factor()
+    print(mydata)
+    brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
     if (tentative_fix) {
         brt_fixed <- TentativeRoughFix(brt)
     } else {
