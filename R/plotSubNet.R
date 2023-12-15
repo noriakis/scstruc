@@ -8,7 +8,7 @@
 #' @export
 plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     with_hist=FALSE, spe=NULL, label="label", node_size=3, show=NULL,
-    layout="kk", cell_label=NULL, cell_column=NULL) {
+    layout="kk", cell_label=NULL, cell_column=NULL, highlight_edge=NULL) {
     # Probably better to split to sce and spatial experiment
     flag <- is.null(cell_label)+is.null(cell_column)
     if (flag==1) {stop("Please specify both of cell_label and cell_column")}
@@ -38,6 +38,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     if (dim(subset_graph)[1]==0) {stop("No edges present")}
     minc <- subset_graph$coefficient |> min(na.rm=TRUE)
     maxc <- subset_graph$coefficient |> max(na.rm=TRUE)
+    subset_graph$edge_name <- paste0(subset_graph$from,"->",subset_graph$to)
 
     plot_subset_g <- tbl_graph(edges=subset_graph)
 
@@ -66,6 +67,15 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed"))+
+            ggfx::with_outer_glow(
+            geom_edge_parallel(
+                aes(color=coefficient, width=coefficient,
+                filter=edge_name %in% highlight_edge),
+                end_cap=circle(2,"mm"),
+                start_cap=circle(2,"mm"),
+                arrow=arrow(length=unit(1.5,"mm"), type="closed")),
+                colour="gold", sigma=5
+            )+
             scale_edge_color_gradient2(low="blue", high="red", limits=c(minc, maxc))+
             scale_edge_width(range=c(0.5, 1.5), limits=c(minc, maxc))+
             geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
