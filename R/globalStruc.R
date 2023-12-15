@@ -25,7 +25,7 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
     }
 
     if (reg) {
-    	cat(penalty, " selected")
+    	cat(penalty, " selected\n")
 	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
 	              penalty=penalty, nFolds=5, debug=debug)
     } else {
