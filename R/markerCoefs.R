@@ -1,6 +1,6 @@
 markerCoefs <- function(coef_mat, spe, classif_label="group",
 	cell_label=NULL, cell_column="label", sample_column="Sample.Name",
-    tentative_fix=TRUE) {
+    tentative_fix=TRUE, return_mat=FALSE) {
 	if (is.null(cell_label)) {
 		cell_label <- coef_mat[[cell_column]] |> unique()
 	}
@@ -22,7 +22,10 @@ markerCoefs <- function(coef_mat, spe, classif_label="group",
 
 
     mydata[["classif_label"]] <- group_dic[row.names(mydata)] |> factor()
-    print(mydata)
+
+    if (return_mat) {
+        return(mydata)
+    }
     brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
     if (tentative_fix) {
         brt_fixed <- TentativeRoughFix(brt)
