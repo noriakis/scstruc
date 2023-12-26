@@ -7,6 +7,10 @@ shdmat <- function(netlist) {
 }
 
 
+#' convert_to_tbl_graph
+#' convert bn object to tbl_graph object
+#' @param bn bn object
+#' @return tbl_graph
 #' @export
 convert_to_tbl_graph <- function(bn) {
     bn |> 
@@ -14,9 +18,17 @@ convert_to_tbl_graph <- function(bn) {
     tidygraph::as_tbl_graph()
 }
 
-
+#' 
+#' bn_fit_to_igraph
+#' 
+#' This function coverts the bn.fit object to igraph object.
+#' The nodes with no parents or nodes will not be included in the resulting igraph.
+#' The coefficient value is stored in `coef` attribute of resulting graph.
+#' 
+#' @param graph bn.fit object
+#' 
 #' @export
-bn.fit_to_igraph <- function(graph) {
+bn_fit_to_igraph <- function(graph) {
 	igraph::graph_from_data_frame(do.call(rbind, lapply(names(graph), function(i) {
 	    tmp <- graph[[i]]
 	    if (length(tmp$coefficients)>1) {
