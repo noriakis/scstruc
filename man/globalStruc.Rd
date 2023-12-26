@@ -14,8 +14,15 @@ globalStruc(
   algorithm.args = list(),
   return_bn = FALSE,
   return_data = FALSE,
-  debug = FALSE
+  debug = FALSE,
+  cluster_label = NULL,
+  penalty = "glmnet"
 )
+}
+\arguments{
+\item{algorithm}{inference algorithm of BN, ignored if reg=TRUE}
+
+\item{cluster_labels}{(experimental) aggregate to speed up computation}
 }
 \description{
 globalStruc

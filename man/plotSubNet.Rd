@@ -13,13 +13,22 @@ plotSubNet(
   label = "label",
   node_size = 3,
   show = NULL,
-  layout = "kk"
+  layout = "kk",
+  cell_label = NULL,
+  cell_column = NULL,
+  highlight_edge = NULL
 )
 }
 \arguments{
 \item{df}{the results of `globalStrucValues`}
 
 \item{candidate_node_id}{candidate node id to subset}
+
+\item{cell_label}{if you need to plot per cell basis, specify cell label,
+along with cell column}
+
+\item{cell_column}{if you need to plot per cell basis, specify cell column,
+along with cell label}
 }
 \description{
 plotSubNet
