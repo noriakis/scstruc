@@ -2,6 +2,7 @@
 
 export(bn_fit_to_igraph)
 export(convert_to_tbl_graph)
+export(plasso.fit)
 export(plotST)
 export(plotSTNet)
 export(plotSTWithNum)
