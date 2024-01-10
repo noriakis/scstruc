@@ -1,3 +1,7 @@
+#' @useDynLib scstruc, .registration=TRUE
+#' @importFrom Rcpp sourceCpp
+NULL
+
 #' plasso.fit
 #' 
 #' @description reimplementation of PrecisionLasso.
