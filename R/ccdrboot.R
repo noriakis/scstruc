@@ -1,6 +1,8 @@
 #' ccdr.boot
 #' 
-#' Bootstrap-based arc strength calculation based on CCDr algorithm
+#' Bootstrap-based arc strength calculation based on CCDr algorithm.
+#' The function uses ccdrAlgorithm::ccdr.run for the sampled data, and returns the 
+#' bootstrap strength for the arcs per lambda.
 #' 
 #' @param data
 #' @param lambda.length passed to generate.lambdas
