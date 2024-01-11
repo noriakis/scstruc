@@ -2,17 +2,44 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' plasso.fit
+#' @export
+plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
+	eps=1e-6, maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2) {
+	## Generate lambdas using sparsebnUtils
+    if (!is.matrix(X)) {stop("X must be matrix")}
+	rlam <- 1e-2
+	nn <- nrow(X)
+	lambdas <- sparsebnUtils::generate.lambdas(lambda.max = sqrt(nn),
+       lambdas.ratio = rlam,
+       lambdas.length = as.integer(lambdas.length),
+       scale = "log")
+	all_res <- lapply(lambdas, function(l) {
+		fit <- plasso_fit(X, y,
+			maxIter=maxIter, lambda=l, gamma=gamma, eps=eps)
+		tmp_coef <- fit[1:(length(fit)-1)]
+		pred <- plasso.predict(X, fit)
+		## Remove intercept
+		list("coef"=tmp_coef,
+			"suppsize"=length(which(tmp_coef!=0)),
+			"pred"=pred)
+	})
+	names(all_res) <- as.character(lambdas)
+	return(all_res)
+}
+
+
+#' plasso.fit.single
 #' 
 #' @description reimplementation of PrecisionLasso.
 #' Currently, only the continuous response is supported.
 #' Automatic determination of gamma will be supported.
+#' RcppArmadillo version is faster (plasso_fit).
 #'  
 #' @param X matrix
 #' @param y response vector
 #' @export
 #' 
-plasso.fit <- function(X, y, lambda=1, eps=1e-6, P=NULL,
+plasso.fit.single <- function(X, y, lambda=1, eps=1e-6, P=NULL,
     maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2) {
     if (!is.matrix(X)) {stop("X must be matrix")}
     X0 <- cbind(rep(1, length(y)))
@@ -70,4 +97,11 @@ plasso.fit <- function(X, y, lambda=1, eps=1e-6, P=NULL,
     w[is.na(w)] <- 0
     w[abs(w) < mu] <- 0
     return(w)
+}
+
+#' @export
+plasso.predict <- function(X, w) {
+    X0 = rep(1, nrow(X))
+    X = cbind(X, X0)
+    X %*% w
 }
