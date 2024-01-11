@@ -47,7 +47,7 @@ plasso.fit <- function(X, y, lambda=1, eps=1e-6, P=NULL,
 
         s1 <- sqrt(s1)
         s2 <- sqrt(s2)
-        
+                
         U1 <- t(P) %*% U1
         D1 <- apply(U1 * U1 * t(replicate(dim(U1)[1], 1/s1)), 1, sum)
         maxi <- max(D1)
