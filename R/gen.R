@@ -11,6 +11,6 @@ gen <- function(n, data, method="melancon", params=list()) {
     params[["nodes"]] <- nodename
     
     rdbn <- do.call(bnlearn::random.graph, params)
-    fitted <- bn.fit(rdbn, data[, nodename])
+    fitted <- bnlearn::bn.fit(rdbn, data[, nodename])
     return(list("net"=rdbn, "fitted"=fitted))
 }

@@ -1,6 +1,9 @@
 #' globalStruc
 #' @param algorithm inference algorithm of BN, ignored if reg=TRUE
 #' @param cluster_labels (experimental) aggregate to speed up computation
+#' @param penalty if {reg}=TRUE, the penalty used can be specified, default to {glmnet} (lasso).
+#' If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
+#' If you use CCDr algorithm, the {bn} object is returned.
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
 	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE,
     cluster_label=NULL, penalty="glmnet") {
@@ -26,8 +29,17 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
 
     if (reg) {
     	cat(penalty, " selected\n")
-	    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
-	              penalty=penalty, nFolds=5, debug=debug)
+    	if (penalty=="ccdr") {
+	        dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
+    		algorithm.args[["data"]] <- dat
+    		return(do.call(ccdrAlgorithm::ccdr.run, algorithm.args))
+    	} else if (penalty=="ccdr.boot") {
+    		algorithm.args[["data"]] <- input
+    		return(do.call(scstruc::ccdr.boot, algorithm.args))    		
+    	} else {
+		    global_graph <- bnlearnReg::rsmax2(input, restrict="mmpc", maximize="hc",
+		              penalty=penalty, nFolds=5, debug=debug)    		
+    	}
     } else {
     	algorithm.args[["x"]] <- input
     	algorithm.args[["debug"]] <- debug
