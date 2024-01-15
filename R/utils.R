@@ -41,3 +41,16 @@ bn_fit_to_igraph <- function(graph) {
 	})))
 }
 
+
+#' getCyclinGenes
+#' @export
+getCyclinGenes <- function(sce, id="Symbol", title=FALSE) {
+	if (title) {
+		cyclin.genes <- grep("^Ccn[abde]+", rowData(sce)[["Symbol"]])
+	} else {
+	    cyclin.genes <- grep("^CCN[ABDE]+", rowData(sce)[["Symbol"]])
+	}
+
+    cyclin.genes <- rownames(sce)[cyclin.genes]
+    return(cyclin.genes)
+}
