@@ -3,7 +3,8 @@
 #' @param label_name if all=FALSE, must be specified
 #' @export
 perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FALSE, penalty="glmnet",
-    use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, cluster_label=NULL, algorithm.args=list()) {
+    use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list()) {
+    cluster_label <- NULL
     if (all) {
         nets <- lapply(unique(colData(spe)[[label]]), function(x) {
             input <- .getInput(spe, candidate_genes, label, x, use_assay, cluster_label, verbose)
