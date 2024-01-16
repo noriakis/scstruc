@@ -3,12 +3,13 @@
 #' @param label_name if all=FALSE, must be specified
 #' @export
 perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FALSE, penalty="glmnet",
-    use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list()) {
-    cluster_label <- NULL
+    use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list(), barcode_column="Barcode",
+    change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL) {
     if (all) {
         alll <- unique(colData(spe)[[label]])
         nets <- lapply(alll, function(x) {
-            input <- .getInput(spe, candidate_genes, label, x, use_assay, cluster_label, verbose)
+            cat(x, "\n")
+            input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose, change_symbol, symbol_column)
             net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
             return(net)
         })
@@ -16,33 +17,42 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FAL
         return(nets)        
     } else {
         if (is.null(label_name)) {stop("Please specify label name")}
-        input <- .getInput(spe, candidate_genes, label, label_name, use_assay, cluster_label, verbose)
+        input <- .getInput(spe, candidate_genes, label, label_name, use_assay, barcode_column, cluster_label, verbose,
+            change_symbol, symbol_column)
         net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
         return(net)
     }
 }
 
 #' @noRd
-.getInput <- function(sce, candidate_genes, label, x, use_assay, cluster_label=NULL, verbose=FALSE) {
+.getInput <- function(sce, candidate_genes, label, x, use_assay, barcode_column="Barcode", cluster_label=NULL, verbose=FALSE,
+    change_symbol=TRUE, symbol_column="Symbol") {
     logc <- sce@assays@data[[use_assay]]
+    if (change_symbol) {
+        row.names(logc) <- rowData(sce)[[symbol_column]]
+    }
     meta <- colData(sce) |> data.frame()
+    if (barcode_column=="row") {
+        meta[["Barcode"]] <- row.names(meta)
+        barcode_column <- "Barcode"
+    }
+    if (is.null(colnames(logc))) {
+        colnames(logc) <- meta[[barcode_column]]
+    }
     if (is.null(x)) {
-        inc_cells <- colnames(sce)
+        inc_cells <- meta[[barcode_column]]
     } else {
-        if ("barcode_id" %in% (meta |> colnames())) {
-            inc_cells <- meta[meta[[label]] == x, ]$barcode_id
-        } else {
-            inc_cells <- meta[meta[[label]] == x, ] |> row.names()
-        }
+        inc_cells <- meta[meta[[label]] == x, ][[barcode_column]]
     }
     if (!is.null(cluster_label)) {
-        ## Ignoring `x`
+        ## First subset to inc_cell, and subsequently aggregate based on `cluster_label`.
+        sce <- sce[, inc_cells %in% colData(sce)[[barcode_column]]]
         agg <- aggregateAcrossCells(sce, colData(sce)[[cluster_label]], use.assay.type=use_assay)
-        input <- agg@assays@data[[use_assay]][candidate_genes, ] |>
+        input <- agg@assays@data[[use_assay]][intersect(row.names(agg), candidate_genes), ] |>
         as.matrix() |> t() |> 
         data.frame(check.names=FALSE)
     } else {
-        input <- logc[candidate_genes,
+        input <- logc[intersect(row.names(logc), candidate_genes),
                   intersect(colnames(logc), inc_cells)] |>
         as.matrix() |> t() |>
         data.frame(check.names=FALSE)        

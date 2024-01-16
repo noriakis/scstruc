@@ -4,15 +4,16 @@
 #' 
 #' @export
 #' 
-perLabelStrucValues <- function(strucs) {
+perLabelStrucValues <- function(strucs, remove_zero=TRUE) {
     booted_sub <- lapply(names(strucs), function(b) {
         str <- strucs[[b]] %>% data.frame()
         str[["coefficient"]] <- str[["strength"]]
         str <- str[,c("from","to","coefficient")]
         str[["label"]] <- b
+        str <- str[str[["coefficient"]]>0, ]
         str
     })
-    names(booted_sub) <- names(booted)
+    names(booted_sub) <- names(strucs)
     merge_str <- do.call(rbind, booted_sub)
     row.names(merge_str) <- 1:nrow(merge_str)
     return(merge_str)

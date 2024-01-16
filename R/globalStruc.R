@@ -8,10 +8,12 @@
 #' @export
 globalStruc <- function(spe, candidate_genes, label, algorithm="mmhc",
 	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE,
-    cluster_label=NULL, penalty="glmnet",verbose=FALSE, use_assay="logcounts") {
+    cluster_label=NULL, penalty="glmnet",verbose=FALSE, use_assay="logcounts",
+    barcode_column="Barcode",change_symbol=TRUE, symbol_column="Symbol") {
     ## .getInput for global label
     x <- NULL
-    input <- .getInput(spe, candidate_genes, label, x, use_assay, cluster_label, verbose)
+    input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
+        change_symbol, symbol_column)
     global_graph <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
 
     if (penalty %in% c("ccdr.run","ccdr.boot")) {

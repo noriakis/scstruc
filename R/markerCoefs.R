@@ -1,4 +1,4 @@
-markerCoefs <- function(coef_mat, spe, classif_label="group",
+markerCoefs <- function(coef_mat, classif_label="group",
 	cell_label=NULL, cell_column="label", sample_column="Sample.Name",
     tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE) {
 	if (is.null(cell_label)) {
@@ -25,6 +25,8 @@ markerCoefs <- function(coef_mat, spe, classif_label="group",
     if (return_mat) {
         return(mydata)
     }
+
+    mydata[is.na(mydata)] <- 0
     brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
     if (tentative_fix) {
         brt_fixed <- TentativeRoughFix(brt)
