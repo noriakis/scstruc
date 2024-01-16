@@ -8,19 +8,25 @@ globalStruc(
   spe,
   candidate_genes,
   label,
-  exclude_label = NA,
   algorithm = "mmhc",
   reg = FALSE,
   algorithm.args = list(),
   return_bn = FALSE,
   return_data = FALSE,
-  debug = FALSE,
   cluster_label = NULL,
-  penalty = "glmnet"
+  penalty = "glmnet",
+  verbose = FALSE,
+  use_assay = "logcounts"
 )
 }
 \arguments{
 \item{algorithm}{inference algorithm of BN, ignored if reg=TRUE}
+
+\item{penalty}{if {reg}=TRUE, the penalty used can be specified, default to {glmnet} (lasso).
+If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
+If you use CCDr algorithm, the {bn} object is returned.}
+
+\item{use_assay}{use assay}
 
 \item{cluster_labels}{(experimental) aggregate to speed up computation}
 }

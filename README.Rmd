@@ -1,24 +1,40 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  fig.dev = "grDevices::png",
+  dpi = 300L,
+  dev.args = list(),
+  fig.ext = "png",
+  fig.height=8,
+  fig.width=12,
+  fig.retina = 2L,
+  fig.align = "center"
+)
+```
+
 # scstruc
 
-The package for analysing the gene regulatory network based on the
-structure of single-cell transcriptomics data, inferred by Bayesian
-network. The function works with `SingleCellExperiment` and
-`SpatialExperiment`.
+The package for analysing the gene regulatory network based on the structure of single-cell transcriptomics data, inferred by Bayesian network. The function works with `SingleCellExperiment` and `SpatialExperiment`.
 
 ## Installation
 
 Using `devtools`:
 
-``` r
+```{r, eval=FALSE}
 devtools::install_github("noriakis/scstruc")
 ```
 
 ## Examples
 
-``` r
+```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
 library(scran)
 library(scstruc)
 library(bnlearn)
@@ -34,5 +50,3 @@ ggraph(bn_fit_to_igraph(fitted), layout="fr") +
   geom_node_point()+
   theme_graph()
 ```
-
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="2400" style="display: block; margin: auto;" />
