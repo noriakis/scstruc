@@ -6,7 +6,7 @@
 #' If you use CCDr algorithm, the {bn} object is returned.
 globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm="mmhc",
 	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE, debug=FALSE,
-    cluster_label=NULL, penalty="glmnet") {
+    cluster_label=NULL, penalty="glmnet",verbose=FALSE) {
 	logc <- spe@assays@data$logcounts
 	meta <- colData(spe) |> data.frame()
     if ("barcode_id" %in% (meta |> colnames())) {
@@ -27,13 +27,21 @@ globalStruc <- function(spe, candidate_genes, label, exclude_label=NA, algorithm
         data.frame(check.names=FALSE)        
     }
 
+    if (verbose) {
+    	cat("Dimension of the input for structure learning: n", dim(input)[1], "p", dim(input)[2], "\n")
+    }
+
     if (reg) {
-    	cat(penalty, " selected\n")
+    	if (verbose) {
+	    	cat("Penalty: ", penalty, " selected\n")		
+    	}
     	if (penalty=="ccdr") {
+    		cat("Returning the result of ccdr.run\n")
 	        dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
     		algorithm.args[["data"]] <- dat
     		return(do.call(ccdrAlgorithm::ccdr.run, algorithm.args))
     	} else if (penalty=="ccdr.boot") {
+    		cat("Returning the list of bn.strength\n")
     		algorithm.args[["data"]] <- input
     		return(do.call(scstruc::ccdr.boot, algorithm.args))    		
     	} else {
