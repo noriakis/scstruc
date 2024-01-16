@@ -6,11 +6,13 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FAL
     use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list()) {
     cluster_label <- NULL
     if (all) {
-        nets <- lapply(unique(colData(spe)[[label]]), function(x) {
+        alll <- unique(colData(spe)[[label]])
+        nets <- lapply(alll, function(x) {
             input <- .getInput(spe, candidate_genes, label, x, use_assay, cluster_label, verbose)
             net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
             return(net)
         })
+        names(nets) <- alll
         return(nets)        
     } else {
         if (is.null(label_name)) {stop("Please specify label name")}

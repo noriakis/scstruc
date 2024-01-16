@@ -1,5 +1,25 @@
 #' perLabelStrucValues
-perLabelStrucValues <- function(spe, per_struc, label) {
+#' 
+#' @param strucs named list of bn.strength
+#' 
+#' @export
+#' 
+perLabelStrucValues <- function(strucs) {
+    booted_sub <- lapply(names(strucs), function(b) {
+        str <- strucs[[b]] %>% data.frame()
+        str[["coefficient"]] <- str[["strength"]]
+        str <- str[,c("from","to","coefficient")]
+        str[["label"]] <- b
+        str
+    })
+    names(booted_sub) <- names(booted)
+    merge_str <- do.call(rbind, booted_sub)
+    row.names(merge_str) <- 1:nrow(merge_str)
+    return(merge_str)
+}
+
+#' @noRd
+DEPRECATED_perLabelStrucValues <- function(strucs) {
 	logc <- spe@assays@data$logcounts
 	alllabels <- unique(colData(spe)[[label]])
     meta <- colData(spe) |> data.frame()
