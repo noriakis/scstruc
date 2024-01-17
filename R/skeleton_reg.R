@@ -30,7 +30,7 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
     nFolds=5, verbose=FALSE) {
     if (verbose) {
         cat("Penalty:", penalty, "\n")
-        cat("Input for structure learning: n", dim(data)[1], "p", dim(data[2]), "\n")
+        cat("Input for structure learning: n", dim(data)[1], "p", dim(data)[2], "\n")
     }
     nodes <- colnames(data)
     penFun <- dplyr::case_when(
@@ -44,7 +44,7 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
         penalty=="L0_CV" ~ ".L0CV"
     )
     mb <- sapply(nodes, function(nn) {
-        if (verbose) {cat(nn)}
+        if (verbose) {cat(" ", nn)}
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
         included_var_index <- do.call(penFun, list("X"=X, "y"=y,
