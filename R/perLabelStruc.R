@@ -1,4 +1,10 @@
-
+#' perLabelStruc
+#' 
+#' Infer the BN per label (like using only the Epithelial cells or one sample)
+#' The input is SingleCellExperiment or SpatialExperiment object and candidate genes to be included in the inference,
+#' and label column in colData.
+#' 
+#' @param spe SingleCellExperiment or SpatialExperiment
 #' @param all infer all the network of the corresponding label
 #' @param label_name if all=FALSE, must be specified
 #' @export

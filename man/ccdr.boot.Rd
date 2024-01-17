@@ -14,14 +14,22 @@ ccdr.boot(
 )
 }
 \arguments{
+\item{data}{data (row: sample, column: gene)}
+
+\item{R}{replicate number}
+
 \item{alpha}{passed to ccdr.run}
 
 \item{gamma}{passed to ccdr.run}
 
 \item{lambda.length}{passed to generate.lambdas}
 }
+\value{
+list of the bn.strength per lambda
+}
 \description{
 Bootstrap-based arc strength calculation based on CCDr algorithm.
 The function uses ccdrAlgorithm::ccdr.run for the sampled data, and returns the 
-bootstrap strength for the arcs per lambda.
+bootstrap strength for the arcs per lambda. The same lambdas are used for all the inference.
+The networks with the same lambda are used to compute bootstapped network.
 }

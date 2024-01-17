@@ -6,7 +6,8 @@ Description: Functions for capturing single-cell transcriptomic structure
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), ggplot2, ggraph, igraph, tidygraph, SpatialExperiment, SingleCellExperiment, RcppArmadillo, Rcpp
+    R (>= 4.3.0), bnlearn, ggplot2, ggraph, igraph, tidygraph,
+    SpatialExperiment, SingleCellExperiment, RcppArmadillo, Rcpp
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr

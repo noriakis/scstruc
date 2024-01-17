@@ -17,8 +17,6 @@ skeleton.reg.boot <- function(data, penalty="glmnet_CV", R=100,  m=nrow(data), a
 }
 
 
-
-
 #' skeleton.reg
 #' 
 #' Two-stage approach for regularization-based structure learning.

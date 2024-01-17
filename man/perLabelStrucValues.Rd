@@ -4,7 +4,10 @@
 \alias{perLabelStrucValues}
 \title{perLabelStrucValues}
 \usage{
-perLabelStrucValues(spe, per_struc, label)
+perLabelStrucValues(strucs, remove_zero = TRUE)
+}
+\arguments{
+\item{strucs}{named list of bn.strength}
 }
 \description{
 perLabelStrucValues

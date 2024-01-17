@@ -2,13 +2,17 @@
 #' 
 #' Bootstrap-based arc strength calculation based on CCDr algorithm.
 #' The function uses ccdrAlgorithm::ccdr.run for the sampled data, and returns the 
-#' bootstrap strength for the arcs per lambda.
+#' bootstrap strength for the arcs per lambda. The same lambdas are used for all the inference.
+#' The networks with the same lambda are used to compute bootstapped network.
 #' 
-#' @param data
+#' @param data data (row: sample, column: gene)
+#' @param R replicate number
 #' @param lambda.length passed to generate.lambdas
 #' @param alpha passed to ccdr.run
 #' @param gamma passed to ccdr.run
 #' @export
+#' @return list of the bn.strength per lambda
+#' 
 ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gamma=2) {
     nodes = names(data)
     ## Use same lambda for all replicate (probably not needed)

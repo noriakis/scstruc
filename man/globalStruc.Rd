@@ -16,7 +16,10 @@ globalStruc(
   cluster_label = NULL,
   penalty = "glmnet",
   verbose = FALSE,
-  use_assay = "logcounts"
+  use_assay = "logcounts",
+  barcode_column = "Barcode",
+  change_symbol = TRUE,
+  symbol_column = "Symbol"
 )
 }
 \arguments{
