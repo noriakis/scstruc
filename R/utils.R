@@ -1,4 +1,22 @@
 
+#' sel.genes.kegg.ora
+#' select genes based on KEGG over-representation analysis
+#' @export
+sel.genes.kegg.ora <- function(genes, orgDb=org.Hs.eg.db, keyType="ENSEMBL", sel=NULL, organism="hsa") {
+  input <- AnnotationDbi::mapIds(orgDb, genes, column="ENTREZID", keytype=keyType, multiVals="first") %>%
+    as.character()
+  input <- input[!is.na(input)]
+  ora <- clusterProfiler::enrichKEGG(input, organism=organism)
+  if (!is.null(sel)) {
+    cat(ora@result[sel, ]$Description, "\n")
+    ora <- ora@result[sel, ]$geneID %>% strsplit("/") %>% unlist()
+    ora <- AnnotationDbi::mapIds(orgDb, ora, column=keyType, keytype="ENTREZID",
+                                 multiVals="first") %>% as.character()
+  }
+  return(ora)
+}
+
+
 #' shdmat
 #' 
 #' @export
