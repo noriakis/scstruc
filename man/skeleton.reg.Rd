@@ -10,8 +10,12 @@ skeleton.reg(
   whitelist = NULL,
   blacklist = NULL,
   nFolds = 5,
-  verbose = FALSE
+  verbose = FALSE,
+  s = "lambda.min"
 )
+}
+\arguments{
+\item{s}{effective only in glmnet, lambda.min or lambda.1se}
 }
 \description{
 Two-stage approach for regularization-based structure learning.
