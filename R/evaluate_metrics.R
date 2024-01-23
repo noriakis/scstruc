@@ -37,7 +37,7 @@ evaluate_metrics <- function(fitted, N, pens=c("glmnet_CV"),
                      lambdas.length=20)
     e <- Sys.time()
     for (i in ccdr) {
-      alls[[paste0("ccdr_",i$lambda)]] <- list(sparsebnUtils::to_bn(i)$edges,
+      alls[[paste0("ccdr_",round(i$lambda,3))]] <- list(sparsebnUtils::to_bn(i)$edges,
                                                as.numeric(e-s, unit="secs"))
     }  
   } 
