@@ -87,11 +87,11 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FAL
             algorithm.args[["data"]] <- input
             return(do.call(scstruc::ccdr.boot, algorithm.args))         
         } else {
-            algorithm.args[["x"]] <- input
-            algorithm.args[["restrict"]] <- "mmpc"
-            algorithm.args[["maximize"]] <- "hc"
+            algorithm.args[["data"]] <- input
+            # algorithm.args[["restrict"]] <- "mmpc"
+            # algorithm.args[["maximize"]] <- "hc"
             algorithm.args[["penalty"]] <- penalty
-            net <- do.call(bnlearnReg::rsmax2, algorithm.args)
+            net <- do.call(skeleton.reg, algorithm.args)
             return(net)
         }
     } else {

@@ -7,9 +7,9 @@
 #' @param use_assay use assay
 #' @export
 globalStruc <- function(spe, candidate_genes, label, algorithm="mmhc",
-	reg=FALSE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE,
+	reg=TRUE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE,
     cluster_label=NULL, penalty="glmnet",verbose=FALSE, use_assay="logcounts",
-    barcode_column="Barcode",change_symbol=TRUE, symbol_column="Symbol") {
+    barcode_column="row", change_symbol=TRUE, symbol_column="Symbol") {
     ## .getInput for global label
     x <- NULL
     input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
@@ -17,7 +17,11 @@ globalStruc <- function(spe, candidate_genes, label, algorithm="mmhc",
     global_graph <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
 
     if (penalty %in% c("ccdr.run","ccdr.boot")) {
-        return(global_graph)
+        if (return_data) {
+            return(list(global_graph, input))
+        } else {
+            return(global_graph)
+        }
     }
     if (return_bn) {
         if (return_data) {
