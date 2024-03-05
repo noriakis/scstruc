@@ -9,7 +9,7 @@ globalStruc(
   candidate_genes,
   label,
   algorithm = "mmhc",
-  reg = FALSE,
+  reg = TRUE,
   algorithm.args = list(),
   return_bn = FALSE,
   return_data = FALSE,
@@ -17,7 +17,7 @@ globalStruc(
   penalty = "glmnet",
   verbose = FALSE,
   use_assay = "logcounts",
-  barcode_column = "Barcode",
+  barcode_column = "row",
   change_symbol = TRUE,
   symbol_column = "Symbol"
 )
