@@ -4,7 +4,14 @@
 \alias{plotAVN}
 \title{plotAVN}
 \usage{
-plotAVN(avn, str, edge = geom_edge_diagonal, ew = strength, lyt = "fr")
+plotAVN(
+  avn,
+  str,
+  edge = geom_edge_diagonal,
+  ew = strength,
+  lyt = "fr",
+  size_degree = TRUE
+)
 }
 \arguments{
 \item{ew}{edge width, strength or direction}

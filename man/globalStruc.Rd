@@ -19,7 +19,8 @@ globalStruc(
   use_assay = "logcounts",
   barcode_column = "row",
   change_symbol = TRUE,
-  symbol_column = "Symbol"
+  symbol_column = "Symbol",
+  input = NULL
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
 If you use CCDr algorithm, the {bn} object is returned.}
 
 \item{use_assay}{use assay}
+
+\item{input}{default to NULL}
 
 \item{cluster_labels}{(experimental) aggregate to speed up computation}
 }
