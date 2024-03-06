@@ -8,7 +8,7 @@
 #' @param all infer all the network of the corresponding label
 #' @param label_name if all=FALSE, must be specified
 #' @export
-perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FALSE, penalty="glmnet",
+perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRUE, penalty="glmnet",
     use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list(), barcode_column="Barcode",
     change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL) {
     if (all) {
@@ -23,10 +23,14 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=FAL
         return(nets)        
     } else {
         if (is.null(label_name)) {stop("Please specify label name")}
-        input <- .getInput(spe, candidate_genes, label, label_name, use_assay, barcode_column, cluster_label, verbose,
-            change_symbol, symbol_column)
-        net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
-        return(net)
+        nets <- lapply(label_name, function(x) {
+            cat(x, "\n")
+            input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
+                change_symbol, symbol_column)
+            net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)            
+        })
+        names(nets) <- label_name
+        return(nets)
     }
 }
 
