@@ -20,7 +20,8 @@ globalStruc(
   barcode_column = "row",
   change_symbol = TRUE,
   symbol_column = "Symbol",
-  input = NULL
+  input = NULL,
+  nonzero = 1
 )
 }
 \arguments{

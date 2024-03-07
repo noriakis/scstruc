@@ -75,7 +75,7 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
     if (dim(input)[1]==0) {stop("No samples")}
     input <- input[, apply(input==0, 2, function(x) sum(x) <= nrow(input) * nonzero)]
     if (verbose) {
-        qqcat("Dimension of the input for structure learning (filtered by sum of zero < @{nrow(input)*nonzero}: n ", dim(input)[1], "p ", dim(input)[2], "\n")
+        cat("Dimension of the input for structure learning (filtered by sum of zero): n", dim(input)[1], "p", dim(input)[2], "\n")
     }
     return(input)
 }

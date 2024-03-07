@@ -5,12 +5,12 @@
 \title{plotAVN}
 \usage{
 plotAVN(
-  avn,
   str,
   edge = geom_edge_diagonal,
   ew = strength,
   lyt = "fr",
-  size_degree = TRUE
+  size_degree = TRUE,
+  size_range = c(1, 5)
 )
 }
 \arguments{

@@ -1,5 +1,5 @@
 
-#' @import AnnotatiobDbi mapIds
+#' @importFrom AnnotationDbi mapIds
 returnKEGGPathSymbol <- function(pid, org="mmu", orgDb=org.Mm.eg.db) {
     path_eg  <- keggLink("pathway", org) %>% 
       tibble(pathway = ., eg = sub(paste0(org,":"), "", names(.))) %>%

@@ -19,7 +19,8 @@ perLabelStruc(
   barcode_column = "Barcode",
   change_symbol = TRUE,
   symbol_column = "Symbol",
-  cluster_label = NULL
+  cluster_label = NULL,
+  nonzero = 1
 )
 }
 \arguments{

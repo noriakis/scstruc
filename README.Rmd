@@ -47,7 +47,7 @@ library(bnlearn)
 sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
-gs <- globalStruc(sce, included_genes, return_bn=TRUE, return_data=TRUE)
+gs <- globalStruc(sce, included_genes, return_bn=TRUE, return_data=TRUE, change_symbol=FALSE)
 fitted <- bn.fit(gs[[1]], gs[[2]])
 ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
   geom_edge_diagonal(aes(color=coef),
@@ -55,4 +55,13 @@ ggraph(bn_fit_to_igraph(fitted), layout="fr") +
       start_cap=circle(1,"mm"), end_cap=circle(1,"mm"))+
   geom_node_point()+
   theme_graph()
+```
+
+Using the bootstrapping, the averaged network is obtained.
+
+```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+gs2 <- globalStruc(sce, included_genes, return_bn=TRUE, penalty="glmnet_BIC.boot",
+                  change_symbol = FALSE, algorithm.args=list("R"=20))
+plotAVN(gs2)
+
 ```
