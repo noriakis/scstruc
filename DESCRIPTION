@@ -7,7 +7,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.3.0), bnlearn, ggplot2, ggraph, igraph, tidygraph,
-    SpatialExperiment, SingleCellExperiment, RcppArmadillo, Rcpp
+    SpatialExperiment, SingleCellExperiment, RcppArmadillo, Rcpp,
+    KEGGREST
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr

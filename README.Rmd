@@ -32,6 +32,12 @@ Using `devtools`:
 devtools::install_github("noriakis/scstruc")
 ```
 
+For using the CCDr algorithm in the latest R version, please install `ccdrAlgorithm` package from the following repository, which removes the `||` usage error.
+
+```{r, eval=FALSE}
+devtools::install_github("noriakis/ccdrAlgorithm")
+```
+
 ## Examples
 
 ```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=5}

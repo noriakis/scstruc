@@ -110,6 +110,7 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
         if (verbose) {cat(" ", nn)}
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
+        if (length(unique(y))==1) {return(NULL)}
         included_var_index <- do.call(penFun, list("X"=X, "y"=y,
             "nFolds"=nFolds, "pen"=penalty, "s"=s))
         if (verbose) {cat(" candidate:", length(included_var_index), "\n")}

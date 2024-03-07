@@ -10,12 +10,13 @@
 #' @export
 perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRUE, penalty="glmnet",
     use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list(), barcode_column="Barcode",
-    change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL) {
+    change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL, nonzero=1) {
     if (all) {
         alll <- unique(colData(spe)[[label]])
         nets <- lapply(alll, function(x) {
             cat(x, "\n")
-            input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose, change_symbol, symbol_column)
+            input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column,
+                cluster_label, verbose, change_symbol, symbol_column, nonzero   )
             net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
             return(net)
         })
@@ -26,7 +27,7 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
         nets <- lapply(label_name, function(x) {
             cat(x, "\n")
             input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
-                change_symbol, symbol_column)
+                change_symbol, symbol_column, nonzero)
             net <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)            
         })
         names(nets) <- label_name
@@ -36,7 +37,7 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
 
 #' @noRd
 .getInput <- function(sce, candidate_genes, label, x, use_assay, barcode_column="Barcode", cluster_label=NULL, verbose=FALSE,
-    change_symbol=TRUE, symbol_column="Symbol") {
+    change_symbol=TRUE, symbol_column="Symbol", nonzero=1) {
     logc <- sce@assays@data[[use_assay]]
     if (change_symbol) {
         row.names(logc) <- rowData(sce)[[symbol_column]]
@@ -68,14 +69,19 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
         data.frame(check.names=FALSE)        
     }
     if (verbose) {
-        cat("Dimension of the input for structure learning: n", dim(input)[1], "p", dim(input)[2], "\n")
+        cat("Dimension of the input: n", dim(input)[1], "p", dim(input)[2], "\n")
     }
     if (dim(input)[2]==0) {stop("No genes")}
     if (dim(input)[1]==0) {stop("No samples")}
+    input <- input[, apply(input==0, 2, function(x) sum(x) <= nrow(input) * nonzero)]
+    if (verbose) {
+        qqcat("Dimension of the input for structure learning (filtered by sum of zero < @{nrow(input)*nonzero}: n ", dim(input)[1], "p ", dim(input)[2], "\n")
+    }
     return(input)
 }
 
 
+#' @noRd
 .getStruc <- function(input, algorithm, reg, penalty, algorithm.args, verbose) {
     if (reg) {
         if (verbose) {
@@ -91,14 +97,36 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
             algorithm.args[["data"]] <- input
             return(do.call(scstruc::ccdr.boot, algorithm.args))         
         } else {
-            algorithm.args[["data"]] <- input
-            # algorithm.args[["restrict"]] <- "mmpc"
-            # algorithm.args[["maximize"]] <- "hc"
-            algorithm.args[["penalty"]] <- penalty
-            net <- do.call(skeleton.reg, algorithm.args)
+            if (grepl("boot", penalty)) {
+                cat("Bootstrapping specified\n")
+                pen <- strsplit(penalty, "\\.") %>% sapply("[", 1)
+                nodes <- names(input)
+                perRun <- list()
+                m <- nrow(input) ## m determined
+                R <- algorithm.args[["R"]]
+                algorithm.args[["R"]] <- NULL
+                for (r in seq_len(R)) {
+                    if (verbose) {cat(r)}
+                    resampling = sample(nrow(input), m, replace = TRUE)
+                    replicate = input[resampling, , drop = FALSE]
+                    algorithm.args[["data"]] <- replicate
+                    algorithm.args[["penalty"]] <- pen
+                    repnet <- do.call(skeleton.reg, algorithm.args)
+                    perRun[[r]] <- repnet
+                }
+                if (verbose) {cat("\n")}
+                net <- custom.strength(perRun, nodes)                
+            } else {
+                algorithm.args[["data"]] <- input
+                # algorithm.args[["restrict"]] <- "mmpc"
+                # algorithm.args[["maximize"]] <- "hc"
+                algorithm.args[["penalty"]] <- penalty
+                net <- do.call(skeleton.reg, algorithm.args)                
+            }
             return(net)
         }
     } else {
+        cat("Using default MMHC\n")
         algorithm.args[["x"]] <- input
         net <- do.call(algorithm, algorithm.args)
         return(net)
