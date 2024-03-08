@@ -6,18 +6,18 @@
 \usage{
 perLabelStruc(
   spe,
-  label,
   candidate_genes,
+  label = "label",
   algorithm = "mmhc",
   reg = TRUE,
-  penalty = "glmnet",
+  penalty = "glmnet_CV",
   use_assay = "logcounts",
   all = FALSE,
   label_name = NULL,
   verbose = FALSE,
   algorithm.args = list(),
   barcode_column = "Barcode",
-  change_symbol = TRUE,
+  change_symbol = FALSE,
   symbol_column = "Symbol",
   cluster_label = NULL,
   nonzero = 1

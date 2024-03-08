@@ -5,27 +5,32 @@
 \title{superCellMat}
 \usage{
 superCellMat(
-  GE,
-  pca = FALSE,
+  sce,
   genes = NULL,
+  prop = 0.2,
+  pca = TRUE,
   gamma = 10,
   k.knn = 5,
-  mode = "average"
+  rank = 10,
+  mode = "average",
+  ID = "ID",
+  verbose = TRUE
 )
 }
 \arguments{
-\item{GE}{gene (row) to cell (column) matrix, like log-normalized}
+\item{genes}{subset of the genes to use in PCA (`getTopHVGs`, etc)}
 
 \item{pca}{use PCA or not}
-
-\item{genes}{subset of the genes to use in PCA (`getTopHVGs`, etc)}
 
 \item{gamma}{param to SCimplify}
 
 \item{k.knn}{param to SCimplify}
 
 \item{mode}{average or sum}
+
+\item{GE}{gene (row) to cell (column) matrix, like log-normalized}
 }
 \description{
 Return the metacell abundance matrix
+Should provide SingleCellExperiment with logcounts data filled.
 }

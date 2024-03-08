@@ -57,3 +57,53 @@ plotAVN(gs2)
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="2400" style="display: block; margin: auto;" />
+
+Celltype-specific bootstrapped networks.
+
+``` r
+sce <- mockSCE()
+sce2 <- mockSCE()
+sces <- list(sce, sce2)
+sces <- lapply(sces, function(x) logNormCounts(x))
+sces <- lapply(sces, function(x) {
+  colLabels(x) <- sample(c("Celltype_1","Celltype_2"), ncol(x), replace=TRUE)
+  return(x)})
+
+included_genes <- sample(row.names(sce), 50)
+booted <- lapply(sces, function(x) perLabelStruc(x, label_name = "Celltype_1",
+     algorithm.args=list("R"=10), barcode_column="row",
+     candidate_genes=included_genes, nonzero=0.5,
+     penalty="glmnet_CV.boot"))
+#> Celltype_1 
+#> Bootstrapping specified
+#> Celltype_1 
+#> Bootstrapping specified
+ce <- coreEdges(booted, "Celltype_1")
+ce
+#> # A tbl_graph: 33 nodes and 36 edges
+#> #
+#> # A directed simple graph with 4 components
+#> #
+#> # Node Data: 33 × 1 (active)
+#>    name     
+#>    <chr>    
+#>  1 Gene_0074
+#>  2 Gene_0918
+#>  3 Gene_0109
+#>  4 Gene_0306
+#>  5 Gene_1059
+#>  6 Gene_0280
+#>  7 Gene_1234
+#>  8 Gene_1917
+#>  9 Gene_0356
+#> 10 Gene_1562
+#> # ℹ 23 more rows
+#> #
+#> # Edge Data: 36 × 4
+#>    from    to strength direction
+#>   <int> <int>    <dbl>     <dbl>
+#> 1     1     2      0.7     0.714
+#> 2     3     4      0.7     0.786
+#> 3     3     2      0.9     0.667
+#> # ℹ 33 more rows
+```

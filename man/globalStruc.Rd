@@ -14,7 +14,7 @@ globalStruc(
   return_bn = FALSE,
   return_data = FALSE,
   cluster_label = NULL,
-  penalty = "glmnet",
+  penalty = "glmnet_CV",
   verbose = FALSE,
   use_assay = "logcounts",
   barcode_column = "row",

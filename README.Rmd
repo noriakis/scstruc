@@ -65,3 +65,23 @@ gs2 <- globalStruc(sce, included_genes, return_bn=TRUE, penalty="glmnet_BIC.boot
                   change_symbol = FALSE, algorithm.args=list("R"=100))
 plotAVN(gs2)
 ```
+
+Celltype-specific bootstrapped networks.
+
+```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
+sce <- mockSCE()
+sce2 <- mockSCE()
+sces <- list(sce, sce2)
+sces <- lapply(sces, function(x) logNormCounts(x))
+sces <- lapply(sces, function(x) {
+  colLabels(x) <- sample(c("Celltype_1","Celltype_2"), ncol(x), replace=TRUE)
+  return(x)})
+
+included_genes <- sample(row.names(sce), 50)
+booted <- lapply(sces, function(x) perLabelStruc(x, label_name = "Celltype_1",
+     algorithm.args=list("R"=10), barcode_column="row",
+     candidate_genes=included_genes, nonzero=0.5,
+     penalty="glmnet_CV.boot"))
+ce <- coreEdges(booted, "Celltype_1")
+ce
+```

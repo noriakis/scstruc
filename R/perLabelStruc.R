@@ -8,9 +8,9 @@
 #' @param all infer all the network of the corresponding label
 #' @param label_name if all=FALSE, must be specified
 #' @export
-perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRUE, penalty="glmnet",
+perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc", reg=TRUE, penalty="glmnet_CV",
     use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list(), barcode_column="Barcode",
-    change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL, nonzero=1) {
+    change_symbol=FALSE, symbol_column="Symbol", cluster_label=NULL, nonzero=1) {
     if (all) {
         alll <- unique(colData(spe)[[label]])
         nets <- lapply(alll, function(x) {
@@ -41,6 +41,9 @@ perLabelStruc <- function(spe, label, candidate_genes, algorithm="mmhc", reg=TRU
     logc <- sce@assays@data[[use_assay]]
     if (change_symbol) {
         row.names(logc) <- rowData(sce)[[symbol_column]]
+    }
+    if (is.null(colData(sce)[[barcode_column]])) {
+        colData(sce)[[barcode_column]] <- as.character(1:ncol(sce))
     }
     meta <- colData(sce) |> data.frame()
     if (barcode_column=="row") {

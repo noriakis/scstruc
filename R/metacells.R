@@ -1,6 +1,7 @@
 #' superCellMat
 #' 
 #' Return the metacell abundance matrix
+#' Should provide SingleCellExperiment with logcounts data filled.
 #' 
 #' @import SuperCell
 #' @param GE gene (row) to cell (column) matrix, like log-normalized
@@ -11,11 +12,19 @@
 #' @param mode average or sum
 #' @export
 #' 
-superCellMat <- function(GE, pca=FALSE, genes=NULL, gamma=10, k.knn=5, mode="average") {
+superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5, rank=10,
+    mode="average", ID="ID", verbose=TRUE) {
+    if (is.null(genes)) {
+        genes <- getTopHVGs(sce, prop=prop)
+    }
+
+    GE <- sce@assays@data$logcounts
+    row.names(GE) <- rowData(sce)[[ID]]
+
     if (pca) {
-        GE <- stats::prcomp(Matrix::t(GE[genes, ]), rank. = 10)$x
+        pcs <- stats::prcomp(Matrix::t(GE[genes, ]), rank. = rank)$x
         SC <- SCimplify_from_embedding(
-          X = GE, 
+          X = pcs, 
           k.knn = k.knn, 
           gamma = gamma
         )
@@ -27,5 +36,8 @@ superCellMat <- function(GE, pca=FALSE, genes=NULL, gamma=10, k.knn=5, mode="ave
         )        
     }
     SC.GE <- supercell_GE(GE, SC$membership, mode=mode)
-    return(SC.GE)
+    cat("  ", dim(SC.GE),"\n")
+    ret = SingleCellExperiment(assays=SimpleList("logcounts"=SC.GE))
+    rowData(ret) <- rowData(sce)
+    return(ret)
 }

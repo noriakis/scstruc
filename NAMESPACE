@@ -3,6 +3,7 @@
 export(bn_fit_to_igraph)
 export(ccdr.boot)
 export(convert_to_tbl_graph)
+export(coreEdges)
 export(evaluate_metrics)
 export(gen)
 export(getCyclinGenes)
