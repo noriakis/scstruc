@@ -1,3 +1,4 @@
+#' coreEdges
 #' @param listOfNets list of bn.strength
 #' @export
 coreEdges <- function(listOfNets, label_name) {
@@ -5,7 +6,7 @@ coreEdges <- function(listOfNets, label_name) {
       avn <- data.frame(igraph::as_edgelist(bnlearn::as.igraph(averaged.network(listOfNets[[x]][[label_name]]))))
       colnames(avn) <- c("from","to")
       df <- merge(avn, x[[label_name]], by=c("from","to"))
-      if (!is.null(names(listOfNets)) {
+      if (!is.null(names(listOfNets))) {
         df[["net"]] <- names(listOfNets)[x]
       }
       return(df)
