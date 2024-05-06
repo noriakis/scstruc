@@ -7,7 +7,7 @@
 #' @param use_assay use assay
 #' @param input default to NULL
 #' @export
-globalStruc <- function(spe, candidate_genes, label, algorithm="mmhc",
+globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
 	reg=TRUE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE,
     cluster_label=NULL, penalty="glmnet_CV",verbose=FALSE, use_assay="logcounts",
     barcode_column="row", change_symbol=TRUE, symbol_column="Symbol", input=NULL,

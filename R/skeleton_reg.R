@@ -17,6 +17,24 @@
     included_var_index
 }
 
+
+.glmmTMB <- function(nodes, nn, data) {
+    pred <- setdiff(nodes, nn)
+    if (length(pred) == 0) {
+        model = paste(nn, "~ 1")
+    } else {
+        model = paste(nn, "~", paste(pred, collapse = "+"))
+    }
+    fit <- glmmTMB(as.formula(model), data=data,
+        ziformula= ~ 1,
+        family=gaussian)
+    res <- summary(fit)
+    tbl <- res$coefficients$cond
+    tbl <- tbl[2:nrow(tbl),]
+    tbl <- tbl[!is.na(tbl[,4]),]
+    row.names(tbl[tbl[,4]<0.05,])
+}
+
 .plassoBIC <- function(X, y, nFolds=NULL, pen=NULL, s=NULL) {
     fit <- plasso_fit(X %>% as.matrix(), y, lambda=0.1, maxIter=100, gamma=0.5, eps=1e-6)
     ## The last coefficient is intercept
@@ -79,6 +97,22 @@ skeleton.reg.boot <- function(data, penalty="glmnet_CV", R=100,  m=nrow(data), a
     return(st)
 }
 
+#' Custom score function for bnlearn, using hurdle model.
+#' BIC is scaled by -2.
+#' @noRd
+zeroinf.bic <- function(node, parents, data, args) {
+    ## Using glmmTMB
+    if (length(parents) == 0) {
+        model = paste(node, "~ 1")
+    } else {
+        model = paste(node, "~", paste(parents, collapse = "+"))
+    }
+    fit <- glmmTMB(as.formula(model), data=data,
+        ziformula= ~ 1,
+        family=gaussian)
+   - BIC(fit) / 2
+
+}#MY.BIC
 
 #' skeleton.reg
 #' 
@@ -89,7 +123,7 @@ skeleton.reg.boot <- function(data, penalty="glmnet_CV", R=100,  m=nrow(data), a
 #' @param s effective only in glmnet, lambda.min or lambda.1se
 #' @export
 skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NULL,
-    nFolds=5, verbose=FALSE, s="lambda.min") {
+    nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list()) {
     if (verbose) {
         cat("Penalty:", penalty, "\n")
         cat("Input for structure learning: n", dim(data)[1], "p", dim(data)[2], "\n")
@@ -111,13 +145,18 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
         if (length(unique(y))==1) {return(NULL)}
-        included_var_index <- do.call(penFun, list("X"=X, "y"=y,
-            "nFolds"=nFolds, "pen"=penalty, "s"=s))
-        if (verbose) {cat(" candidate:", length(included_var_index), "\n")}
-        if (length(included_var_index)==0) {return(NULL)}
-        colnames(X)[included_var_index]
+        if (penalty=="glmmTMB") {
+            sign <- .glmmTMB(nodes, nn, data)
+            if (length(sign)==0) {return(NULL)}
+            return(.glmmTMB(nodes, nn, data))
+        } else {
+            included_var_index <- do.call(penFun, list("X"=X, "y"=y,
+                "nFolds"=nFolds, "pen"=penalty, "s"=s))            
+            if (verbose) {cat(" candidate:", length(included_var_index), "\n")}
+            if (length(included_var_index)==0) {return(NULL)}
+            return(colnames(X)[included_var_index])
+        }
     })
-
 
     names(mb) <- nodes
 
@@ -142,7 +181,10 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
     constraints <- bnlearn:::arcs.to.be.added(res$arcs,
         nodes, whitelist = res$learning$blacklist)
     start <- empty.graph(nodes = nodes)
-
-    hc_res <- hc(data, start=start, blacklist=constraints)
-    return(hc_res)
+    maximize.args[["x"]] <- data
+    maximize.args[["start"]] <- start
+    maximize.args[["blacklist"]] <- constraints
+    struc_res <- do.call(maximize, maximize.args)
+    # hc_res <- hc(data, start=start, blacklist=constraints)
+    return(struc_res)
 }

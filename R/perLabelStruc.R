@@ -76,9 +76,9 @@ perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc",
     }
     if (dim(input)[2]==0) {stop("No genes")}
     if (dim(input)[1]==0) {stop("No samples")}
-    input <- input[, apply(input==0, 2, function(x) sum(x) <= nrow(input) * nonzero)]
+    input <- input[, apply(input==0, 2, function(x) sum(x) < nrow(input) * nonzero)]
     if (verbose) {
-        cat("Dimension of the input for structure learning (filtered by sum of zero): n", dim(input)[1], "p", dim(input)[2], "\n")
+        cat("Dimension of the input for structure learning (filtered by the number of zero): n", dim(input)[1], "p", dim(input)[2], "\n")
     }
     return(input)
 }
@@ -120,6 +120,7 @@ perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc",
                 if (verbose) {cat("\n")}
                 net <- custom.strength(perRun, nodes)                
             } else {
+                algorithm.args[["verbose"]] <- verbose
                 algorithm.args[["data"]] <- input
                 # algorithm.args[["restrict"]] <- "mmpc"
                 # algorithm.args[["maximize"]] <- "hc"
