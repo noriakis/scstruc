@@ -7,7 +7,7 @@
 globalStruc(
   spe,
   candidate_genes,
-  label,
+  label = NULL,
   algorithm = "mmhc",
   reg = TRUE,
   algorithm.args = list(),

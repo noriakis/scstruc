@@ -7,7 +7,7 @@ returnKEGGPathSymbol <- function(pid, org="mmu", orgDb=org.Mm.eg.db) {
         symbol = mapIds(orgDb, eg, "SYMBOL", "ENTREZID")
       )
 
-    inc <- as.character(path_eg %>% filter(pathway == "path:mmu04150") %>% pull(symbol))
+    inc <- as.character(path_eg %>% filter(pathway == paste0("path:", pid)) %>% pull(symbol))
     inc
 }
 

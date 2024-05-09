@@ -77,6 +77,8 @@ perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc",
     if (dim(input)[2]==0) {stop("No genes")}
     if (dim(input)[1]==0) {stop("No samples")}
     input <- input[, apply(input==0, 2, function(x) sum(x) < nrow(input) * nonzero)]
+    ## Remove constants
+    # input <- input[, apply(input, 2, function(x) unique(x)!=1)]
     if (verbose) {
         cat("Dimension of the input for structure learning (filtered by the number of zero): n", dim(input)[1], "p", dim(input)[2], "\n")
     }

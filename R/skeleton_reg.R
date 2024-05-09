@@ -18,7 +18,7 @@
 }
 
 
-.glmmTMB <- function(nodes, nn, data) {
+.glmmTMB <- function(nodes, nn, data, formula= ~ 1) {
     pred <- setdiff(nodes, nn)
     if (length(pred) == 0) {
         model = paste(nn, "~ 1")
@@ -26,9 +26,10 @@
         model = paste(nn, "~", paste(pred, collapse = "+"))
     }
     fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= ~ 1,
+        ziformula= formula,
         family=gaussian)
     res <- summary(fit)
+    print(res)
     tbl <- res$coefficients$cond
     tbl <- tbl[2:nrow(tbl),]
     tbl <- tbl[!is.na(tbl[,4]),]
@@ -148,7 +149,8 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
         if (penalty=="glmmTMB") {
             sign <- .glmmTMB(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
-            return(.glmmTMB(nodes, nn, data))
+            if (verbose) {cat(" candidate:", length(sign), "\n")}
+            return(sign)
         } else {
             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
                 "nFolds"=nFolds, "pen"=penalty, "s"=s))            

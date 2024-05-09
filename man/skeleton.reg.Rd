@@ -11,7 +11,9 @@ skeleton.reg(
   blacklist = NULL,
   nFolds = 5,
   verbose = FALSE,
-  s = "lambda.min"
+  s = "lambda.min",
+  maximize = "hc",
+  maximize.args = list()
 )
 }
 \arguments{
