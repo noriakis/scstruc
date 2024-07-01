@@ -1,8 +1,8 @@
 #' globalStrucValues
 globalStrucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
-	summarize_func=mean, variation_func=sd, bn=NULL) {
+	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id") {
     if (is.null(bn) & is.null(global_tbl_graph)) {stop("Please supply either of tbl_graph or bn")}
-    if (!is.null(bn)) {return(.globalStrucValuesCoef(spe, bn, labels, exclude_label))}
+    if (!is.null(bn)) {return(.globalStrucValuesCoef(spe, bn, labels, exclude_label, barcode))}
     gedges <- global_tbl_graph |> activate(edges) |> data.frame()
     gnnames <- global_tbl_graph |> activate(nodes) |> pull(name)
     gedges$from <- gnnames[gedges$from]
@@ -20,8 +20,8 @@ globalStrucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=
     ## Currently, multiple labels are not supported for this operation.
     if (length(labels)>1) {stop("Multiple labels are supported for coefficient mode")}
     appendix <- do.call(cbind, lapply(alllabels, function(x) {
-        if ("barcode_id" %in% (meta |> colnames())) {
-            inc_cells <- meta[meta[[label]] == x, ]$barcode_id
+        if (barcode %in% (meta |> colnames())) {
+            inc_cells <- meta[meta[[label]] == x, ][[barcode]]
         } else {
             inc_cells <- meta[meta[[label]] == x, ] |> row.names()
         }
@@ -37,22 +37,23 @@ globalStrucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=
     return(appendix)
 }
 
-.globalStrucValuesCoef <- function(spe, bn, labels, exclude_label) {
+.globalStrucValuesCoef <- function(spe, bn, labels, exclude_label, barcode) {
+    cat("Coefficient calculation per specified group\n")
     logc <- spe@assays@data$logcounts
     ## In case
     if ("Symbol" %in% colnames(rowData(spe))) {
         row.names(logc) <- rowData(spe)$Symbol
     }
     meta <- colData(spe) |> data.frame()
-	if (!"barcode_id" %in% (meta |> colnames())) {
-	    meta[["barcode_id"]] <- row.names(meta)
+	if (!barcode %in% (meta |> colnames())) {
+	    meta[[barcode]] <- row.names(meta)
 	}
 	
 	get_edges <- function(df) {## df means group.by metadata
 	    group_name <- df[,labels] |> as.matrix()
 	    group_name <- group_name[1,] |> as.character()
 	    fit_df <- logc[names(bn$nodes),
-	      which(colData(spe)$Barcode %in% df$Barcode)] |>
+	      which(colData(spe)[[barcode]] %in% df[[barcode]])] |>
 	      as.matrix() |> t() |>
 	      data.frame(check.names=FALSE)
 	    fitted <- bnlearn::bn.fit(bn, fit_df)

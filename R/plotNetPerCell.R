@@ -18,7 +18,7 @@ plotNetPerCell <- function(
         V(g)$degree <- igraph::degree(g)
     } else {
         if (is.null(net)) {
-            stop("Please provide net")
+            stop("Please provide net (igraph or bn object), or avn (averaged network of bnlearn) and str (strength from bnlearn)")
         }
         if ("igraph" %in% class(net)) {
             g <- net        

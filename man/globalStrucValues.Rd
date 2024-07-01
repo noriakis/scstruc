@@ -11,7 +11,8 @@ globalStrucValues(
   exclude_label = NA,
   summarize_func = mean,
   variation_func = sd,
-  bn = NULL
+  bn = NULL,
+  barcode = "barcode_id"
 )
 }
 \description{

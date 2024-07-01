@@ -9,7 +9,7 @@ loadppi(org = "mm")
 \description{
 The igraph represenatation of the STRING database.
 The file was downloaded from https://string-db.org/cgi/download, with the organism
-corresponding to Homo sapiens or Mus musculus. The network was subset by the combined scores
+corresponding to Homo sapiens or Mus musculus. The network was subset by the combined scores (above 900)
 and attached to the package.
 }
 \details{

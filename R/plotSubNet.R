@@ -5,10 +5,12 @@
 #' along with cell column
 #' @param cell_column if you need to plot per cell basis, specify cell column,
 #' along with cell label
+#' @param coef_cutoff edge with value below this thrshold will not be drawn.
 #' @export
 plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     with_hist=FALSE, spe=NULL, label="label", node_size=3, show=NULL,
-    layout="kk", cell_label=NULL, cell_column=NULL, highlight_edge=NULL) {
+    layout="kk", cell_label=NULL, cell_column=NULL, highlight_edge=NULL,
+    coef_cutoff=0.01) {
     # Probably better to split to sce and spatial experiment
     flag <- is.null(cell_label)+is.null(cell_column)
     if (flag==1) {stop("Please specify both of cell_label and cell_column")}
@@ -63,20 +65,20 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             ggraph(layout=layout) +
             geom_node_point(color=curcol, size=node_size) +
             geom_edge_parallel(
-                aes(color=coefficient, width=coefficient),
+                aes(color=coefficient, width=coefficient, filter= abs(coefficient) > coef_cutoff),
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed"))+
             ggfx::with_outer_glow(
             geom_edge_parallel(
                 aes(color=coefficient, width=coefficient,
-                filter=edge_name %in% highlight_edge),
+                filter=edge_name %in% highlight_edge & abs(coefficient) > coef_cutoff),
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed")),
                 colour="gold", sigma=5
             )+
-            scale_edge_color_gradient2(low="blue", high="red", limits=c(minc, maxc))+
+            scale_edge_color_gradient2(low="blue", mid="white", high="red", limits=c(minc, maxc))+
             scale_edge_width(range=c(0.5, 1.5), limits=c(minc, maxc))+
             geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
             ggtitle(paste0(x))+ theme_graph()
