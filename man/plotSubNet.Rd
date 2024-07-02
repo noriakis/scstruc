@@ -16,7 +16,8 @@ plotSubNet(
   layout = "kk",
   cell_label = NULL,
   cell_column = NULL,
-  highlight_edge = NULL
+  highlight_edge = NULL,
+  coef_cutoff = 0.01
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ along with cell column}
 
 \item{cell_column}{if you need to plot per cell basis, specify cell column,
 along with cell label}
+
+\item{coef_cutoff}{edge with value below this thrshold will not be drawn.}
 }
 \description{
 plotSubNet
