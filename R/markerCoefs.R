@@ -5,8 +5,8 @@ markerCoefs <- function(coef_mat, classif_label="group",
 		cell_label <- coef_mat[[cell_column]] |> unique()
 	}
     mydata <- coef_mat |>
-        mutate(edge_name=paste0(from,"->",to)) |>
-        filter(.data[[cell_column]] %in% cell_label) |>
+        dplyr::mutate(edge_name=paste0(from,"->",to)) |>
+        dplyr::filter(.data[[cell_column]] %in% cell_label) |>
         tidyr::pivot_wider(id_cols=edge_name,
             values_from=coefficient,
             names_from=sample_column) |>
@@ -27,6 +27,7 @@ markerCoefs <- function(coef_mat, classif_label="group",
     }
 
     mydata[is.na(mydata)] <- 0
+    cat("Performing Boruta algorithm ...\n")
     brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
     if (tentative_fix) {
         brt_fixed <- TentativeRoughFix(brt)

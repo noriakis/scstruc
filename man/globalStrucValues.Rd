@@ -12,7 +12,8 @@ globalStrucValues(
   summarize_func = mean,
   variation_func = sd,
   bn = NULL,
-  barcode = "barcode_id"
+  barcode = "barcode_id",
+  assay = "logcounts"
 )
 }
 \description{
