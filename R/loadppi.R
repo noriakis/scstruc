@@ -18,3 +18,19 @@ loadppi <- function(org="mm") {
     tb = cache$table
     tb
 }
+
+
+#' intersectPpi
+#' 
+#' Examine intersection of PPI using output of `markerCoefs`
+#' 
+#' @param edge_names edge names in `GeneA->GeneB` style
+#' @param org organism name (mm, or hsa)
+#' @export
+intersectPpi <- function(edge_names, org="mm") {
+  importantGraph <- do.call(rbind,
+                            edge_names %>% strsplit("->")) %>%
+    graph_from_edgelist(directed = FALSE)
+    ppis <- loadppi()
+    intersection(ppis, importantGraph)
+}
