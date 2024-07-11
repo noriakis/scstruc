@@ -108,9 +108,11 @@ zeroinf.bic <- function(node, parents, data, args) {
     } else {
         model = paste(node, "~", paste(parents, collapse = "+"))
     }
+    cat("Fitting:", model, "\n")
+
     fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= ~ 1,
-        family=gaussian)
+        ziformula= ~ 1, family=gaussian)
+
    - BIC(fit) / 2
 
 }#MY.BIC
