@@ -101,6 +101,9 @@ perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc",
             cat("Returning the list of bn.strength\n")
             algorithm.args[["data"]] <- input
             return(do.call(scstruc::ccdr.boot, algorithm.args))         
+        } else if (penalty == "Hurdle") {
+            algorithm.args[["data"]] <- input
+            return(do.call(.Hurdle, algorithm.args))
         } else {
             if (grepl("boot", penalty)) {
                 cat("Bootstrapping specified\n")

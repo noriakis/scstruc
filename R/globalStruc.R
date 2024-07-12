@@ -20,7 +20,7 @@ globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
     }
     global_graph <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
 
-    if (penalty %in% c("ccdr.run","ccdr.boot")) {
+    if (penalty %in% c("ccdr.run","ccdr.boot","Hurdle")) {
         if (return_data) {
             return(list(global_graph, input))
         } else {

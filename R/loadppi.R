@@ -28,9 +28,21 @@ loadppi <- function(org="mm") {
 #' @param org organism name (mm, or hsa)
 #' @export
 intersectPpi <- function(edge_names, org="mm") {
-  importantGraph <- do.call(rbind,
+  if (!is.matrix(edge_names)) {
+    enn <- length(edge_names)
+    importantGraph <- do.call(rbind,
                             edge_names %>% strsplit("->")) %>%
-    graph_from_edgelist(directed = FALSE)
-    ppis <- loadppi()
-    intersection(ppis, importantGraph)
+    graph_from_edgelist(directed = FALSE)    
+  } else {
+    enn <- dim(edge_names)[1]
+    importantGraph <- graph_from_edgelist(edge_names, directed=FALSE)
+  }
+
+    ppis <- loadppi(org=org)
+    ints <- igraph::intersection(ppis, importantGraph)
+
+    inten <- as_edgelist(ints) %>% dim() %>% purrr::pluck(1)
+
+    cat(inten / enn, "\n")
+    return(ints)
 }
