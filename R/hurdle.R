@@ -28,10 +28,10 @@
 	bl <- bnlearn:::arcs.to.be.added(arcs, V(g)$name)
 
 	if (is.null(score)) {
-		net <- hc(mat[,inc_node_undir],
+		net <- hc(data[,inc_node_undir],
 			debug=debug, blacklist=bl)
 	} else {
-		net <- hc(mat[,inc_node_undir],
+		net <- hc(data[,inc_node_undir],
 	         blacklist=bl, debug = debug,
 	         score="custom", fun=score)		
 	}
