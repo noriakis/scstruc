@@ -4,7 +4,7 @@
 \alias{loadppi}
 \title{loadppi}
 \usage{
-loadppi(org = "mm")
+loadppi(org = "mm", database = "string")
 }
 \description{
 The igraph represenatation of the STRING database.

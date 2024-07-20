@@ -17,7 +17,7 @@ perLabelStruc(
   verbose = FALSE,
   algorithm.args = list(),
   barcode_column = "Barcode",
-  change_symbol = FALSE,
+  change_symbol = TRUE,
   symbol_column = "Symbol",
   cluster_label = NULL,
   nonzero = 1

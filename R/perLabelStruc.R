@@ -10,7 +10,7 @@
 #' @export
 perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc", reg=TRUE, penalty="glmnet_CV",
     use_assay="logcounts", all=FALSE, label_name=NULL, verbose=FALSE, algorithm.args=list(), barcode_column="Barcode",
-    change_symbol=FALSE, symbol_column="Symbol", cluster_label=NULL, nonzero=1) {
+    change_symbol=TRUE, symbol_column="Symbol", cluster_label=NULL, nonzero=1) {
     if (all) {
         alll <- unique(colData(spe)[[label]])
         nets <- lapply(alll, function(x) {
@@ -50,9 +50,9 @@ perLabelStruc <- function(spe, candidate_genes, label="label", algorithm="mmhc",
         meta[["Barcode"]] <- row.names(meta)
         barcode_column <- "Barcode"
     }
-    if (is.null(colnames(logc))) {
-        colnames(logc) <- meta[[barcode_column]]
-    }
+    # if (is.null(colnames(logc))) {
+    colnames(logc) <- meta[[barcode_column]]
+    # }
     if (is.null(x)) {
         inc_cells <- meta[[barcode_column]]
     } else {

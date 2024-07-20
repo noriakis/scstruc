@@ -4,7 +4,7 @@
 \alias{obtainSubNetMatrix}
 \title{obtainSubNetMatrix}
 \usage{
-obtainSubNetMatrix(df, spe, func = "sum")
+obtainSubNetMatrix(df, spe, func = "sum", use_assay = "logcounts")
 }
 \arguments{
 \item{df}{the results of `globalStrucValues` (specifying the bn object)}

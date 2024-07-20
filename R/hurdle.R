@@ -1,6 +1,9 @@
 #' @noRd
 #' @importFrom data.table :=
 .Hurdle <- function(data, score=NULL, debug=FALSE) {
+
+	# cat("Using score", as.character(score), "\n")
+
 	retl <- list()
 
 	## Fit model

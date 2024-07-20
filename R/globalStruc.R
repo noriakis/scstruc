@@ -8,7 +8,7 @@
 #' @param input default to NULL
 #' @export
 globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
-	reg=TRUE, algorithm.args=list(), return_bn=FALSE, return_data=FALSE,
+	reg=TRUE, algorithm.args=list(), return_bn=TRUE, return_data=TRUE,
     cluster_label=NULL, penalty="glmnet_CV",verbose=FALSE, use_assay="logcounts",
     barcode_column="row", change_symbol=TRUE, symbol_column="Symbol", input=NULL,
     nonzero=1) {
@@ -34,6 +34,7 @@ globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
             return(global_graph)
         }
     }
+    ## When not returning bn object, return tbl_graph
     global_tbl_graph <- global_graph |> 
         bnlearn::as.igraph() |>
         tidygraph::as_tbl_graph()

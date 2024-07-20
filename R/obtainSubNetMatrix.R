@@ -1,10 +1,10 @@
 #' obtainSubNetMatrix
 #' 
 #' @param df the results of `globalStrucValues` (specifying the bn object)
-obtainSubNetMatrix <- function(df, spe, func="sum") {
+obtainSubNetMatrix <- function(df, spe, func="sum", use_assay="logcounts") {
 	
 	
-	logc <- spe@assays@data$logcounts
+	logc <- spe@assays@data[[use_assay]]
 
 	all_nodes <- unique(c(df$from, df$to))
 	mat <- do.call(rbind, lapply(all_nodes, function(x) {
