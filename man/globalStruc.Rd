@@ -9,12 +9,10 @@ globalStruc(
   candidate_genes,
   label = NULL,
   algorithm = "mmhc",
-  reg = TRUE,
   algorithm.args = list(),
   return_bn = TRUE,
   return_data = TRUE,
   cluster_label = NULL,
-  penalty = "glmnet_CV",
   verbose = FALSE,
   use_assay = "logcounts",
   barcode_column = "row",
@@ -25,13 +23,11 @@ globalStruc(
 )
 }
 \arguments{
-\item{algorithm}{inference algorithm of BN, ignored if reg=TRUE}
-
-\item{penalty}{if {reg}=TRUE, the penalty used can be specified, default to {glmnet} (lasso).
+\item{algorithm}{inference algorithm of BN
 If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
 If you use CCDr algorithm, the {bn} object is returned.}
 
-\item{use_assay}{use assay}
+\item{use_assay}{use assay, default to logcounts}
 
 \item{input}{default to NULL}
 

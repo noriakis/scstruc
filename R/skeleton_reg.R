@@ -1,12 +1,12 @@
 
-.ncvregCV <- function(X, y, nFolds, pen, s=NULL) {
-    pen <- strsplit(pen, "_") %>% vapply("[", 1, FUN.VALUE="a")
-    fit <- cv.ncvreg(X, y, alpha=1, penalty=pen, nfolds=nFolds)
+.ncvregCV <- function(X, y, nFolds, algorithm, s=NULL) {
+    algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
+    fit <- cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
     included_var_index <- as.numeric(which(fit$fit$beta[, fit$min][-1]!=0))
     included_var_index
 }
 
-.glmnetBIC <- function(X, y, nFolds=NULL, pen=NULL, s=NULL) {
+.glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL, s=NULL) {
     ## This corresponds to L1MB
     fit <- glmnet(X, y, alpha=1, family="gaussian")
     tLL <- fit$nulldev - fit$nulldev * (1-fit$dev.ratio)
@@ -36,14 +36,14 @@
     row.names(tbl[tbl[,4]<0.05,])
 }
 
-.plassoBIC <- function(X, y, nFolds=NULL, pen=NULL, s=NULL) {
-    fit <- plasso_fit(X %>% as.matrix(), y, lambda=0.1, maxIter=100, gamma=0.5, eps=1e-6)
+.plasso <- function(X, y, lambda, nFolds=NULL, algorithm=NULL, s=NULL) {
+    fit <- plasso_fit(X %>% as.matrix(), y, lambda=lambda, maxIter=100, gamma=0.5, eps=1e-6)
     ## The last coefficient is intercept
     included_var_index <- which(fit[1:(length(fit)-1)]!=0)
     included_var_index
 }
 
-.glmnetCV <- function(X, y, nFolds=5, pen=NULL, s="lambda.min") {
+.glmnetCV <- function(X, y, nFolds=5, algorithm=NULL, s="lambda.min") {
     fit <- cv.glmnet(X %>% as.matrix(), y, alpha=1, family="gaussian", nfolds=nFolds)
     numcoef <- coef(fit, s=s)[,1]
     numcoef <- numcoef[2:length(numcoef)]
@@ -51,7 +51,7 @@
     included_var_index
 }
 
-.L0CV <- function(X, y, nFolds=5, pen=NULL, s=NULL) {
+.L0CV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
     fit=L0Learn::L0Learn.cvfit(x=X %>% as.matrix(), y=y, penalty="L0",
         nFolds=nFolds, algorithm="CD")
     lambdaIndex <- which.min(fit$cvMeans[[1]])
@@ -63,9 +63,9 @@
 }
 
 
-.L0LXCV <- function(X, y, nFolds=5, pen=NULL, s=NULL) {
-    pen <- strsplit(pen, "_") %>% vapply("[", 1, FUN.VALUE="a")
-    fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=pen, nFolds=nFolds, algorithm="CD")
+.L0LXCV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
+    algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
+    fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=algorithm, nFolds=nFolds, algorithm="CD")
     ## Choose gamma which have the lowest PE
     min_cvmean <- which.min(lapply(fit$cvMeans, function(cvm) cvm[[which.min(cvm)]]) |> unlist())
     chosen_gamma <- fit$fit$gamma[[min_cvmean]]
@@ -82,7 +82,7 @@
 }
 
 #' @export
-skeleton.reg.boot <- function(data, penalty="glmnet_CV", R=100,  m=nrow(data), algorithm.args=list()) {
+skeleton.reg.boot <- function(data, algorithm="glmnet_CV", R=100,  m=nrow(data), algorithm.args=list()) {
     nodes = names(data)
     perRun <- list()
     for (r in seq_len(R)) {
@@ -90,7 +90,7 @@ skeleton.reg.boot <- function(data, penalty="glmnet_CV", R=100,  m=nrow(data), a
         # generate the r-th bootstrap sample.
         replicate = data[resampling, , drop = FALSE]
         algorithm.args[["data"]] <- replicate
-        algorithm.args[["penalty"]] <- penalty
+        algorithm.args[["algorithm"]] <- algorithm
         run <- do.call(skeleton.reg, algorithm.args)
         perRun[[r]] <- run
     }    
@@ -125,22 +125,22 @@ zeroinf.bic <- function(node, parents, data, args) {
 #' 
 #' @param s effective only in glmnet, lambda.min or lambda.1se
 #' @export
-skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NULL,
+skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
     nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list()) {
     if (verbose) {
-        cat("Penalty:", penalty, "\n")
+        cat("Algorithm:", algorithm, "\n")
         cat("Input for structure learning: n", dim(data)[1], "p", dim(data)[2], "\n")
     }
     nodes <- colnames(data)
     penFun <- dplyr::case_when(
-        penalty=="glmnet_BIC" ~ ".glmnetBIC",
-        penalty=="plasso_BIC" ~ ".plassoBIC",
-        penalty=="glmnet_CV" ~ ".glmnetCV",
-        penalty=="MCP_CV" ~ ".ncvregCV",
-        penalty=="SCAD_CV" ~ ".ncvregCV",
-        penalty=="L0L2_CV" ~ ".L0LXCV",
-        penalty=="L0L1_CV" ~ ".L0LXCV",
-        penalty=="L0_CV" ~ ".L0CV"
+        algorithm=="glmnet_BIC" ~ ".glmnetBIC",
+        algorithm=="plasso" ~ ".plasso",
+        algorithm=="glmnet_CV" ~ ".glmnetCV",
+        algorithm=="MCP_CV" ~ ".ncvregCV",
+        algorithm=="SCAD_CV" ~ ".ncvregCV",
+        algorithm=="L0L2_CV" ~ ".L0LXCV",
+        algorithm=="L0L1_CV" ~ ".L0LXCV",
+        algorithm=="L0_CV" ~ ".L0CV"
     )
 
     mb <- sapply(nodes, function(nn) {
@@ -148,14 +148,14 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
         if (length(unique(y))==1) {return(NULL)}
-        if (penalty=="glmmTMB") {
+        if (algorithm=="glmmTMB") {
             sign <- .glmmTMB(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
             if (verbose) {cat(" candidate:", length(sign), "\n")}
             return(sign)
         } else {
             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
-                "nFolds"=nFolds, "pen"=penalty, "s"=s))            
+                "nFolds"=nFolds, "algorithm"=algorithm, "s"=s))            
             if (verbose) {cat(" candidate:", length(included_var_index), "\n")}
             if (length(included_var_index)==0) {return(NULL)}
             return(colnames(X)[included_var_index])
@@ -178,7 +178,7 @@ skeleton.reg <- function(data, penalty="glmnet_CV", whitelist=NULL, blacklist=NU
     mb <- bnlearn:::bn.recovery(mb, nodes = nodes)
 
     arcs <- bnlearn:::nbr2arcs(mb)
-    res <- list(learning = list("method"="reg",
+    res <- list(learning = list("method"="scstruc",
         "blacklist"=list(blacklist)),
         nodes = bnlearn:::cache.structure(names(mb), arcs = arcs),
         arcs = arcs, blacklist=blacklist)

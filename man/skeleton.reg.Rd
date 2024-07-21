@@ -6,7 +6,7 @@
 \usage{
 skeleton.reg(
   data,
-  penalty = "glmnet_CV",
+  algorithm = "glmnet_CV",
   whitelist = NULL,
   blacklist = NULL,
   nFolds = 5,

@@ -29,22 +29,34 @@ loadppi <- function(org="mm", database="string") {
 #' @param edge_names edge names in `GeneA->GeneB` style
 #' @param org organism name (mm, or hsa)
 #' @export
-intersectPpi <- function(edge_names, org="mm", database="string") {
-  if (!is.matrix(edge_names)) {
-    enn <- length(edge_names)
-    importantGraph <- do.call(rbind,
-                            edge_names %>% strsplit("->")) %>%
-    graph_from_edgelist(directed = FALSE)    
-  } else {
+intersectPpi <- function(edge_names, org="mm", database="string", return_net=FALSE) {
+  if (is.vector(edge_names)) {
+      enn <- length(edge_names)
+      importantGraph <- do.call(rbind,
+                            edge_names %>% unique() %>% strsplit("->")) %>%
+      graph_from_edgelist(directed = FALSE)
+  } else if ("bn" %in% class(edge_names)) {
+    ## If BN, considering the undirected edges, simplify
+    g <- bnlearn::as.igraph(edge_names) %>% as.undirected() %>% simplify()
+    enn <- length(E(g))
+    importantGraph <- g
+  } else if (is.igraph(edge_names)) {
+    ## If igraph, simplify
+    importantGraph <- as.undirected(edge_names) %>% simplify()
+    enn <- E(importantGraph) %>% length()
+  } else if (is.matrix(edge_names)) {
+    ## User-specification warning
+    warning("Matrix will be taken care of as is, so multiple rows with same relationships (undirected edges) will be counted as two.")
     enn <- dim(edge_names)[1]
-    importantGraph <- graph_from_edgelist(edge_names, directed=FALSE)
+    importantGraph <- graph_from_edgelist(edge_names, directed=FALSE) %>% simplify()
   }
-
     ppis <- loadppi(org=org, database=database)
     ints <- igraph::intersection(ppis, importantGraph)
 
     inten <- as_edgelist(ints) %>% dim() %>% purrr::pluck(1)
-
-    cat(inten / enn, "\n")
-    return(ints)
+    if (return_net) {
+      return(ints)
+    }
+    # cat(inten / enn, "\n")
+    return(inten / enn)
 }

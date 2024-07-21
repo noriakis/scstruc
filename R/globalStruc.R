@@ -1,15 +1,14 @@
 #' globalStruc
-#' @param algorithm inference algorithm of BN, ignored if reg=TRUE
-#' @param cluster_labels (experimental) aggregate to speed up computation
-#' @param penalty if {reg}=TRUE, the penalty used can be specified, default to {glmnet} (lasso).
+#' @param algorithm inference algorithm of BN
 #' If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
 #' If you use CCDr algorithm, the {bn} object is returned.
-#' @param use_assay use assay
+#' @param cluster_labels (experimental) aggregate to speed up computation
+#' @param use_assay use assay, default to logcounts
 #' @param input default to NULL
 #' @export
 globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
-	reg=TRUE, algorithm.args=list(), return_bn=TRUE, return_data=TRUE,
-    cluster_label=NULL, penalty="glmnet_CV",verbose=FALSE, use_assay="logcounts",
+	algorithm.args=list(), return_bn=TRUE, return_data=TRUE,
+    cluster_label=NULL,verbose=FALSE, use_assay="logcounts",
     barcode_column="row", change_symbol=TRUE, symbol_column="Symbol", input=NULL,
     nonzero=1) {
     ## .getInput for global label
@@ -18,9 +17,9 @@ globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
         input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
             change_symbol, symbol_column, nonzero)
     }
-    global_graph <- .getStruc(input, algorithm, reg, penalty, algorithm.args, verbose)
+    global_graph <- .getStruc(input, algorithm, algorithm.args, verbose)
 
-    if (penalty %in% c("ccdr.run","ccdr.boot","Hurdle")) {
+    if (algorithm %in% c("ccdr","ccdr.boot","Hurdle")) {
         if (return_data) {
             return(list(global_graph, input))
         } else {

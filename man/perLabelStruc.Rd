@@ -9,8 +9,6 @@ perLabelStruc(
   candidate_genes,
   label = "label",
   algorithm = "mmhc",
-  reg = TRUE,
-  penalty = "glmnet_CV",
   use_assay = "logcounts",
   all = FALSE,
   label_name = NULL,

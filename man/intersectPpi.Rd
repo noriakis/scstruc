@@ -4,7 +4,7 @@
 \alias{intersectPpi}
 \title{intersectPpi}
 \usage{
-intersectPpi(edge_names, org = "mm", database = "string")
+intersectPpi(edge_names, org = "mm", database = "string", return_net = FALSE)
 }
 \arguments{
 \item{edge_names}{edge names in `GeneA->GeneB` style}
