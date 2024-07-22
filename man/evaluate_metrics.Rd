@@ -7,12 +7,13 @@
 evaluate_metrics(
   fitted,
   N,
-  pens = c("glmnet_CV"),
+  algos = c("glmnet_CV"),
   mmhc = TRUE,
   alphas = c(0.001, 0.005, 0.01, 0.05),
   ppi = FALSE,
   database = "string",
   org = "mm",
+  algorithm.args = list(),
   ccdr = TRUE,
   return_net = FALSE,
   lambdas.length = 20,
@@ -29,6 +30,8 @@ alphas specified in `alphas` argument.}
 
 \item{ppi}{if specified, include metrics of comparison with PPI.
 The network node name should be symbol.}
+
+\item{algorithm.args}{algorithm args}
 
 \item{ccdr}{perform comparison with CCDr algorithm with lambda length specified in 
 `lambdas.length` argument.}

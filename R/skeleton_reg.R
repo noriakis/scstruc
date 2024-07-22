@@ -29,14 +29,14 @@
         ziformula= formula,
         family=gaussian)
     res <- summary(fit)
-    print(res)
     tbl <- res$coefficients$cond
     tbl <- tbl[2:nrow(tbl),]
     tbl <- tbl[!is.na(tbl[,4]),]
     row.names(tbl[tbl[,4]<0.05,])
 }
 
-.plasso <- function(X, y, lambda, nFolds=NULL, algorithm=NULL, s=NULL) {
+.plasso <- function(X, y, lambda=0.1, nFolds=NULL, algorithm=NULL, s=NULL) {
+    cat("Precision lasso lambda:", lambda, "\n")
     fit <- plasso_fit(X %>% as.matrix(), y, lambda=lambda, maxIter=100, gamma=0.5, eps=1e-6)
     ## The last coefficient is intercept
     included_var_index <- which(fit[1:(length(fit)-1)]!=0)

@@ -19,14 +19,21 @@
 #' @param ppi if specified, include metrics of comparison with PPI.
 #' The network node name should be symbol.
 #' @param sid compute SID, needs package SID in CRAN.
+#' @param algorithm.args algorithm args
 #' @export
 evaluate_metrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
          database="string", org="mm",
+         algorithm.args=list(),
          ccdr=TRUE, return_net=FALSE, lambdas.length=20, sid=FALSE) {
 
-  if ("ccdr" %in% pens) {
+  if ("ccdr" %in% algos) {
     stop("Cannot specify CCDr in this argument, please choose `ccdr` argument as TRUE")
+  }
+  if (length(algorithm.args)!=0) {
+    if (length(algorithm.args)!=length(algos)){
+      stop("Length of algos and algorithm.args does not match")
+    }
   }
 
   rawnet <- as.bn(bn_fit_to_igraph(fitted))
@@ -40,7 +47,7 @@ evaluate_metrics <- function(fitted, N, algos=c("glmnet_CV"),
     cat(tim, "\n")
     list(net, tim)
   })
-  names(alls) <- pens
+  names(alls) <- algos
   
   if (mmhc) {
     for (al in alphas) {
