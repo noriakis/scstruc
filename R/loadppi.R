@@ -24,7 +24,8 @@ loadppi <- function(org="mm", database="string") {
 
 #' intersectPpi
 #' 
-#' Examine intersection of PPI using output of `markerCoefs`
+#' Examine intersection of PPI.
+#' Named vector of edge number, intersection number and proportion will be returned.
 #' 
 #' @param edge_names edge names in `GeneA->GeneB` style
 #' @param org organism name (mm, or hsa)
@@ -58,5 +59,7 @@ intersectPpi <- function(edge_names, org="mm", database="string", return_net=FAL
       return(ints)
     }
     # cat(inten / enn, "\n")
-    return(inten / enn)
+    vec <- c(enn, inten, inten / enn)
+    names(vec) <- c("edge_number", "intersect", "proportion")
+    return(vec)
 }
