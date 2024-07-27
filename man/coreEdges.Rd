@@ -4,10 +4,10 @@
 \alias{coreEdges}
 \title{coreEdges}
 \usage{
-coreEdges(listOfNets, label_name)
+coreEdges(listOfNets)
 }
 \arguments{
-\item{listOfNets}{list of bn.strength}
+\item{listOfNets}{list of bn}
 }
 \description{
 coreEdges

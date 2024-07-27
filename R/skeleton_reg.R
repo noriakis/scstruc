@@ -29,7 +29,7 @@
         ziformula= formula,
         family=gaussian)
     res <- summary(fit)
-    tbl <- res$coefficients$cond
+    tbl <- data.frame(res$coefficients$cond)
     tbl <- tbl[2:nrow(tbl),]
     tbl <- tbl[!is.na(tbl[,4]),]
     row.names(tbl[tbl[,4]<0.05,])
@@ -44,7 +44,8 @@
 }
 
 .glmnetCV <- function(X, y, nFolds=5, algorithm=NULL, s="lambda.min") {
-    fit <- cv.glmnet(X %>% as.matrix(), y, alpha=1, family="gaussian", nfolds=nFolds)
+    fit <- cv.glmnet(X %>% as.matrix(), y,
+        alpha=1, family="gaussian", nfolds=nFolds)
     numcoef <- coef(fit, s=s)[,1]
     numcoef <- numcoef[2:length(numcoef)]
     included_var_index <- which(numcoef!=0)
@@ -81,6 +82,23 @@
     included_var_index
 }
 
+.MASTHurdle <- function(nodes, nn, data, formula= ~ 1) {
+
+    pred <- setdiff(nodes, nn)
+    if (length(pred) == 0) {
+        model = paste(nn, "~ 1")
+    } else {
+        model = paste(nn, "~", paste(pred, collapse = "+"))
+    }
+    fit <- MAST::zlm(as.formula(model), data=data)
+    res <- summary.glm(fit$cont)
+    tbl <- data.frame(coefficients(res))
+    tbl <- tbl[2:nrow(tbl),]
+    tbl <- tbl[!is.na(tbl[,4]),]
+    row.names(tbl[tbl[,4]<0.05,])
+}
+
+
 #' @export
 skeleton.reg.boot <- function(data, algorithm="glmnet_CV", R=100,  m=nrow(data), algorithm.args=list()) {
     nodes = names(data)
@@ -111,11 +129,30 @@ zeroinf.bic <- function(node, parents, data, args) {
     cat("Fitting:", model, "\n")
 
     fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= ~ 1, family=gaussian)
+        ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 10))
 
    - BIC(fit) / 2
 
 }#MY.BIC
+
+#' Custom score function for bnlearn, using MAST hurdle model.
+#' @noRd
+#' @importFrom MAST zlm
+hurdle.aic <- function(node, parents, data, args) {
+    ## Using glmmTMB
+    if (length(parents) == 0) {
+        model = paste(node, "~ 1")
+    } else {
+        model = paste(node, "~", paste(parents, collapse = "+"))
+    }
+    cat("Fitting:", model, "\n")
+
+    fit <- MAST::zlm(as.formula(model), sca=data)
+    return(-1 * (fit$cont$aic + fit$disc$aic))
+
+}#MY.BIC
+
+
 
 #' skeleton.reg
 #' 
@@ -150,6 +187,11 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
         if (length(unique(y))==1) {return(NULL)}
         if (algorithm=="glmmTMB") {
             sign <- .glmmTMB(nodes, nn, data)
+            if (length(sign)==0) {return(NULL)}
+            if (verbose) {cat(" candidate:", length(sign), "\n")}
+            return(sign)
+        } else if (algorithm=="MAST") {
+            sign <- .MASTHurdle(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
             if (verbose) {cat(" candidate:", length(sign), "\n")}
             return(sign)

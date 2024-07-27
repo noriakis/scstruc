@@ -12,5 +12,6 @@ intersectPpi(edge_names, org = "mm", database = "string", return_net = FALSE)
 \item{org}{organism name (mm, or hsa)}
 }
 \description{
-Examine intersection of PPI using output of `markerCoefs`
+Examine intersection of PPI.
+Named vector of edge number, intersection number and proportion will be returned.
 }

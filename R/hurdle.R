@@ -39,5 +39,6 @@
 	         score="custom", fun=score)		
 	}
 	retl[["bn"]] <- net
+	retl[["data"]] <- data[, inc_node_undir]
 	return(retl)
 }
