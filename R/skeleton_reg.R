@@ -116,7 +116,7 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV", R=100,  m=nrow(data),
     return(st)
 }
 
-#' Custom score function for bnlearn, using hurdle model.
+#' Custom score function for bnlearn, using hurdle model in glmmTMB.
 #' BIC is scaled by -2.
 #' @noRd
 zeroinf.bic <- function(node, parents, data, args) {
@@ -129,7 +129,7 @@ zeroinf.bic <- function(node, parents, data, args) {
     cat("Fitting:", model, "\n")
 
     fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 10))
+        ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 1))
 
    - BIC(fit) / 2
 
@@ -148,7 +148,9 @@ hurdle.aic <- function(node, parents, data, args) {
     cat("Fitting:", model, "\n")
 
     fit <- MAST::zlm(as.formula(model), sca=data)
-    return(-1 * (fit$cont$aic + fit$disc$aic))
+    aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)
+    
+    return(aic.sum)    
 
 }#MY.BIC
 

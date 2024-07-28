@@ -1,4 +1,4 @@
-#' evaluate_metrics
+#' evaluateMetrics
 #' 
 #' s0: edge number in original graph
 #' edges: edge number in inferred graph
@@ -21,10 +21,10 @@
 #' @param sid compute SID, needs package SID in CRAN.
 #' @param algorithm.args algorithm args
 #' @export
-evaluate_metrics <- function(fitted, N, algos=c("glmnet_CV"),
+evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
          database="string", org="mm",
-         algorithm.args=list(),
+         algorithm.args=list(), hurdleScore=NULL, hurdle=FALSE,
          ccdr=TRUE, return_net=FALSE, lambdas.length=20, sid=FALSE) {
 
   if ("ccdr" %in% algos) {
@@ -49,6 +49,15 @@ evaluate_metrics <- function(fitted, N, algos=c("glmnet_CV"),
   })
   names(alls) <- algos
   
+  if (hurdle) {
+      s <- Sys.time()
+      net <- .Hurdle(input, score=hurdleScore)$bn
+      e <- Sys.time()
+      tim <- as.numeric(e-s, unit="secs")
+      cat("Hurdle", tim, "\n")
+      scName <- ifelse(is.null(hurdleScore), "BIC", "custom")
+      alls[[paste0("hurdle_",scName)]] <- list(net, tim)      
+  }
   if (mmhc) {
     for (al in alphas) {
       s <- Sys.time()

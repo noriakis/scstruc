@@ -10,12 +10,12 @@ globalStruc <- function(spe, candidate_genes, label=NULL, algorithm="mmhc",
 	algorithm.args=list(), return_bn=TRUE, return_data=TRUE,
     cluster_label=NULL,verbose=FALSE, use_assay="logcounts",
     barcode_column="row", change_symbol=TRUE, symbol_column="Symbol", input=NULL,
-    nonzero=1) {
+    nonzero=1, rmNeg=FALSE) {
     ## .getInput for global label
     x <- NULL
     if (is.null(input)) {
         input <- .getInput(spe, candidate_genes, label, x, use_assay, barcode_column, cluster_label, verbose,
-            change_symbol, symbol_column, nonzero)
+            change_symbol, symbol_column, nonzero, rmNeg)
     }
     global_graph <- .getStruc(input, algorithm, algorithm.args, verbose)
 
