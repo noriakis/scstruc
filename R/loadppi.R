@@ -30,7 +30,7 @@ loadppi <- function(org="mm", database="string") {
 #' @param edge_names edge names in `GeneA->GeneB` style
 #' @param org organism name (mm, or hsa)
 #' @export
-intersectPpi <- function(edge_names, org="mm", database="string", return_net=FALSE) {
+intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
   if (is.vector(edge_names)) {
       enn <- length(edge_names)
       importantGraph <- do.call(rbind,
@@ -51,15 +51,26 @@ intersectPpi <- function(edge_names, org="mm", database="string", return_net=FAL
     enn <- dim(edge_names)[1]
     importantGraph <- graph_from_edgelist(edge_names, directed=FALSE) %>% simplify()
   }
-    ppis <- loadppi(org=org, database=database)
+
+    ppis <- loadppi(org=org, database="string")
     ints <- igraph::intersection(ppis, importantGraph)
 
-    inten <- as_edgelist(ints) %>% dim() %>% purrr::pluck(1)
+    ppis.biogrid <- loadppi(org=org, database="biogrid")
+    ints.biogrid <- igraph::intersection(ppis.biogrid, importantGraph)
+
     if (return_net) {
-      return(ints)
+      return(list("string"=ints, "biogrid"=ints.biogrid))
     }
+
+    inten <- as_edgelist(ints) %>% dim() %>% purrr::pluck(1)
+    inten.biogrid <- as_edgelist(ints.biogrid) %>% dim() %>% purrr::pluck(1)
+
     # cat(inten / enn, "\n")
-    vec <- c(enn, inten, inten / enn)
-    names(vec) <- c("edge_number", "intersect", "proportion")
-    return(vec)
+    vec <- c(enn, inten, inten / enn, "string")
+    names(vec) <- c("edge_number", "intersect", "proportion", "database")
+
+    vec2 <- c(enn, inten.biogrid, inten.biogrid / enn, "biogrid")
+    names(vec2) <- c("edge_number", "intersect", "proportion", "database")
+
+    return(rbind(vec, vec2))
 }

@@ -19,7 +19,8 @@ globalStruc(
   change_symbol = TRUE,
   symbol_column = "Symbol",
   input = NULL,
-  nonzero = 1
+  nonzero = 1,
+  rmNeg = FALSE
 )
 }
 \arguments{

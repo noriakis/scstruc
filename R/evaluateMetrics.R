@@ -20,10 +20,12 @@
 #' The network node name should be symbol.
 #' @param sid compute SID, needs package SID in CRAN.
 #' @param algorithm.args algorithm args
+#' @param return_net return list of whole BN
+#' @param return_data return data
 #' @export
 evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
-         database="string", org="mm",
+         database="string", org="mm", return_data=FALSE,
          algorithm.args=list(), hurdleScore=NULL, hurdle=FALSE,
          ccdr=TRUE, return_net=FALSE, lambdas.length=20, sid=FALSE) {
 
@@ -121,9 +123,14 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
 
   netList <- lapply(alls, function(x) x[[1]])
   names(netList) <- names(alls)
+
+  returns <- list()
+  returns[["metrics"]] <- res
   if (return_net) {
-     return(list(res, netList))    
-  } else {
-     return(res)
+    returns[["net"]] <- netList
   }
+  if (return_data) {
+    returns[["data"]] <- input
+  }
+  return(returns)
 }

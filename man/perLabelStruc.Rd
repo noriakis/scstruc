@@ -18,7 +18,9 @@ perLabelStruc(
   change_symbol = TRUE,
   symbol_column = "Symbol",
   cluster_label = NULL,
-  nonzero = 1
+  nonzero = 1,
+  return_data = FALSE,
+  rmNeg = FALSE
 )
 }
 \arguments{
@@ -27,6 +29,8 @@ perLabelStruc(
 \item{all}{infer all the network of the corresponding label}
 
 \item{label_name}{if all=FALSE, must be specified}
+
+\item{return_data}{return the data used to infer the network}
 }
 \description{
 Infer the BN per label (like using only the Epithelial cells or one sample)
