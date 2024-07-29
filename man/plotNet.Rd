@@ -10,7 +10,8 @@ plotNet(
   data = NULL,
   layout = "kk",
   geom = geom_edge_link,
-  largest_components = TRUE
+  largest_components = TRUE,
+  sizeRange = c(1, 5)
 )
 }
 \arguments{
