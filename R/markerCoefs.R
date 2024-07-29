@@ -1,5 +1,5 @@
 markerCoefs <- function(coef_mat, classif_label="group",
-	cell_label=NULL, cell_column="label", sample_column="Sample.Name",
+	cell_label=NULL, cell_column="label", sample_column="Sample",
     tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE) {
 	if (is.null(cell_label)) {
 		cell_label <- coef_mat[[cell_column]] |> unique()

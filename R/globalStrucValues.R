@@ -1,8 +1,8 @@
 #' globalStrucValues
-globalStrucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
+strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id", assay="logcounts") {
     if (is.null(bn) & is.null(global_tbl_graph)) {stop("Please supply either of tbl_graph or bn")}
-    if (!is.null(bn)) {return(.globalStrucValuesCoef(spe, bn, labels, exclude_label, barcode, assay))}
+    if (!is.null(bn)) {return(.strucValuesCoef(spe, bn, labels, exclude_label, barcode, assay))}
     gedges <- global_tbl_graph |> activate(edges) |> data.frame()
     gnnames <- global_tbl_graph |> activate(nodes) |> pull(name)
     gedges$from <- gnnames[gedges$from]
@@ -37,7 +37,7 @@ globalStrucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=
     return(appendix)
 }
 
-.globalStrucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay) {
+.strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay) {
     cat("Coefficient calculation per specified group\n")
     logc <- spe@assays@data[[assay]]
     ## In case
