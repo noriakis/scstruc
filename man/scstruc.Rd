@@ -4,13 +4,47 @@
 \alias{scstruc}
 \title{scstruc}
 \usage{
-scstruc(sce, path)
+scstruc(
+  spe,
+  candidateGenes,
+  label = NULL,
+  labelName = NULL,
+  algorithm = "mmhc",
+  algorithm.args = list(),
+  returnBn = TRUE,
+  returnData = TRUE,
+  clusterLabel = NULL,
+  verbose = FALSE,
+  useAssay = "logcounts",
+  barcodeColumn = "row",
+  changeSymbol = TRUE,
+  symbolColumn = "Symbol",
+  input = NULL,
+  nonzero = 1,
+  rmNeg = FALSE
+)
 }
 \arguments{
-\item{sce}{class object storing single cell data}
+\item{spe}{SingleCellExperiment, SpatialExpetiment object}
 
-\item{path}{pathway ID}
+\item{label}{label column}
+
+\item{algorithm}{inference algorithm of BN
+If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
+If you use CCDr algorithm, the {bn} object is returned.}
+
+\item{returnData}{By default, return the data used for the inference.}
+
+\item{useAssay}{use assay, default to logcounts}
+
+\item{barcodeColumn}{barcode for cell identification}
+
+\item{input}{default to NULL}
+
+\item{clusterLabels}{(experimental) aggregate the count across this cluster to speed up computation}
+
+\item{returBn}{By default, returns the bn class object}
 }
 \description{
-Main function wrapping the structure learning and fitting.
+The main function for scstruc package.
 }

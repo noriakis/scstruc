@@ -8,6 +8,10 @@
         cat("Returning the bn per lambda from result of ccdr.run\n")
         dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
         algorithm.args[["data"]] <- dat
+        if (is.null(algorithm.args[["lambdas.length"]]) & is.null(algorithm.args[["lambdas"]])) {
+            cat("Setting `lambdas.length` to 10\n")
+            algorithm.args[["lambdas.length"]] = 10
+        }
         ccdr.res <- do.call(ccdrAlgorithm::ccdr.run, algorithm.args)
         bn.res <- lapply(seq_along(ccdr.res), function(x) {
             sparsebnUtils::to_bn(ccdr.res[[x]]$edges)

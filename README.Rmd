@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 # scstruc
 
-The package for analysing the gene regulatory network based on the structure of single-cell transcriptomics data, inferred by Bayesian network. The function works with `SingleCellExperiment` and `SpatialExperiment`.
+The package for analysing the gene regulatory network based on the Bayesian network structure of single-cell transcriptomics data. The function works with `SingleCellExperiment` and `SpatialExperiment`.
 
 ## Installation
 
@@ -47,7 +47,7 @@ library(bnlearn)
 sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
-gs <- globalStruc(sce, included_genes, return_bn=TRUE, return_data=TRUE, change_symbol=FALSE, reg=FALSE)
+gs <- scstruc(sce, included_genes, change_symbol=FALSE)
 fitted <- bn.fit(gs[[1]], gs[[2]])
 ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
   geom_edge_diagonal(aes(color=coef),
@@ -61,8 +61,8 @@ Using the bootstrapping, the averaged network is obtained.
 
 ```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
 library(glmnet)
-gs2 <- globalStruc(sce, included_genes, return_bn=TRUE, penalty="glmnet_BIC.boot",
-                  change_symbol = FALSE, algorithm.args=list("R"=100))
+gs2 <- scstruc(sce, included_genes, penalty="glmnet_BIC.boot",
+               change_symbol=FALSE, algorithm.args=list("R"=20))
 plotAVN(gs2)
 ```
 
@@ -78,10 +78,10 @@ sces <- lapply(sces, function(x) {
   return(x)})
 
 included_genes <- sample(row.names(sce), 50)
-booted <- lapply(sces, function(x) perLabelStruc(x, label_name = "Celltype_1",
+booted <- lapply(sces, function(x) scstruc(x, labelName="Celltype_1",
      algorithm.args=list("R"=10), barcode_column="row",
      candidate_genes=included_genes, nonzero=0.5,
-     penalty="glmnet_CV.boot"))
-ce <- coreEdges(booted, "Celltype_1")
+     algorithm="glmnet_CV.boot"))
+ce <- coreBootEdges(booted, "Celltype_1")
 ce
 ```

@@ -25,7 +25,7 @@ ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gam
         # generate the r-th bootstrap sample.
         replicate = data[resampling, , drop = FALSE]
         dat <- sparsebnUtils::sparsebnData(replicate, type = "continuous")
-        run <- ccdr.run(data = dat, lambdas=lambdas,
+        run <- ccdrAlgorithm::ccdr.run(data = dat, lambdas=lambdas,
             alpha=alpha, gamma=gamma, verbose=FALSE)
         perRun[[r]] <- run
     }

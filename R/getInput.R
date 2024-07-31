@@ -1,5 +1,10 @@
 #' @noRd
-.getInput <- function(sce, candidate_genes, label, x, use_assay, barcode_column="Barcode", cluster_label=NULL, verbose=FALSE,
+#' @param label label column
+#' @param x label name
+.getInput <- function(sce,
+    candidate_genes, label, x,
+    use_assay, barcode_column="Barcode",
+    cluster_label=NULL, verbose=FALSE,
     change_symbol=TRUE, symbol_column="Symbol", nonzero=1, rmNeg=FALSE) {
     logc <- sce@assays@data[[use_assay]]
     if (change_symbol) {
@@ -16,7 +21,6 @@
     # if (is.null(colnames(logc))) {
     colnames(logc) <- meta[[barcode_column]]
     # }
-
     if (is.null(x)) {
         inc_cells <- meta[[barcode_column]]
     } else {
@@ -35,6 +39,7 @@
         as.matrix() |> t() |>
         data.frame(check.names=FALSE)        
     }
+    if (dim(input)[1]==1) {stop("Only one gene is available")}
     if (verbose) {
         cat("Dimension of the input: n", dim(input)[1], "p", dim(input)[2], "\n")
     }

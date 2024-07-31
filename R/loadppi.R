@@ -72,5 +72,10 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
     vec2 <- c(enn, inten.biogrid, inten.biogrid / enn, "biogrid")
     names(vec2) <- c("edge_number", "intersect", "proportion", "database")
 
-    return(rbind(vec, vec2))
+    df <- data.frame(rbind(vec, vec2))
+    df$edge_number <- as.numeric(df$edge_number)
+    df$intersect <- as.numeric(df$intersect)
+    df$proportion <- as.numeric(df$proportion)
+    row.names(df) <- seq_len(nrow(df))
+    return(df)
 }

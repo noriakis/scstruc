@@ -3,7 +3,7 @@
 #' @param net network in bn class
 #' @export
 plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
-	largest_components=TRUE, sizeRange=c(1,5)) {
+	largest_components=TRUE, sizeRange=c(3,6)) {
 	  edgeArgs <- list()
 	  edgeArgs[["color"]] <- "grey80"
 	  edgeArgs[["arrow"]] <- arrow(length=unit(2,"mm"), type="closed")
@@ -38,7 +38,7 @@ ggraph(layout=layout) +
 if (is.null(data)) {
 	gra
 } else {
-	gra + scale_edge_color_gradient(low="blue", high="red")
+	gra + scale_edge_color_gradient()
 }
 
 }

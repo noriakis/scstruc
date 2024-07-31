@@ -1,4 +1,5 @@
-#' globalStrucValues
+#' strucValues
+#' @export
 strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id", assay="logcounts") {
     if (is.null(bn) & is.null(global_tbl_graph)) {stop("Please supply either of tbl_graph or bn")}

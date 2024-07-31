@@ -1,13 +1,17 @@
 #' @noRd
 #' @importFrom data.table :=
-.Hurdle <- function(data, score=NULL, debug=FALSE) {
+.Hurdle <- function(data, score=NULL, debug=FALSE, skeleton=NULL) {
 
 	# cat("Using score", as.character(score), "\n")
 
 	retl <- list()
+	if (is.null(skeleton)) {
+		## Fit model
+		hurdle <- fitHurdle(data)
 
-	## Fit model
-	hurdle <- fitHurdle(data)
+	} else {
+		hurdle <- skeleton
+	}
 
 	## Best model selection
 	BIC_etc <- hurdle$BIC_etc
