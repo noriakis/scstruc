@@ -47,7 +47,7 @@ library(bnlearn)
 sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
-gs <- scstruc(sce, included_genes, change_symbol=FALSE)
+gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 fitted <- bn.fit(gs[[1]], gs[[2]])
 ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
   geom_edge_diagonal(aes(color=coef),
@@ -61,9 +61,9 @@ Using the bootstrapping, the averaged network is obtained.
 
 ```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
 library(glmnet)
-gs2 <- scstruc(sce, included_genes, penalty="glmnet_BIC.boot",
-               change_symbol=FALSE, algorithm.args=list("R"=20))
-plotAVN(gs2)
+gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC.boot",
+               changeSymbol=FALSE, algorithm.args=list("R"=20))
+plotAVN(gs2$net)
 ```
 
 Celltype-specific bootstrapped networks.
@@ -78,10 +78,14 @@ sces <- lapply(sces, function(x) {
   return(x)})
 
 included_genes <- sample(row.names(sce), 50)
-booted <- lapply(sces, function(x) scstruc(x, labelName="Celltype_1",
-     algorithm.args=list("R"=10), barcode_column="row",
-     candidate_genes=included_genes, nonzero=0.5,
-     algorithm="glmnet_CV.boot"))
-ce <- coreBootEdges(booted, "Celltype_1")
+booted <- lapply(sces, function(x) {
+  scstruc(x, included_genes,
+    changeSymbol=FALSE,
+    labelName="Celltype_1",
+    label="label",
+    algorithm="glmnet_CV.boot",
+    algorithm.args=list("R"=10))
+})
+ce <- coreBootEdges(booted)
 ce
 ```
