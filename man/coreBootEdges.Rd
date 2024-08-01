@@ -4,7 +4,7 @@
 \alias{coreBootEdges}
 \title{coreBootEdges}
 \usage{
-coreBootEdges(listOfNets, label_name)
+coreBootEdges(listOfNets)
 }
 \arguments{
 \item{listOfNets}{list of bn.strength}
