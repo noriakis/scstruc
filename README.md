@@ -4,9 +4,8 @@
 # scstruc
 
 The package for analysing the gene regulatory network based on the
-structure of single-cell transcriptomics data, inferred by Bayesian
-network. The function works with `SingleCellExperiment` and
-`SpatialExperiment`.
+Bayesian network structure of single-cell transcriptomics data. The
+function works with `SingleCellExperiment` and `SpatialExperiment`.
 
 ## Installation
 
@@ -33,8 +32,8 @@ library(bnlearn)
 sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
-gs <- globalStruc(sce, included_genes, return_bn=TRUE, return_data=TRUE, change_symbol=FALSE, reg=FALSE)
-#> Using default MMHC
+gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
+#> Using default bnlearn algorithm
 fitted <- bn.fit(gs[[1]], gs[[2]])
 ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
   geom_edge_diagonal(aes(color=coef),
@@ -50,10 +49,10 @@ Using the bootstrapping, the averaged network is obtained.
 
 ``` r
 library(glmnet)
-gs2 <- globalStruc(sce, included_genes, return_bn=TRUE, penalty="glmnet_BIC.boot",
-                  change_symbol = FALSE, algorithm.args=list("R"=100))
+gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC.boot",
+               changeSymbol=FALSE, algorithm.args=list("R"=20))
 #> Bootstrapping specified
-plotAVN(gs2)
+plotAVN(gs2$net)
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="2400" style="display: block; margin: auto;" />
@@ -70,40 +69,42 @@ sces <- lapply(sces, function(x) {
   return(x)})
 
 included_genes <- sample(row.names(sce), 50)
-booted <- lapply(sces, function(x) perLabelStruc(x, label_name = "Celltype_1",
-     algorithm.args=list("R"=10), barcode_column="row",
-     candidate_genes=included_genes, nonzero=0.5,
-     penalty="glmnet_CV.boot"))
-#> Celltype_1 
+booted <- lapply(sces, function(x) {
+  scstruc(x, included_genes,
+    changeSymbol=FALSE,
+    labelName="Celltype_1",
+    label="label",
+    algorithm="glmnet_CV.boot",
+    algorithm.args=list("R"=10))
+})
 #> Bootstrapping specified
-#> Celltype_1 
 #> Bootstrapping specified
-ce <- coreEdges(booted, "Celltype_1")
+ce <- coreBootEdges(booted)
 ce
-#> # A tbl_graph: 33 nodes and 36 edges
+#> # A tbl_graph: 44 nodes and 71 edges
 #> #
-#> # A directed simple graph with 4 components
+#> # A directed multigraph with 1 component
 #> #
-#> # Node Data: 33 × 1 (active)
+#> # Node Data: 44 × 1 (active)
 #>    name     
 #>    <chr>    
-#>  1 Gene_0074
-#>  2 Gene_0918
-#>  3 Gene_0109
-#>  4 Gene_0306
-#>  5 Gene_1059
-#>  6 Gene_0280
-#>  7 Gene_1234
-#>  8 Gene_1917
-#>  9 Gene_0356
-#> 10 Gene_1562
-#> # ℹ 23 more rows
+#>  1 Gene_0017
+#>  2 Gene_0196
+#>  3 Gene_0728
+#>  4 Gene_0080
+#>  5 Gene_0221
+#>  6 Gene_0714
+#>  7 Gene_0111
+#>  8 Gene_0689
+#>  9 Gene_0114
+#> 10 Gene_0639
+#> # ℹ 34 more rows
 #> #
-#> # Edge Data: 36 × 4
+#> # Edge Data: 71 × 4
 #>    from    to strength direction
 #>   <int> <int>    <dbl>     <dbl>
-#> 1     1     2      0.7     0.714
-#> 2     3     4      0.7     0.786
-#> 3     3     2      0.9     0.667
-#> # ℹ 33 more rows
+#> 1     1     2      0.8     0.875
+#> 2     1     3      0.6     0.667
+#> 3     4     5      1       0.9  
+#> # ℹ 68 more rows
 ```
