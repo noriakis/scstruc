@@ -59,6 +59,25 @@ bn_fit_to_igraph <- function(graph) {
 	})))
 }
 
+#' 
+#' bn_fit_to_df
+#' 
+#' This function coverts the bn.fit object to data.frame
+#' 
+#' @param graph bn.fit object
+#' 
+#' @export
+bn_fit_to_df <- function(fitted) {
+    do.call(rbind, lapply(names(fitted), function(x) {
+        tmp.n <- names(fitted[[x]]$coefficients)
+        ps <- tmp.n[tmp.n!="(Intercept)"]
+        do.call(rbind, lapply(ps, function(p) {
+            c(paste0(x,"->",p), fitted[[x]]$coefficients[p]) %>% setNames(c("edge","coefficient"))
+        })) %>% data.frame()
+    }))
+}
+
+
 
 #' getCyclinGenes
 #' @export
