@@ -39,7 +39,7 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 }
 
 .strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay) {
-    cat("Coefficient calculation per specified group\n")
+    cat("Coefficient calculation per specified group:", paste0(labels, collapse=","), "\n")
     logc <- spe@assays@data[[assay]]
     ## In case
     if ("Symbol" %in% colnames(rowData(spe))) {
