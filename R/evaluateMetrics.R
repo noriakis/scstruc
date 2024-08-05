@@ -26,7 +26,7 @@
 evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
          database="string", org="mm", return_data=FALSE,
-         algorithm.args=list(), hurdleScore=NULL, hurdle=FALSE,
+         algorithm.args=list(), hurdle=FALSE,
          ccdr=TRUE, return_net=FALSE, lambdas.length=20, sid=FALSE) {
 
   if ("ccdr" %in% algos) {
@@ -52,13 +52,22 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
   names(alls) <- algos
   
   if (hurdle) {
+      ## Two types of scores will be tested
+      ## Hurdle object can be passed to .Hurdle, but
+      ## for evaluation of time, raw calculation will be performed.
       s <- Sys.time()
-      net <- .Hurdle(input, score=hurdleScore)$bn
+      net <- .Hurdle(input, score=NULL)
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
       cat("Hurdle", tim, "\n")
-      scName <- ifelse(is.null(hurdleScore), "BIC", "custom")
-      alls[[paste0("hurdle_",scName)]] <- list(net, tim)      
+      alls[[paste0("Hurdle_BIC")]] <- list(net$bn, tim)
+
+      s <- Sys.time()
+      net <- .Hurdle(input, score=hurdle.aic)
+      e <- Sys.time()
+      tim <- as.numeric(e-s, unit="secs")
+      cat("Hurdle", tim, "\n")
+      alls[[paste0("Hurdle_AIC")]] <- list(net$bn, tim)
   }
   if (mmhc) {
     for (al in alphas) {

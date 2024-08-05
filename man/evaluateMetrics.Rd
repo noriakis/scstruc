@@ -15,7 +15,6 @@ evaluateMetrics(
   org = "mm",
   return_data = FALSE,
   algorithm.args = list(),
-  hurdleScore = NULL,
   hurdle = FALSE,
   ccdr = TRUE,
   return_net = FALSE,

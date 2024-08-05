@@ -32,7 +32,7 @@ markerCoefs <- function(coef_mat, classif_label="group",
         require(xgboost)
         trueLabel <- unique(as.character(mydata$classif_label))[2]
         cat("True label will be:", trueLabel, "\n")
-        vec <- as.numeric(coefmat$classif_label==trueLabel)
+        vec <- as.numeric(mydata$classif_label==trueLabel)
         mydata$classif_label <- NULL
         if (length(xgboostArgs)==0) {
             xgboostArgs[["nrounds"]] <- 100
