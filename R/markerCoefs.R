@@ -1,6 +1,7 @@
 markerCoefs <- function(coef_mat, classif_label="group",
 	cell_label=NULL, cell_column="label", sample_column="Sample",
-    tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE) {
+    tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE, returnChar=TRUE,
+    xgboost=FALSE, xgboostArgs=list()) {
 	if (is.null(cell_label)) {
 		cell_label <- coef_mat[[cell_column]] |> unique()
 	}
@@ -26,17 +27,37 @@ markerCoefs <- function(coef_mat, classif_label="group",
         return(mydata)
     }
 
-    mydata[is.na(mydata)] <- 0
-    cat("Performing Boruta algorithm ...\n")
-    brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
-    if (tentative_fix) {
-        brt_fixed <- TentativeRoughFix(brt)
+    ## We do not use impXgboost in Boruta as not recommended.
+    if (xgboost) {
+        require(xgboost)
+        trueLabel <- unique(as.character(mydata$classif_label))[2]
+        cat("True label will be:", trueLabel, "\n")
+        vec <- as.numeric(coefmat$classif_label==trueLabel)
+        mydata$classif_label <- NULL
+        if (length(xgboostArgs)==0) {
+            xgboostArgs[["nrounds"]] <- 100
+        }
+        xgboostArgs[["data"]] <- mydata %>% as.matrix()
+        xgboostArgs[["label"]] <- vec
+        res <- do.call(xgboost::xgboost, xgboostArgs)
+        importance <- xgb.importance(feature_names = colnames(mydata), model = res)
+        return(list("xgboost"=res, "importance"=importance, "data"=mydata))
     } else {
-        brt_fixed <- brt
+        mydata[is.na(mydata)] <- 0
+        cat("Performing Boruta algorithm ...\n")
+        brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
+        if (tentative_fix) {
+            brt_fixed <- TentativeRoughFix(brt)
+        } else {
+            brt_fixed <- brt
+        }
+        important_edge <- brt_fixed$finalDecision[
+            brt_fixed$finalDecision=="Confirmed"
+        ] |>
+            names()
+        if (!returnChar) {
+            important_edge <- do.call(rbind, important_edge %>% strsplit("->")) %>% data.frame() %>% `colnames<-`(c("from","to"))
+        }
+        return(list(brt_fixed, important_edge))    
     }
-    important_edge <- brt_fixed$finalDecision[
-        brt_fixed$finalDecision=="Confirmed"
-    ] |>
-        names()
-    return(list(brt_fixed, important_edge))
 }

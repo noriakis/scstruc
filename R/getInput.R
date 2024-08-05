@@ -55,6 +55,8 @@
         if (any(negg)) {
             cat(paste(colnames(input)[negg], collapse=","), "\n")
             input <- input[, !negg]
+        } else {
+            cat("  None available\n")
         }
     }
     # input <- input[, apply(input, 2, function(x) unique(x)!=1)]

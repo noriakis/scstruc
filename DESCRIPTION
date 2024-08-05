@@ -10,7 +10,7 @@ Depends:
     SpatialExperiment, SingleCellExperiment, RcppArmadillo, Rcpp,
     KEGGREST, glmnet
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 URL: https://github.com/noriakis/scstruc
 BugReports: https://github.com/noriakis/scstruc/issues
