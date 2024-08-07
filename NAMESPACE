@@ -2,6 +2,7 @@
 
 export(bn_fit_to_df)
 export(bn_fit_to_igraph)
+export(cat_subtle)
 export(ccdr.boot)
 export(convert_to_tbl_graph)
 export(coreBootEdges)

@@ -62,20 +62,25 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
       cat("Hurdle BIC", tim, "\n")
       alls[[paste0("Hurdle_BIC")]] <- list(net$bn, tim)
 
-      s <- Sys.time()
-      net <- .Hurdle(input, score=hurdle.aic)
-      e <- Sys.time()
-      tim <- as.numeric(e-s, unit="secs")
-      cat("Hurdle AIC", tim, "\n")
-      alls[[paste0("Hurdle_AIC")]] <- list(net$bn, tim)
+      aicinput <- removeAllNegative(input)
+      if (dim(aicinput)[2]==dim(input)[2]) {
+        s <- Sys.time()
+        net <- .Hurdle(input, score=hurdle.aic)
+        e <- Sys.time()
+        tim <- as.numeric(e-s, unit="secs")
+        cat("Hurdle AIC", tim, "\n")
+        alls[[paste0("Hurdle_AIC")]] <- list(net$bn, tim)
 
-      s <- Sys.time()
-      net <- skeleton.reg(input, algorithm="MAST",
-        maximize.args=list("score"="custom", "fun"=hurdle.aic))
-      e <- Sys.time()
-      tim <- as.numeric(e-s, unit="secs")
-      cat("MAST AIC", tim, "\n")
-      alls[[paste0("MAST_AIC")]] <- list(net, tim)
+        s <- Sys.time()
+        net <- skeleton.reg(input, algorithm="MAST",
+          maximize.args=list("score"="custom", "fun"=hurdle.aic))
+        e <- Sys.time()
+        tim <- as.numeric(e-s, unit="secs")
+        cat("MAST AIC", tim, "\n")
+        alls[[paste0("MAST_AIC")]] <- list(net, tim)        
+      } else {
+        cat_subtle("Skipping AIC scoring as all negative features are present.\n")
+      }
   }
   if (mmhc) {
     for (al in alphas) {

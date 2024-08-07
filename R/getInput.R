@@ -47,17 +47,7 @@
     if (dim(input)[1]==0) {stop("No samples")}
     input <- input[, apply(input==0, 2, function(x) sum(x) < nrow(input) * nonzero)]
     if (rmNeg) {
-        cat("Removing all negative genes if available\n")
-        negg <- lapply(colnames(input), function(x) {
-            tmp <- input[,x]
-            all(tmp[tmp!=0] < 0)
-        }) %>% unlist()
-        if (any(negg)) {
-            cat(paste(colnames(input)[negg], collapse=","), "\n")
-            input <- input[, !negg]
-        } else {
-            cat("  None available\n")
-        }
+        input <- removeAllNegative(input)
     }
     # input <- input[, apply(input, 2, function(x) unique(x)!=1)]
     if (verbose) {

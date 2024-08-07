@@ -146,7 +146,7 @@ hurdle.aic <- function(node, parents, data, args) {
     } else {
         model = paste(node, "~", paste(parents, collapse = "+"))
     }
-    # cat("Fitting ZLM:", model, "\n")
+    cat("Fitting ZLM:", model, "\n")
 
     fit <- MAST::zlm(as.formula(model), sca=data)
     aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)

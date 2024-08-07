@@ -16,6 +16,8 @@ sel.genes.kegg.ora <- function(genes, orgDb=org.Hs.eg.db, keyType="ENSEMBL", sel
   return(ora)
 }
 
+#' @export
+cat_subtle <- function(...) cat(pillar::style_subtle(paste0(...)))
 
 #' shdmat
 #' 
@@ -24,6 +26,21 @@ shdmat <- function(netlist) {
     sapply(netlist, function(x) sapply(netlist, function(y) bnlearn::shd(x,y)))
 }
 
+#' @noRd
+removeAllNegative <- function(input) {
+    cat("Removing all negative genes if available\n")
+    negg <- lapply(colnames(input), function(x) {
+        tmp <- input[,x]
+        all(tmp[tmp!=0] < 0)
+    }) %>% unlist()
+    if (any(negg)) {
+        cat(paste(colnames(input)[negg], collapse=","), "\n")
+        input <- input[, !negg]
+    } else {
+        cat("  None available\n")
+    }
+    return(input)
+}
 
 #' convert_to_tbl_graph
 #' convert bn object to tbl_graph object
