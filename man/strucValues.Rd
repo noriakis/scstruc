@@ -13,9 +13,10 @@ strucValues(
   variation_func = sd,
   bn = NULL,
   barcode = "barcode_id",
-  assay = "logcounts"
+  assay = "logcounts",
+  verbose = FALSE
 )
 }
 \description{
-strucValues
+Fit the network parameters using SingleCellExperiment object.
 }

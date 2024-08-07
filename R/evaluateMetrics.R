@@ -59,15 +59,23 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
       net <- .Hurdle(input, score=NULL)
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
-      cat("Hurdle", tim, "\n")
+      cat("Hurdle BIC", tim, "\n")
       alls[[paste0("Hurdle_BIC")]] <- list(net$bn, tim)
 
       s <- Sys.time()
       net <- .Hurdle(input, score=hurdle.aic)
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
-      cat("Hurdle", tim, "\n")
+      cat("Hurdle AIC", tim, "\n")
       alls[[paste0("Hurdle_AIC")]] <- list(net$bn, tim)
+
+      s <- Sys.time()
+      net <- skeleton.reg(input, algorithm="MAST",
+        maximize.args=list("score"="custom", "fun"=hurdle.aic))
+      e <- Sys.time()
+      tim <- as.numeric(e-s, unit="secs")
+      cat("MAST AIC", tim, "\n")
+      alls[[paste0("MAST_AIC")]] <- list(net, tim)
   }
   if (mmhc) {
     for (al in alphas) {
