@@ -1,9 +1,13 @@
 #' strucValues
+#' 
+#' Fit the network parameters using SingleCellExperiment object.
+#' 
 #' @export
 strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
-	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id", assay="logcounts") {
+	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id", assay="logcounts",
+    verbose=FALSE) {
     if (is.null(bn) & is.null(global_tbl_graph)) {stop("Please supply either of tbl_graph or bn")}
-    if (!is.null(bn)) {return(.strucValuesCoef(spe, bn, labels, exclude_label, barcode, assay))}
+    if (!is.null(bn)) {return(.strucValuesCoef(spe, bn, labels, exclude_label, barcode, assay, verbose))}
     gedges <- global_tbl_graph |> activate(edges) |> data.frame()
     gnnames <- global_tbl_graph |> activate(nodes) |> pull(name)
     gedges$from <- gnnames[gedges$from]
@@ -38,8 +42,8 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
     return(appendix)
 }
 
-.strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay) {
-    cat("Coefficient calculation per specified group:", paste0(labels, collapse=","), "\n")
+.strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay, verbose) {
+    cat("Coefficient calculation per specified group:", paste0(labels, collapse=", "), "\n")
     logc <- spe@assays@data[[assay]]
     ## In case
     if ("Symbol" %in% colnames(rowData(spe))) {
@@ -52,9 +56,9 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 	}
 
 	get_edges <- function(df) {## df means group.by metadata
+
 	    group_name <- df[,labels] |> as.matrix()
 	    group_name <- group_name[1,] |> as.character()
-
 
 	    fit_df <- logc[names(bn$nodes),
 	      which(colData(spe)[[barcode]] %in% df[[barcode]])] |>

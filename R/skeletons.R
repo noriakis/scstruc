@@ -139,13 +139,14 @@ zeroinf.bic <- function(node, parents, data, args) {
 #' @noRd
 #' @importFrom MAST zlm
 hurdle.aic <- function(node, parents, data, args) {
-    ## Using glmmTMB
+
+
     if (length(parents) == 0) {
         model = paste(node, "~ 1")
     } else {
         model = paste(node, "~", paste(parents, collapse = "+"))
     }
-    cat("Fitting:", model, "\n")
+    # cat("Fitting ZLM:", model, "\n")
 
     fit <- MAST::zlm(as.formula(model), sca=data)
     aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)

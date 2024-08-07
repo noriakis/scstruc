@@ -8,6 +8,8 @@ coreBootEdges <- function(listOfNets) {
       df <- merge(avn, listOfNets[[x]]$net, by=c("from","to"))
       if (!is.null(names(listOfNets))) {
         df[["net"]] <- names(listOfNets)[x]
+      } else {
+        df[["net"]] <- as.character(seq_along(listOfNets))
       }
       return(df)
     })))
