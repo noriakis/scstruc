@@ -16,11 +16,11 @@ sel.genes.kegg.ora <- function(genes, orgDb=org.Hs.eg.db, keyType="ENSEMBL", sel
   return(ora)
 }
 
-#' @export
+#' @noRd
 cat_subtle <- function(...) cat(pillar::style_subtle(paste0(...)))
 
 #' shdmat
-#' 
+#' @param netlist list of bn
 #' @export
 shdmat <- function(netlist) {
     sapply(netlist, function(x) sapply(netlist, function(y) bnlearn::shd(x,y)))
@@ -28,16 +28,17 @@ shdmat <- function(netlist) {
 
 #' @noRd
 removeAllNegative <- function(input) {
-    cat("Removing all negative genes if available\n")
+    cat_subtle("Removing all negative genes if available\n")
     negg <- lapply(colnames(input), function(x) {
         tmp <- input[,x]
         all(tmp[tmp!=0] < 0)
     }) %>% unlist()
     if (any(negg)) {
-        cat(paste(colnames(input)[negg], collapse=","), "\n")
+        cat_subtle("  Found some genes\n")
+        cat_subtle("  ", paste(colnames(input)[negg], collapse=", "), "\n")
         input <- input[, !negg]
     } else {
-        cat("  None available\n")
+        cat_subtle("  None available\n")
     }
     return(input)
 }
@@ -81,7 +82,7 @@ bn_fit_to_igraph <- function(graph) {
 #' 
 #' This function coverts the bn.fit object to data.frame
 #' 
-#' @param graph bn.fit object
+#' @param fitted bn.fit object
 #' 
 #' @export
 bn_fit_to_df <- function(fitted) {
@@ -94,10 +95,8 @@ bn_fit_to_df <- function(fitted) {
     }))
 }
 
-
-
 #' getCyclinGenes
-#' @export
+#' @noRd
 getCyclinGenes <- function(sce, id="Symbol", title=FALSE) {
 	if (title) {
 		cyclin.genes <- grep("^Ccn[abde]+", rowData(sce)[["Symbol"]])

@@ -1,8 +1,8 @@
 #' @useDynLib scstruc, .registration=TRUE
 #' @importFrom Rcpp sourceCpp
 NULL
-
-#' @export
+#' plasso_fit using RcppArmadillo is faster.
+#' @noRd
 plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
 	eps=1e-6, maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2) {
 	## Generate lambdas using sparsebnUtils

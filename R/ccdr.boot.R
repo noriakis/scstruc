@@ -40,50 +40,7 @@ ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gam
     	st
     })
     
-    
-    ## No need to calculate, just use bnlearn::custom.strength()
-    # probs <- lapply(which(lambdas %in% all_lambdas), function(l) {
-    #     prob = matrix(0, ncol = ncol(data), nrow = ncol(data))
-    #     for (pr in perRun) {
-    #         tmp <- pr[[l]]
-    #         tmpbn <- sparsebnUtils::to_igraph(tmp$edges)
-    #         tmpadj <- igraph::get.adjacency(tmpbn, sparse=FALSE)
-    #         for (i in seq_len(ncol(data))) {
-    #             for (j in seq_len(ncol(data))) {
-    #                 if (tmpadj[i,j] == 1) {
-    #                     prob[i,j] <- prob[i,j] + 1
-    #                 }
-    #             }
-    #         }
-    #     }
-    #     prob / R
-    # })
-    # names(probs) <- as.character(lambdas[lambdas %in% all_lambdas])
-    # ## Strength and direction computing
-    # res <- lapply(names(probs), function(p) {
-    #     amat <- probs[[p]]
-    #     ret <- NULL
-    #     for (i in seq_len(ncol(data))) {
-    #         for (j in seq_len(ncol(data))) {
-    #             if (i==j) {
-    #                 next
-    #             }
-    #             s <- amat[i, j] + amat[j, i]
-    #             if (s==0) {d <- 0} else {
-    #                 d <- amat[i,j] / s
-    #             }
-    #             if (d < 0) {d <- 0}
-    #             if (d > 1) {d <- 1}
-    #             if (s < 0) {s <- 0}
-    #             if (s > 1) {s <- 1}
-    #             ret <- rbind(ret, c(nodes[i], nodes[j], s, d))
-    #         }
-    #     }
-    #     ret <- data.frame(ret) %>% `colnames<-`(c("from","to","strength","direction"))
-    #     ret$strength <- as.numeric(ret$strength)
-    #     ret$direction <- as.numeric(ret$direction)
-    #     ret
-    # })
+
     names(res) <- as.character(lambdas[lambdas %in% all_lambdas])
     res
 }

@@ -6,16 +6,29 @@
 \usage{
 plotAVN(
   str,
-  edge = geom_edge_diagonal,
+  edge = geom_edge_link,
   ew = strength,
-  lyt = "fr",
-  size_degree = TRUE,
-  size_range = c(1, 5)
+  layout = "kk",
+  degreeMode = "all",
+  sizeDegree = TRUE,
+  sizeRange = c(1, 5)
 )
 }
 \arguments{
+\item{str}{boot.strength object}
+
+\item{edge}{geom to be used in edge}
+
 \item{ew}{edge width, strength or direction}
+
+\item{layout}{layout in ggraph}
+
+\item{degreeMode}{degree mode in igraph::degree}
+
+\item{sizeDegree}{size the node based on degree}
+
+\item{sizeRange}{node size range}
 }
 \description{
-plotAVN
+plot the averaged network based on bootstrapping
 }

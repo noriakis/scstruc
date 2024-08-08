@@ -1,14 +1,15 @@
 #' @noRd
 #' @importFrom data.table :=
-.Hurdle <- function(data, score=NULL, debug=FALSE, skeleton=NULL) {
+.Hurdle <- function(data, score=NULL, debug=FALSE,
+	skeleton=NULL, hurdle.args=list()) {
 
 	# cat("Using score", as.character(score), "\n")
 
 	retl <- list()
 	if (is.null(skeleton)) {
 		## Fit model
-		hurdle <- fitHurdle(data)
-
+		hurdle.args[["samp"]] <- data
+		hurdle <- do.call(fitHurdle, hurdle.args)
 	} else {
 		hurdle <- skeleton
 	}

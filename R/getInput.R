@@ -39,17 +39,18 @@
     }
     if (dim(input)[1]==1) {stop("Only one gene is available")}
     if (verbose) {
-        cat("Dimension of the input: n", dim(input)[1], "p", dim(input)[2], "\n")
+        cat_subtle("Dimension of the input: n ", dim(input)[1], ", p ", dim(input)[2], "\n")
     }
-    if (dim(input)[2]==0) {stop("No genes")}
-    if (dim(input)[1]==0) {stop("No samples")}
+    if (dim(input)[2]==0) {stop("No genes remained")}
+    if (dim(input)[1]==0) {stop("No samples remained")}
     input <- input[, apply(input==0, 2, function(x) sum(x) < nrow(input) * nonzero)]
     if (rmNeg) {
         input <- removeAllNegative(input)
     }
     # input <- input[, apply(input, 2, function(x) unique(x)!=1)]
     if (verbose) {
-        cat("Dimension of the input for structure learning (filtered by the number of zero): n", dim(input)[1], "p", dim(input)[2], "\n")
+        cat_subtle("Dimension of the input for structure learning (filtered by the number of zero): n ",
+            dim(input)[1], ", p ", dim(input)[2], "\n")
     }
     return(input)
 }

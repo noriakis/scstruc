@@ -20,6 +20,9 @@ superCellMat(
 \arguments{
 \item{genes}{subset of the genes to use in PCA (`getTopHVGs`, etc)}
 
+\item{prop}{if genes are not specified, `getTopHVGs` will run based on 
+proportion.}
+
 \item{pca}{use PCA or not}
 
 \item{gamma}{param to SCimplify}
@@ -27,6 +30,10 @@ superCellMat(
 \item{k.knn}{param to SCimplify}
 
 \item{mode}{average or sum}
+
+\item{ID}{SingleCellExperiment rowData column}
+
+\item{verbose}{control logging}
 
 \item{GE}{gene (row) to cell (column) matrix, like log-normalized}
 }

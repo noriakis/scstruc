@@ -1,3 +1,11 @@
+#' @title markerCoefs
+#' @description identify marker regulatory relationships based on 
+#' fitted coefficient matrix.
+#' @details Users can choose XGBoost or Boruta algorithm.
+#' @param coef_mat returned value of `strucValues`
+#' @param classif_label which label to be used for classification
+#' @param cell_label cell label for fitting
+#' @param cell_column which column represents cell types
 markerCoefs <- function(coef_mat, classif_label="group",
 	cell_label=NULL, cell_column="label", sample_column="Sample",
     tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE, returnChar=TRUE,

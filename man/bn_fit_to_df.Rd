@@ -7,7 +7,7 @@
 bn_fit_to_df(fitted)
 }
 \arguments{
-\item{graph}{bn.fit object}
+\item{fitted}{bn.fit object}
 }
 \description{
 This function coverts the bn.fit object to data.frame

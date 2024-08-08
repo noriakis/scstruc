@@ -2,8 +2,7 @@
 % Please edit documentation in R/plotNet.R
 \name{plotNet}
 \alias{plotNet}
-\title{plotNet
-plot inferred network (with coefficients if available)}
+\title{plotNet}
 \usage{
 plotNet(
   net,
@@ -11,13 +10,37 @@ plotNet(
   layout = "kk",
   geom = geom_edge_link,
   largest_components = TRUE,
-  sizeRange = c(3, 6)
+  sizeRange = c(3, 6),
+  edgeArgs = list(),
+  degreeMode = "all",
+  highlightEdges = NULL,
+  highlightEdgeWidth = 1
 )
 }
 \arguments{
 \item{net}{network in bn class}
+
+\item{data}{data to fit the inferred BN}
+
+\item{layout}{layout of the graph}
+
+\item{geom}{geom for edge in ggraph}
+
+\item{sizeRange}{specifying size of the nodes}
+
+\item{edgeArgs}{edge arguments used in `geom` argument}
+
+\item{degreeMode}{degree method}
+
+\item{highlightEdges}{if the two column matrix (corresponding to from and to)
+is provided, highlight the corresponding edges in the plot.}
+
+\item{highlightEdgeWidth}{highlight edge width}
+
+\item{largeset_components}{take largest components automatically}
 }
 \description{
-plotNet
 plot inferred network (with coefficients if available)
+The nodes will be sized and colored based on degree calculated by
+tidygraph::centrality_degree.
 }

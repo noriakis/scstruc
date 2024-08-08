@@ -1,14 +1,14 @@
 Package: scstruc
 Version: 0.99.0
-Title: Functions for capturing single-cell transcriptomic structure
+Title: Bayesian network analysis for single-cell transcriptomic data
 Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
-Description: Functions for capturing single-cell transcriptomic structure
+Description: Bayesian network analysis for single-cell transcriptomic data
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.3.0), bnlearn, ggplot2, ggraph, igraph, tidygraph,
-    SingleCellExperiment, RcppArmadillo, Rcpp,
-    KEGGREST, glmnet
+    SingleCellExperiment, RcppArmadillo, Rcpp, MAST,
+    KEGGREST, glmnet, ncvreg
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

@@ -1,15 +1,19 @@
-#' superCellMat
+#' @title superCellMat
 #' 
-#' Return the metacell abundance matrix
+#' @description Return the metacell abundance matrix
 #' Should provide SingleCellExperiment with logcounts data filled.
 #' 
 #' @import SuperCell
 #' @param GE gene (row) to cell (column) matrix, like log-normalized
 #' @param pca use PCA or not
+#' @param prop if genes are not specified, `getTopHVGs` will run based on 
+#' proportion.
 #' @param genes subset of the genes to use in PCA (`getTopHVGs`, etc)
 #' @param gamma param to SCimplify
 #' @param k.knn param to SCimplify
 #' @param mode average or sum
+#' @param ID SingleCellExperiment rowData column
+#' @param verbose control logging
 #' @export
 #' 
 superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5, rank=10,

@@ -6,6 +6,9 @@
 \usage{
 shdmat(netlist)
 }
+\arguments{
+\item{netlist}{list of bn}
+}
 \description{
 shdmat
 }
