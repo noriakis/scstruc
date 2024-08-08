@@ -48,13 +48,7 @@ sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
 gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
-fitted <- bn.fit(gs[[1]], gs[[2]])
-ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
-  geom_edge_diagonal(aes(color=coef),
-      arrow=arrow(type="closed", length=unit(2,"mm")),
-      start_cap=circle(1,"mm"), end_cap=circle(1,"mm"))+
-  geom_node_point()+
-  theme_graph()
+plotNet(gs$net, gs$data)
 ```
 
 Using the bootstrapping, the averaged network is obtained.

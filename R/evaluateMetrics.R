@@ -104,7 +104,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
       net <- mmhc(input, restrict.args=list("alpha"=al))
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
-      cat_subtle(al, " ", tim, "\n")
+      cat_subtle("MMHC ", al, " ", tim, "\n")
       alls[[paste0("mmhc_",al)]] <- list(net, tim)
     }
   }
