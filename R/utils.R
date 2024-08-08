@@ -90,7 +90,7 @@ bn_fit_to_df <- function(fitted) {
         tmp.n <- names(fitted[[x]]$coefficients)
         ps <- tmp.n[tmp.n!="(Intercept)"]
         do.call(rbind, lapply(ps, function(p) {
-            c(paste0(x,"->",p), fitted[[x]]$coefficients[p]) %>% setNames(c("edge","coefficient"))
+            c(p, x, fitted[[x]]$coefficients[p]) %>% setNames(c("from","to","coefficient"))
         })) %>% data.frame()
     }))
 }

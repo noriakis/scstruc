@@ -8,13 +8,18 @@
 #' @param sizeRange node size range
 #' @param degreeMode degree mode in igraph::degree
 #' @param largestComponents take largest components automatically
+#' @param threshold threshold for averaged network
 #' @export
 plotAVN <- function(str, edge=geom_edge_link,
     ew=strength, layout="kk", degreeMode="all",
     sizeDegree=TRUE, sizeRange=c(3, 6),
-    largestComponents=TRUE) {
-  
-    avn <- bnlearn::averaged.network(str)
+    largestComponents=TRUE, threshold=NULL) {
+    
+    if (is.null(threshold)) {
+        avn <- bnlearn::averaged.network(str)
+    } else {
+        avn <- bnlearn::averaged.network(str, threshold=threshold)
+    }
     ## Find undirected arcs
     avdf <- igraph::as_data_frame(bnlearn::as.igraph(avn))
     g <- igraph::graph_from_data_frame(merge(avdf, str, by=c("from","to")))
