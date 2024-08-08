@@ -14,5 +14,5 @@ getGOGenes(GO, orgDb = org.Mm.eg.db, type = "SYMBOL")
 \item{type}{return type, default to SYMBOL}
 }
 \description{
-get the vector of genes from GO term
+get the vector of genes related to GO term
 }

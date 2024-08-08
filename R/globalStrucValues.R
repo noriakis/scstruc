@@ -1,6 +1,5 @@
-#' strucValues
-#' 
-#' Fit the network parameters using SingleCellExperiment object.
+#' @title strucValues
+#' @description Fit the network parameters using SingleCellExperiment object and bn object.
 #' 
 #' @export
 strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
@@ -42,6 +41,7 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
     return(appendix)
 }
 
+#' @noRd
 .strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay, verbose) {
     cat("Coefficient calculation per specified group:", paste0(labels, collapse=", "), "\n")
     logc <- spe@assays@data[[assay]]

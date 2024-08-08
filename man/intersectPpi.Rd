@@ -10,6 +10,8 @@ intersectPpi(edge_names, org = "mm", return_net = FALSE)
 \item{edge_names}{edge names in `GeneA->GeneB` style}
 
 \item{org}{organism name (mm, or hsa)}
+
+\item{return_net}{returns the intersected igraph object}
 }
 \description{
 Examine intersection of PPI.

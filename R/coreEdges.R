@@ -1,4 +1,5 @@
-#' coreBootEdges
+#' @title coreBootEdges
+#' @description concatenate bootstrapped Bayesian network
 #' @param listOfNets list of bn.strength
 #' @export
 coreBootEdges <- function(listOfNets) {
@@ -16,8 +17,8 @@ coreBootEdges <- function(listOfNets) {
     return(tblg)
 }
 
-
-#' coreEdges
+#' @title coreEdges
+#' @description concatenate Bayesian network
 #' @param listOfNets list of bn
 #' @export
 coreEdges <- function(listOfNets) {

@@ -18,11 +18,13 @@ ccdr.boot(
 
 \item{R}{replicate number}
 
-\item{alpha}{passed to ccdr.run}
+\item{m}{sampling number}
 
-\item{gamma}{passed to ccdr.run}
+\item{lambdas.length}{passed to generate.lambdas}
 
-\item{lambda.length}{passed to generate.lambdas}
+\item{alpha}{passed to ccdr.run, default to 2}
+
+\item{gamma}{passed to ccdr.run, default to 2}
 }
 \value{
 list of the bn.strength per lambda

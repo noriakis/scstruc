@@ -10,5 +10,5 @@ coreEdges(listOfNets)
 \item{listOfNets}{list of bn}
 }
 \description{
-coreEdges
+concatenate Bayesian network
 }

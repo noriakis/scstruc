@@ -1,5 +1,6 @@
-#' ccdr.boot
+#' @title ccdr.boot
 #' 
+#' @description
 #' Bootstrap-based arc strength calculation based on CCDr algorithm.
 #' The function uses ccdrAlgorithm::ccdr.run for the sampled data, and returns the 
 #' bootstrap strength for the arcs per lambda. The same lambdas are used for all the inference.
@@ -7,9 +8,10 @@
 #' 
 #' @param data data (row: sample, column: gene)
 #' @param R replicate number
-#' @param lambda.length passed to generate.lambdas
-#' @param alpha passed to ccdr.run
-#' @param gamma passed to ccdr.run
+#' @param m sampling number
+#' @param lambdas.length passed to generate.lambdas
+#' @param alpha passed to ccdr.run, default to 2
+#' @param gamma passed to ccdr.run, default to 2
 #' @export
 #' @return list of the bn.strength per lambda
 #' 

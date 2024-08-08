@@ -6,6 +6,15 @@
 \usage{
 getKEGGPathwayGenes(pid, org = "mmu", orgDb = org.Mm.eg.db, type = "SYMBOL")
 }
+\arguments{
+\item{pid}{pathway id in KEGG}
+
+\item{org}{organism name}
+
+\item{orgDb}{organism database}
+
+\item{type}{returned ID type of genes}
+}
 \description{
-getKEGGPathwayGenes
+get genes related to KEGG PATHWAY
 }

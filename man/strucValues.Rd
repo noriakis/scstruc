@@ -18,5 +18,5 @@ strucValues(
 )
 }
 \description{
-Fit the network parameters using SingleCellExperiment object.
+Fit the network parameters using SingleCellExperiment object and bn object.
 }

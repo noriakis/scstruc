@@ -2,13 +2,17 @@
 % Please edit documentation in R/gen.R
 \name{gen}
 \alias{gen}
-\title{gen
-random.graph based on gene node name}
+\title{gen}
 \usage{
 gen(n, data, method = "melancon", params = list())
 }
 \arguments{
-\item{method}{ic-dag, melancon or ordered. default to melancon.}
+\item{n}{sample number}
+
+\item{data}{data to be fitted}
+
+\item{method}{arguments in bnlearn::random.graph().
+ic-dag, melancon or ordered. default to melancon.}
 
 \item{params}{pass to random.graph}
 }
@@ -16,6 +20,6 @@ gen(n, data, method = "melancon", params = list())
 bn object and bn.fit object
 }
 \description{
-gen
-random.graph based on gene node name
+generate random.graph based on gene node name and returns the 
+fitted network based on the user-provided data
 }

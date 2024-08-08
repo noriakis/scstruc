@@ -36,7 +36,7 @@
 }
 
 .plasso <- function(X, y, lambda=0.1, nFolds=NULL, algorithm=NULL, s=NULL) {
-    cat("Precision lasso lambda:", lambda, "\n")
+    cat_subtle("Precision lasso lambda: ", lambda, "\n")
     fit <- plasso_fit(X %>% as.matrix(), y, lambda=lambda, maxIter=100, gamma=0.5, eps=1e-6)
     ## The last coefficient is intercept
     included_var_index <- which(fit[1:(length(fit)-1)]!=0)
@@ -126,7 +126,7 @@ zeroinf.bic <- function(node, parents, data, args) {
     } else {
         model = paste(node, "~", paste(parents, collapse = "+"))
     }
-    cat("Fitting:", model, "\n")
+    # cat("Fitting:", model, "\n")
 
     fit <- glmmTMB(as.formula(model), data=data,
         ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 1))
@@ -146,7 +146,7 @@ hurdle.aic <- function(node, parents, data, args) {
     } else {
         model = paste(node, "~", paste(parents, collapse = "+"))
     }
-    cat("Fitting ZLM:", model, "\n")
+    # cat("Fitting ZLM:", model, "\n")
 
     fit <- MAST::zlm(as.formula(model), sca=data)
     aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)

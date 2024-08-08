@@ -1,8 +1,5 @@
-# cache <- new.env()
-
-#' loadppi
-#' 
-#' The igraph represenatation of the STRING database.
+#' @title loadppi
+#' @description The igraph represenatation of the STRING database.
 #' The file was downloaded from https://string-db.org/cgi/download, with the organism
 #' corresponding to Homo sapiens or Mus musculus. The network was subset by the combined scores (above 900)
 #' and attached to the package.
@@ -17,18 +14,18 @@ loadppi <- function(org="mm", database="string") {
     } else {
       tb = readRDS(system.file("extdata", "ppi_mm_biogrid.rds", package = "scstruc"))
     }
-    # tb = cache$table
     tb
 }
 
-
-#' intersectPpi
+#' @title intersectPpi
 #' 
+#' @description
 #' Examine intersection of PPI.
 #' Named vector of edge number, intersection number and proportion will be returned.
 #' 
 #' @param edge_names edge names in `GeneA->GeneB` style
 #' @param org organism name (mm, or hsa)
+#' @param return_net returns the intersected igraph object
 #' @export
 intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
   if (is.vector(edge_names)) {

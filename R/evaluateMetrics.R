@@ -1,4 +1,11 @@
-#' evaluateMetrics
+#' @title evaluateMetrics
+#' 
+#' @description 
+#' Evaluate various metrics comparing reference network and inferred network.
+#' The inference will be performed based on randomly generated data from 
+#' fitted Bayesian network (`bn.fit` object).
+#' 
+#' The description of metrics is as follows:
 #' 
 #' s0: edge number in original graph
 #' edges: edge number in inferred graph
@@ -8,18 +15,27 @@
 #' SID: structural intervention distance (if specified)
 #' time: time needed in structure learning (sec)
 #' 
-#' Time will be calculated by differences in Sys.time()
+#' Time will be calculated by differences in Sys.time() and will be displayed after
+#' algorithms' name
 #' 
 #' @param fitted reference network that is parameter fitted
 #' @param N number of samples to be drawn from `fitted` by `rbn` function.
 #' @param mmhc perform comparison with MMHC implemented in bnlearn with
 #' alphas specified in `alphas` argument.
+#' @param alphas alpha to be used in the restricting phase of MMHC.
+#' @param algos algorithm names
+#' @param hurdle perform inference based on Hurdle model, default to FALSE.
+#' Some scoring functions used in the function cannot calculate scores
+#' if the feature abundances are all negative. In this case, these scores will be omitted.
 #' @param ccdr perform comparison with CCDr algorithm with lambda length specified in 
 #' `lambdas.length` argument.
 #' @param ppi if specified, include metrics of comparison with PPI.
-#' The network node name should be symbol.
+#' The network node name should be symbol for calculating the intersection.
+#' Also, `database` and `org` argument should be specified based on the node name.
+#' @param org passed to `intersectPpi` function
+#' @param database passed to `intersectPpi` function
 #' @param sid compute SID, needs package SID in CRAN.
-#' @param algorithm.args algorithm args
+#' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
 #' @export
@@ -41,12 +57,12 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
   rawnet <- as.bn(bn_fit_to_igraph(fitted))
   input <- rbn(fitted, N)
   alls <- lapply(algos, function(p) {
-    cat(p,"")
+    cat_subtle(p," ")
     s <- Sys.time()
     net <- skeleton.reg(input, p, s="lambda.min")
     e <- Sys.time()
     tim <- as.numeric(e-s, unit="secs")
-    cat(tim, "\n")
+    cat_subtle(tim, "\n")
     list(net, tim)
   })
   names(alls) <- algos
@@ -59,7 +75,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
       net <- .Hurdle(input, score=NULL)
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
-      cat("Hurdle BIC", tim, "\n")
+      cat_subtle("Hurdle BIC ", tim, "\n")
       alls[[paste0("Hurdle_BIC")]] <- list(net$bn, tim)
 
       aicinput <- removeAllNegative(input)
@@ -68,7 +84,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
         net <- .Hurdle(input, score=hurdle.aic)
         e <- Sys.time()
         tim <- as.numeric(e-s, unit="secs")
-        cat("Hurdle AIC", tim, "\n")
+        cat_subtle("Hurdle AIC ", tim, "\n")
         alls[[paste0("Hurdle_AIC")]] <- list(net$bn, tim)
 
         s <- Sys.time()
@@ -76,7 +92,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
           maximize.args=list("score"="custom-score", "fun"=hurdle.aic))
         e <- Sys.time()
         tim <- as.numeric(e-s, unit="secs")
-        cat("MAST AIC", tim, "\n")
+        cat_subtle("MAST AIC ", tim, "\n")
         alls[[paste0("MAST_AIC")]] <- list(net, tim)        
       } else {
         cat_subtle("Skipping AIC scoring as all negative features are present.\n")
@@ -88,7 +104,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
       net <- mmhc(input, restrict.args=list("alpha"=al))
       e <- Sys.time()
       tim <- as.numeric(e-s, unit="secs")
-      cat(al, tim, "\n")
+      cat_subtle(al, " ", tim, "\n")
       alls[[paste0("mmhc_",al)]] <- list(net, tim)
     }
   }
@@ -102,7 +118,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
                                                as.numeric(e-s, unit="secs"))
     }  
   } 
-  cat("Network computing finished", "\n")
+  cat_subtle("Network computing finished", "\n")
   if (sid) {
       rawadj <- as_adj(as.igraph(rawnet))
   }

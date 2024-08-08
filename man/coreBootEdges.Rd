@@ -10,5 +10,5 @@ coreBootEdges(listOfNets)
 \item{listOfNets}{list of bn.strength}
 }
 \description{
-coreBootEdges
+concatenate bootstrapped Bayesian network
 }

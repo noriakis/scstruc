@@ -1,7 +1,10 @@
-#' getKEGGPathwayGenes
-#' 
-#' 
+#' @title getKEGGPathwayGenes
+#' @description get genes related to KEGG PATHWAY
 #' @importFrom AnnotationDbi mapIds
+#' @param pid pathway id in KEGG
+#' @param org organism name
+#' @param orgDb organism database
+#' @param type returned ID type of genes
 #' @export
 getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=org.Mm.eg.db, type="SYMBOL") {
     path_eg  <- keggLink("pathway", org) %>% 
@@ -13,11 +16,8 @@ getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=org.Mm.eg.db, type="SYMBOL
     inc
 }
 
-
-#' getGOGenes
-#' 
-#' get the vector of genes from GO term
-#' 
+#' @title getGOGenes
+#' @description get the vector of genes related to GO term
 #' @export
 #' @param GO GO ID
 #' @param orgDb AnnotationDbi that has "GOALL" slot

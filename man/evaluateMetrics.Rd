@@ -27,15 +27,28 @@ evaluateMetrics(
 
 \item{N}{number of samples to be drawn from `fitted` by `rbn` function.}
 
+\item{algos}{algorithm names}
+
 \item{mmhc}{perform comparison with MMHC implemented in bnlearn with
 alphas specified in `alphas` argument.}
 
+\item{alphas}{alpha to be used in the restricting phase of MMHC.}
+
 \item{ppi}{if specified, include metrics of comparison with PPI.
-The network node name should be symbol.}
+The network node name should be symbol for calculating the intersection.
+Also, `database` and `org` argument should be specified based on the node name.}
+
+\item{database}{passed to `intersectPpi` function}
+
+\item{org}{passed to `intersectPpi` function}
 
 \item{return_data}{return data}
 
-\item{algorithm.args}{algorithm args}
+\item{algorithm.args}{algorithm args (currently not used in the function)}
+
+\item{hurdle}{perform inference based on Hurdle model, default to FALSE.
+Some scoring functions used in the function cannot calculate scores
+if the feature abundances are all negative. In this case, these scores will be omitted.}
 
 \item{ccdr}{perform comparison with CCDr algorithm with lambda length specified in 
 `lambdas.length` argument.}
@@ -45,6 +58,12 @@ The network node name should be symbol.}
 \item{sid}{compute SID, needs package SID in CRAN.}
 }
 \description{
+Evaluate various metrics comparing reference network and inferred network.
+The inference will be performed based on randomly generated data from 
+fitted Bayesian network (`bn.fit` object).
+
+The description of metrics is as follows:
+
 s0: edge number in original graph
 edges: edge number in inferred graph
 p: node number in original graph
@@ -52,7 +71,7 @@ N: sample number
 SHD: structural hamming distance
 SID: structural intervention distance (if specified)
 time: time needed in structure learning (sec)
-}
-\details{
-Time will be calculated by differences in Sys.time()
+
+Time will be calculated by differences in Sys.time() and will be displayed after
+algorithms' name
 }

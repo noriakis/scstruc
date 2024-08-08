@@ -1,6 +1,4 @@
 #' @noRd
-#' @param label label column
-#' @param x label name
 .getInput <- function(sce,
     candidate_genes, label, x,
     use_assay, barcode_column="Barcode",

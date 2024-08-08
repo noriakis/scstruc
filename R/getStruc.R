@@ -1,4 +1,3 @@
-
 #' @noRd
 .getStruc <- function(input, algorithm, algorithm.args, verbose) {
     if (verbose) {

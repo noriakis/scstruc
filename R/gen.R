@@ -1,6 +1,10 @@
-#' gen
-#' random.graph based on gene node name
-#' @param method ic-dag, melancon or ordered. default to melancon.
+#' @title gen
+#' @description generate random.graph based on gene node name and returns the 
+#' fitted network based on the user-provided data
+#' @param n sample number
+#' @param data data to be fitted
+#' @param method arguments in bnlearn::random.graph().
+#' ic-dag, melancon or ordered. default to melancon.
 #' @param params pass to random.graph
 #' @export
 #' @return bn object and bn.fit object
