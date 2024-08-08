@@ -11,7 +11,8 @@ plotAVN(
   layout = "kk",
   degreeMode = "all",
   sizeDegree = TRUE,
-  sizeRange = c(1, 5)
+  sizeRange = c(3, 6),
+  largestComponents = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ plotAVN(
 \item{sizeDegree}{size the node based on degree}
 
 \item{sizeRange}{node size range}
+
+\item{largestComponents}{take largest components automatically}
 }
 \description{
 plot the averaged network based on bootstrapping

@@ -11,7 +11,6 @@ evaluateMetrics(
   mmhc = TRUE,
   alphas = c(0.001, 0.005, 0.01, 0.05),
   ppi = FALSE,
-  database = "string",
   org = "mm",
   return_data = FALSE,
   algorithm.args = list(),
@@ -37,8 +36,6 @@ alphas specified in `alphas` argument.}
 \item{ppi}{if specified, include metrics of comparison with PPI.
 The network node name should be symbol for calculating the intersection.
 Also, `database` and `org` argument should be specified based on the node name.}
-
-\item{database}{passed to `intersectPpi` function}
 
 \item{org}{passed to `intersectPpi` function}
 

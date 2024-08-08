@@ -6,16 +6,17 @@
 #' @param data data to fit the inferred BN
 #' @param layout layout of the graph
 #' @param geom geom for edge in ggraph
-#' @param largeset_components take largest components automatically
+#' @param largestComponents take largest components automatically
 #' @param sizeRange specifying size of the nodes
 #' @param edgeArgs edge arguments used in `geom` argument
 #' @param degreeMode degree method
 #' @param highlightEdges if the two column matrix (corresponding to from and to)
 #' is provided, highlight the corresponding edges in the plot.
 #' @param highlightEdgeWidth highlight edge width
+#' @param showText show the node name
 #' @export
 plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
-    largest_components=TRUE, sizeRange=c(3,6), edgeArgs=list(),
+    largestComponents=TRUE, sizeRange=c(3,6), edgeArgs=list(), showText=TRUE,
     degreeMode="all", highlightEdges=NULL, highlightEdgeWidth=1) {
       
     if (is.null(edgeArgs[["color"]])) {
@@ -39,19 +40,21 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
       edgeArgs[["color"]] <- NULL
     }
 
-    if (largest_components) {
+    if (largestComponents) {
         comps <- to_components(g)
         g <- comps[[which.max(lapply(comps, function(x) {d <- data.frame(x) %>% dim(); d[1]}))]]
     }
 
     if (is.null(highlightEdges)) {
         gra <- g %>%  mutate(degree=centrality_degree(mode=degreeMode)) %>%
-        ggraph(layout=layout) +
-            do.call(geom, edgeArgs) +
-            geom_node_point(aes(size=degree, color=degree)) +
-            geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")+
-            scale_size(range=sizeRange)+
-            theme_graph()      
+            ggraph(layout=layout) +
+                do.call(geom, edgeArgs) +
+                geom_node_point(aes(size=degree, color=degree))
+        if (showText) {
+            gra <- gra + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")
+        }                
+        gra <- gra + scale_size(range=sizeRange)+
+                theme_graph()      
     } else {
         if (!is.matrix(highlightEdges)) {
             stop("Please provide two column matrix")
@@ -65,13 +68,15 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
         g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
           mutate(highlight=(fromn %in% highlightEdges[,1]) & (ton %in% highlightEdges[,2]))
         gra <- g %N>%  mutate(degree=centrality_degree(mode=degreeMode)) %>%
-        ggraph(layout=layout) +
-          do.call(geom, edgeArgs) +
-          do.call(geom, edgeArgs2) +
-          geom_node_point(aes(size=degree, color=degree)) +
-          geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")+
-          scale_size(range=sizeRange)+
-          theme_graph()
+            ggraph(layout=layout) +
+              do.call(geom, edgeArgs) +
+              do.call(geom, edgeArgs2) +
+              geom_node_point(aes(size=degree, color=degree))
+        if (showText) {
+            gra <- gra + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")
+        }                
+        gra <- gra + scale_size(range=sizeRange)+
+              theme_graph()
     }
 
 

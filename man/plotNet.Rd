@@ -9,9 +9,10 @@ plotNet(
   data = NULL,
   layout = "kk",
   geom = geom_edge_link,
-  largest_components = TRUE,
+  largestComponents = TRUE,
   sizeRange = c(3, 6),
   edgeArgs = list(),
+  showText = TRUE,
   degreeMode = "all",
   highlightEdges = NULL,
   highlightEdgeWidth = 1
@@ -26,9 +27,13 @@ plotNet(
 
 \item{geom}{geom for edge in ggraph}
 
+\item{largestComponents}{take largest components automatically}
+
 \item{sizeRange}{specifying size of the nodes}
 
 \item{edgeArgs}{edge arguments used in `geom` argument}
+
+\item{showText}{show the node name}
 
 \item{degreeMode}{degree method}
 
@@ -36,8 +41,6 @@ plotNet(
 is provided, highlight the corresponding edges in the plot.}
 
 \item{highlightEdgeWidth}{highlight edge width}
-
-\item{largeset_components}{take largest components automatically}
 }
 \description{
 plot inferred network (with coefficients if available)

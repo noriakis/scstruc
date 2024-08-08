@@ -10,7 +10,7 @@ coreBootEdges <- function(listOfNets) {
       if (!is.null(names(listOfNets))) {
         df[["net"]] <- names(listOfNets)[x]
       } else {
-        df[["net"]] <- as.character(seq_along(listOfNets))
+        df[["net"]] <- as.character(x)
       }
       return(df)
     })))

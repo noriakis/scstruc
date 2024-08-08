@@ -33,7 +33,6 @@
 #' The network node name should be symbol for calculating the intersection.
 #' Also, `database` and `org` argument should be specified based on the node name.
 #' @param org passed to `intersectPpi` function
-#' @param database passed to `intersectPpi` function
 #' @param sid compute SID, needs package SID in CRAN.
 #' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
@@ -41,7 +40,7 @@
 #' @export
 evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
-         database="string", org="mm", return_data=FALSE,
+         org="mm", return_data=FALSE,
          algorithm.args=list(), hurdle=FALSE,
          ccdr=TRUE, return_net=FALSE, lambdas.length=10, sid=FALSE) {
 
@@ -134,7 +133,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
 
     if (ppi) {
       numppi <- intersectPpi(cur_net %>% as.igraph() %>% as_edgelist(),
-        org=org, database=database)
+        org=org)
     } else {
       numppi <- NA
     }

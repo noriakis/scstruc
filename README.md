@@ -34,16 +34,10 @@ sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 100)
 gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 #> Using default bnlearn algorithm
-fitted <- bn.fit(gs[[1]], gs[[2]])
-ggraph(bn_fit_to_igraph(fitted), layout="fr") + 
-  geom_edge_diagonal(aes(color=coef),
-      arrow=arrow(type="closed", length=unit(2,"mm")),
-      start_cap=circle(1,"mm"), end_cap=circle(1,"mm"))+
-  geom_node_point()+
-  theme_graph()
+plotNet(gs$net, gs$data, showText=FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="2400" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="3600" style="display: block; margin: auto;" />
 
 Using the bootstrapping, the averaged network is obtained.
 
@@ -52,7 +46,7 @@ library(glmnet)
 gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC.boot",
                changeSymbol=FALSE, algorithm.args=list("R"=20))
 #> Bootstrapping specified
-plotAVN(gs2$net)
+plotAVN(gs2$net, sizeRange=c(1,3))
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="2400" style="display: block; margin: auto;" />
@@ -81,30 +75,30 @@ booted <- lapply(sces, function(x) {
 #> Bootstrapping specified
 ce <- coreBootEdges(booted)
 ce
-#> # A tbl_graph: 44 nodes and 71 edges
+#> # A tbl_graph: 47 nodes and 73 edges
 #> #
 #> # A directed multigraph with 1 component
 #> #
-#> # Node Data: 44 × 1 (active)
+#> # Node Data: 47 × 1 (active)
 #>    name     
 #>    <chr>    
-#>  1 Gene_0017
-#>  2 Gene_0196
-#>  3 Gene_0728
-#>  4 Gene_0080
-#>  5 Gene_0221
-#>  6 Gene_0714
-#>  7 Gene_0111
-#>  8 Gene_0689
-#>  9 Gene_0114
-#> 10 Gene_0639
-#> # ℹ 34 more rows
+#>  1 Gene_0008
+#>  2 Gene_1713
+#>  3 Gene_0059
+#>  4 Gene_1113
+#>  5 Gene_0065
+#>  6 Gene_0078
+#>  7 Gene_0124
+#>  8 Gene_0918
+#>  9 Gene_1040
+#> 10 Gene_0184
+#> # ℹ 37 more rows
 #> #
-#> # Edge Data: 71 × 4
-#>    from    to strength direction
-#>   <int> <int>    <dbl>     <dbl>
-#> 1     1     2      0.8     0.875
-#> 2     1     3      0.6     0.667
-#> 3     4     5      1       0.9  
-#> # ℹ 68 more rows
+#> # Edge Data: 73 × 5
+#>    from    to strength direction net  
+#>   <int> <int>    <dbl>     <dbl> <chr>
+#> 1     1     2      0.6     0.667 1    
+#> 2     3     4      0.9     0.778 1    
+#> 3     5     6      0.6     0.75  1    
+#> # ℹ 70 more rows
 ```

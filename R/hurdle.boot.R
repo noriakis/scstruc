@@ -16,7 +16,7 @@ hurdle.boot <- function(data, R=200, m=nrow(data), score=NULL) {
         resampling = sample(nrow(data), m, replace = TRUE)
         # generate the r-th bootstrap sample.
         replicate = data[resampling, , drop = FALSE]
-        run <- .Hurdle(data, score=score)$bn
+        run <- .Hurdle(replicate, score=score)$bn
         perRun[[r]] <- run
     }
 	st <- custom.strength(perRun, nodes)
