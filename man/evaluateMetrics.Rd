@@ -18,7 +18,7 @@ evaluateMetrics(
   hurdle = FALSE,
   ccdr = TRUE,
   return_net = FALSE,
-  lambdas.length = 20,
+  lambdas.length = 10,
   sid = FALSE
 )
 }

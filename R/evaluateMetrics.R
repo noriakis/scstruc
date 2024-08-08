@@ -27,7 +27,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
          database="string", org="mm", return_data=FALSE,
          algorithm.args=list(), hurdle=FALSE,
-         ccdr=TRUE, return_net=FALSE, lambdas.length=20, sid=FALSE) {
+         ccdr=TRUE, return_net=FALSE, lambdas.length=10, sid=FALSE) {
 
   if ("ccdr" %in% algos) {
     stop("Cannot specify CCDr in this argument, please choose `ccdr` argument as TRUE")
@@ -73,7 +73,7 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
 
         s <- Sys.time()
         net <- skeleton.reg(input, algorithm="MAST",
-          maximize.args=list("score"="custom", "fun"=hurdle.aic))
+          maximize.args=list("score"="custom-score", "fun"=hurdle.aic))
         e <- Sys.time()
         tim <- as.numeric(e-s, unit="secs")
         cat("MAST AIC", tim, "\n")

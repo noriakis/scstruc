@@ -40,7 +40,7 @@
 	} else {
 		net <- hc(data[,inc_node_undir],
 	         blacklist=bl, debug = debug,
-	         score="custom", fun=score)		
+	         score="custom-score", fun=score)		
 	}
 	retl[["bn"]] <- net
 	retl[["data"]] <- data[, inc_node_undir]
