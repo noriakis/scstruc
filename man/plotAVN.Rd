@@ -12,7 +12,8 @@ plotAVN(
   degreeMode = "all",
   sizeDegree = TRUE,
   sizeRange = c(3, 6),
-  largestComponents = TRUE
+  largestComponents = TRUE,
+  threshold = NULL
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ plotAVN(
 \item{sizeRange}{node size range}
 
 \item{largestComponents}{take largest components automatically}
+
+\item{threshold}{threshold for averaged network}
 }
 \description{
 plot the averaged network based on bootstrapping

@@ -3,7 +3,6 @@
 #' @description Return the metacell abundance matrix
 #' Should provide SingleCellExperiment with logcounts data filled.
 #' 
-#' @import SuperCell
 #' @param GE gene (row) to cell (column) matrix, like log-normalized
 #' @param pca use PCA or not
 #' @param prop if genes are not specified, `getTopHVGs` will run based on 
@@ -18,6 +17,9 @@
 #' 
 superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5, rank=10,
     mode="average", ID="ID", verbose=TRUE) {
+    if (!requireNamespace("SuperCell", quietly = TRUE)) {
+        stop("SuperCell package needed to compute the metacell abundance. Please visit https://github.com/GfellerLab/SuperCell")
+    }
     if (is.null(genes)) {
         genes <- getTopHVGs(sce, prop=prop)
     }

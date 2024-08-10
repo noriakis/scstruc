@@ -4,7 +4,14 @@
 \alias{hurdle.boot}
 \title{hurdle.boot}
 \usage{
-hurdle.boot(data, R = 200, m = nrow(data), score = NULL)
+hurdle.boot(
+  data,
+  R = 200,
+  m = nrow(data),
+  score = NULL,
+  removeAllZero = FALSE,
+  debug = FALSE
+)
 }
 \arguments{
 \item{data}{data (row: sample, column: gene)}
@@ -14,6 +21,10 @@ hurdle.boot(data, R = 200, m = nrow(data), score = NULL)
 \item{m}{sampling number}
 
 \item{score}{scoring function after identification of skeleton.}
+
+\item{removeAllZero}{remove all zero genes in replicates}
+
+\item{debug}{passed to maximize function}
 }
 \value{
 bn.strength

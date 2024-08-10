@@ -1,15 +1,21 @@
 #' @noRd
 #' @importFrom data.table :=
 .Hurdle <- function(data, score=NULL, debug=FALSE,
-	skeleton=NULL, hurdle.args=list()) {
+	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
+	noMessages=TRUE) {
 
 	# cat("Using score", as.character(score), "\n")
+
+	# remove whole zero genes
+	if (removeAllZero) {
+		data <- data[, !apply(data==0, 2, function(x) sum(x)==nrow(data))]
+	}
 
 	retl <- list()
 	if (is.null(skeleton)) {
 		## Fit model
 		hurdle.args[["samp"]] <- data
-		hurdle <- do.call(fitHurdle, hurdle.args)
+		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
 	}
@@ -40,7 +46,7 @@
 			debug=debug, blacklist=bl)
 	} else {
 		net <- hc(data[,inc_node_undir],
-	         blacklist=bl, debug = debug,
+	         blacklist=bl, debug=debug,
 	         score="custom-score", fun=score)		
 	}
 	retl[["bn"]] <- net

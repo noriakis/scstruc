@@ -37,6 +37,7 @@
 #' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
+#' @param lambdas.length lambda length in CCDr algorithm
 #' @export
 evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
          mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,

@@ -1,5 +1,7 @@
-#' plotSubNet
-#' @param df the results of `globalStrucValues`
+#' @title plotSubNet
+#' @description plot subnetwork centered to specified gene
+#' 
+#' @param df the results of `strucValues`
 #' @param candidate_node_id candidate node id to subset
 #' @param cell_label if you need to plot per cell basis, specify cell label,
 #' along with cell column

@@ -98,9 +98,16 @@
     row.names(tbl[tbl[,4]<0.05,])
 }
 
-
+#' @title skeleton.reg.boot
+#' @description bootstrapping the two-stage approaches
+#' @param data input data
+#' @param algorithm two-stage algorithm
+#' @param R replicate number
+#' @param m sampling number
+#' @param algorithm.args passed to algorithm function
 #' @export
-skeleton.reg.boot <- function(data, algorithm="glmnet_CV", R=100,  m=nrow(data), algorithm.args=list()) {
+skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
+    R=100,  m=nrow(data), algorithm.args=list()) {
     nodes = names(data)
     perRun <- list()
     for (r in seq_len(R)) {
@@ -119,7 +126,7 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV", R=100,  m=nrow(data),
 #' Custom score function for bnlearn, using hurdle model in glmmTMB.
 #' BIC is scaled by -2.
 #' @noRd
-zeroinf.bic <- function(node, parents, data, args) {
+glmmtmb.bic <- function(node, parents, data, args) {
     ## Using glmmTMB
     if (length(parents) == 0) {
         model = paste(node, "~ 1")
@@ -135,11 +142,50 @@ zeroinf.bic <- function(node, parents, data, args) {
 
 }#MY.BIC
 
-#' Custom score function for bnlearn, using MAST hurdle model.
+#' Custom score function for bnlearn, using hurdle model.
+#' @noRd
+#' @importFrom MAST zlm
+hurdle.bic <- function(node, parents, data, args) {
+
+    if (length(parents) == 0) {
+        model = paste(node, "~ 1")
+    } else {
+        model = paste(node, "~", paste(parents, collapse = "+"))
+    }
+    # cat("Fitting ZLM:", model, "\n")
+    fit <- MAST::zlm(as.formula(model), sca=data)
+    if (is.null(fit$cont)) return(-Inf)
+    bic.sum <- -1 * (BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$cont)) + 
+        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))
+    
+    return(bic.sum)
+}
+
+
+
+#' @noRd
+llk.zlm.bayesglm <- function(obj) {
+  fam <- obj$family$family
+  p <- obj$rank
+  if(fam %in% c("gaussian", "Gamma", "inverse.gaussian")) p <- p + 1
+  val <- p - obj$aic / 2
+  attr(val, "nobs") <- sum(!is.na(obj$residuals))
+  attr(val, "df") <- p
+  class(val) <- "logLik"
+  val
+}
+
+
+#' @noRd
+BIC.zlm.bayesglm <- function(obj) {
+  -2 * as.numeric(obj) + attr(obj, "df") * log(nobs(obj))
+}
+
+
+#' Custom score function for bnlearn, using hurdle model.
 #' @noRd
 #' @importFrom MAST zlm
 hurdle.aic <- function(node, parents, data, args) {
-
 
     if (length(parents) == 0) {
         model = paste(node, "~ 1")
@@ -149,13 +195,11 @@ hurdle.aic <- function(node, parents, data, args) {
     # cat("Fitting ZLM:", model, "\n")
 
     fit <- MAST::zlm(as.formula(model), sca=data)
+    if (is.null(fit$cont)) return(-Inf)    
     aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)
-    
     return(aic.sum)    
 
-}#MY.BIC
-
-
+}
 
 #' skeleton.reg
 #' 
@@ -168,8 +212,8 @@ hurdle.aic <- function(node, parents, data, args) {
 skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
     nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list()) {
     if (verbose) {
-        cat("Algorithm:", algorithm, "\n")
-        cat("Input for structure learning: n", dim(data)[1], "p", dim(data)[2], "\n")
+        cat_subtle("Algorithm: ", algorithm, "\n")
+        cat_subtle("Input for structure learning: n ", dim(data)[1], "p ", dim(data)[2], "\n")
     }
     nodes <- colnames(data)
     penFun <- dplyr::case_when(
@@ -184,24 +228,24 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
     )
 
     mb <- sapply(nodes, function(nn) {
-        if (verbose) {cat(" ", nn)}
+        if (verbose) {cat_subtle(" ", nn)}
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
         if (length(unique(y))==1) {return(NULL)}
         if (algorithm=="glmmTMB") {
             sign <- .glmmTMB(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
-            if (verbose) {cat(" candidate:", length(sign), "\n")}
+            if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
             return(sign)
         } else if (algorithm=="MAST") {
             sign <- .MASTHurdle(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
-            if (verbose) {cat(" candidate:", length(sign), "\n")}
+            if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
             return(sign)
         } else {
             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
                 "nFolds"=nFolds, "algorithm"=algorithm, "s"=s))            
-            if (verbose) {cat(" candidate:", length(included_var_index), "\n")}
+            if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
             if (length(included_var_index)==0) {return(NULL)}
             return(colnames(X)[included_var_index])
         }

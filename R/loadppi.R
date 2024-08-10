@@ -23,7 +23,7 @@ loadppi <- function(org="mm", database="string") {
 #' Examine intersection of PPI.
 #' Named vector of edge number, intersection number and proportion will be returned.
 #' 
-#' @param edge_names edge names in `GeneA->GeneB` style
+#' @param edge_names edge names in `GeneA->GeneB` style character vector or igraph or bn
 #' @param org organism name (mm, or hsa)
 #' @param return_net returns the intersected igraph object
 #' @export

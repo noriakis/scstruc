@@ -5,10 +5,10 @@
 #' 
 #' 
 #' @details
-#' if `Hurdle` algorithm is specified, it returns the list of `hurdle`, `undir`, `bn`.
-#' `hurdle`: returned object of HurdleNormal::fitHurdle.
-#' `undir`: Undirected network with the best BIC.
-#' `bn`: bn object
+#' if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
+#' \code{hurdle}: returned object of HurdleNormal::fitHurdle.
+#' \code{undir}: Undirected network with the best BIC.
+#' \code{bn}: bn object
 #' 
 #' @param spe SingleCellExperiment, SpatialExpetiment object
 #' @param candidateGenes candidate genes to be used.
@@ -16,7 +16,7 @@
 #' @param labelName label name used to subset the cells
 #' @param algorithm inference algorithm of BN
 #' If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
-#' If you use CCDr algorithm, the {bn} object is returned.
+#' If you use CCDr algorithm, the \code{bn} object is returned.
 #' @param algorithim.args list of algorithm arguments
 #' @param clusterLabel (experimental) aggregate the count across this cluster to speed up computation
 #' @param useAssay use assay, default to logcounts
@@ -31,6 +31,15 @@
 #' @param returBn By default, returns the bn class object
 #' @param returnData By default, return the data used for the inference.
 #' @param barcodeColumn barcode for cell identification
+#' @importFrom dplyr %>%
+#' @importFrom tidygraph %E>% %N>%
+#' @examples
+#' library(scran)
+#' library(scstruc)
+#' sce <- mockSCE()
+#' sce <- logNormCounts(sce)
+#' included_genes <- sample(row.names(sce), 10)
+#' gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 #' @export
 scstruc <- function(spe, candidateGenes, label=NULL,
     labelName=NULL, algorithm="mmhc",

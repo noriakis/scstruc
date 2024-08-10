@@ -21,7 +21,7 @@ plotSubNet(
 )
 }
 \arguments{
-\item{df}{the results of `globalStrucValues`}
+\item{df}{the results of `strucValues`}
 
 \item{candidate_node_id}{candidate node id to subset}
 
@@ -34,5 +34,5 @@ along with cell label}
 \item{coef_cutoff}{edge with value below this thrshold will not be drawn.}
 }
 \description{
-plotSubNet
+plot subnetwork centered to specified gene
 }

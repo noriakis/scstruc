@@ -37,9 +37,8 @@ markerCoefs <- function(coef_mat, classif_label="group",
 
     ## We do not use impXgboost in Boruta as not recommended.
     if (xgboost) {
-        require(xgboost)
         trueLabel <- unique(as.character(mydata$classif_label))[2]
-        cat("True label will be:", trueLabel, "\n")
+        cat_subtle("True label will be: ", trueLabel, "\n")
         vec <- as.numeric(mydata$classif_label==trueLabel)
         mydata$classif_label <- NULL
         if (length(xgboostArgs)==0) {
@@ -52,7 +51,7 @@ markerCoefs <- function(coef_mat, classif_label="group",
         return(list("xgboost"=res, "importance"=importance, "data"=mydata))
     } else {
         mydata[is.na(mydata)] <- 0
-        cat("Performing Boruta algorithm ...\n")
+        cat_subtle("Performing Boruta algorithm ...\n")
         brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
         if (tentative_fix) {
             brt_fixed <- TentativeRoughFix(brt)

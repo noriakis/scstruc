@@ -35,7 +35,7 @@ scstruc(
 
 \item{algorithm}{inference algorithm of BN
 If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
-If you use CCDr algorithm, the {bn} object is returned.}
+If you use CCDr algorithm, the \code{bn} object is returned.}
 
 \item{returnData}{By default, return the data used for the inference.}
 
@@ -66,8 +66,16 @@ By default perform no filtering.}
 The main function for scstruc package.
 }
 \details{
-if `Hurdle` algorithm is specified, it returns the list of `hurdle`, `undir`, `bn`.
-`hurdle`: returned object of HurdleNormal::fitHurdle.
-`undir`: Undirected network with the best BIC.
-`bn`: bn object
+if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
+\code{hurdle}: returned object of HurdleNormal::fitHurdle.
+\code{undir}: Undirected network with the best BIC.
+\code{bn}: bn object
+}
+\examples{
+library(scran)
+library(scstruc)
+sce <- mockSCE()
+sce <- logNormCounts(sce)
+included_genes <- sample(row.names(sce), 10)
+gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 }

@@ -52,6 +52,8 @@ if the feature abundances are all negative. In this case, these scores will be o
 
 \item{return_net}{return list of whole BN}
 
+\item{lambdas.length}{lambda length in CCDr algorithm}
+
 \item{sid}{compute SID, needs package SID in CRAN.}
 }
 \description{

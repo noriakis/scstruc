@@ -59,6 +59,7 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
         if (!is.matrix(highlightEdges)) {
             stop("Please provide two column matrix")
         }
+        highchar <- paste0(highlightEdges[,1], "->", highlightEdges[,2])
         edgeArgs2 <- edgeArgs
         edgeArgs[["mapping"]] <- c(edgeArgs[["mapping"]], aes(filter=!highlight))
         edgeArgs2[["mapping"]] <- c(aes(filter=highlight))
@@ -66,7 +67,7 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
         edgeArgs2[["width"]] <- highlightEdgeWidth
         nl <- g %N>% pull(name)
         g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
-          mutate(highlight=(fromn %in% highlightEdges[,1]) & (ton %in% highlightEdges[,2]))
+          mutate(highlight=paste0(fromn, "->", ton) %in% highchar)
         gra <- g %N>%  mutate(degree=centrality_degree(mode=degreeMode)) %>%
             ggraph(layout=layout) +
               do.call(geom, edgeArgs) +

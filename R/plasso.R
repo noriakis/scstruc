@@ -99,6 +99,8 @@ plasso.fit.single <- function(X, y, lambda=1, eps=1e-6, P=NULL,
     return(w)
 }
 
+#' plasso.predict
+#' prediction function for precision lasso
 #' @export
 plasso.predict <- function(X, w) {
     X0 = rep(1, nrow(X))

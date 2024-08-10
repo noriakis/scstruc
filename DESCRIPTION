@@ -2,13 +2,15 @@ Package: scstruc
 Version: 0.99.0
 Title: Bayesian network analysis for single-cell transcriptomic data
 Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
-Description: Bayesian network analysis for single-cell transcriptomic data
+Description: The library infers the gene regulatory network based on Bayesian network structure from single-cell transcriptomic data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), bnlearn, ggplot2, ggraph, igraph, tidygraph,
-    SingleCellExperiment, RcppArmadillo, Rcpp, MAST,
-    KEGGREST, glmnet, ncvreg
+    R (>= 4.3.0)
+Imports:
+    bnlearn, ggplot2, ggraph, igraph, tidygraph, scran,
+    RcppArmadillo, Rcpp, MAST, dplyr,
+    KEGGREST, glmnet, ncvreg, data.table, AnnotationDbi, knitr
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
