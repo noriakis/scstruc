@@ -91,11 +91,12 @@
         model = paste(nn, "~", paste(pred, collapse = "+"))
     }
     fit <- MAST::zlm(as.formula(model), data=data)
+    if (is.null(fit$cont)) {return(NULL)}
     res <- summary.glm(fit$cont)
     tbl <- data.frame(coefficients(res))
     tbl <- tbl[2:nrow(tbl),]
     tbl <- tbl[!is.na(tbl[,4]),]
-    row.names(tbl[tbl[,4]<0.05,])
+    return(row.names(tbl[tbl[,4]<0.05,]))
 }
 
 #' @title skeleton.reg.boot

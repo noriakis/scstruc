@@ -7,7 +7,7 @@
 intersectPpi(edge_names, org = "mm", return_net = FALSE)
 }
 \arguments{
-\item{edge_names}{edge names in `GeneA->GeneB` style character vector, igraph, or bn}
+\item{edge_names}{edge names in `GeneA->GeneB` style character vector or igraph or bn}
 
 \item{org}{organism name (mm, or hsa)}
 

@@ -7,11 +7,13 @@
 plotAVN(
   str,
   edge = geom_edge_link,
-  ew = strength,
+  ew = "strength",
+  ec = "direction",
   layout = "kk",
   degreeMode = "all",
   sizeDegree = TRUE,
   sizeRange = c(3, 6),
+  data = NULL,
   largestComponents = TRUE,
   threshold = NULL
 )
@@ -21,7 +23,11 @@ plotAVN(
 
 \item{edge}{geom to be used in edge}
 
-\item{ew}{edge width, strength or direction}
+\item{ew}{edge width, strength, direction, or coef
+if coef, data to be fitted must be provided}
+
+\item{ec}{edge color, strength, direction, or coef
+if coef, data to be fitted must be provided}
 
 \item{layout}{layout in ggraph}
 
@@ -30,6 +36,8 @@ plotAVN(
 \item{sizeDegree}{size the node based on degree}
 
 \item{sizeRange}{node size range}
+
+\item{data}{data to fit the paramter on averaged network}
 
 \item{largestComponents}{take largest components automatically}
 
