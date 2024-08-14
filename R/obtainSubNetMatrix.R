@@ -1,8 +1,12 @@
-#' obtainSubNetMatrix
-#' 
+#' @title obtainSubNetMatrix
+#' @description obtain subnetwork abundance matrix
 #' @param df the results of `strucValues` (specifying the bn object)
-obtainSubNetMatrix <- function(df, spe, func="sum", use_assay="logcounts") {
-	logc <- spe@assays@data[[use_assay]]
+#' @param spe SingleCellExperiment object
+#' @param func how to summarize subnetwork abundance
+#' @param useAssay which assay to use
+#' @export
+obtainSubNetMatrix <- function(df, spe, func="sum", useAssay="logcounts") {
+	logc <- spe@assays@data[[useAssay]]
 
 	all_nodes <- unique(c(df$from, df$to))
 	mat <- do.call(rbind, lapply(all_nodes, function(x) {

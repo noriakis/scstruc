@@ -16,6 +16,7 @@ plotAVN(
   data = NULL,
   highlightColor = "tomato",
   highlightExpand = 5,
+  highlightSigma = 2,
   highlightEdges = NULL,
   largestComponents = TRUE,
   threshold = NULL
@@ -45,6 +46,8 @@ if coef, data to be fitted must be provided}
 \item{highlightColor}{highlight color for ggfx}
 
 \item{highlightExpand}{expand parameter for ggfx}
+
+\item{highlightSigma}{sigma paramter for ggfx}
 
 \item{highlightEdges}{highlight edges, two-column matrix is expected
 If highlight is specified, ggfx::with_outer_glow 

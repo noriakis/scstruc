@@ -37,6 +37,10 @@ scstruc(
 If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
 If you use CCDr algorithm, the \code{bn} object is returned.}
 
+\item{algorithm.args}{list of algorithm arguments}
+
+\item{returnBn}{By default, returns the bn class object}
+
 \item{returnData}{By default, return the data used for the inference.}
 
 \item{clusterLabel}{(experimental) aggregate the count across this cluster to speed up computation}
@@ -57,15 +61,12 @@ If you use CCDr algorithm, the \code{bn} object is returned.}
 By default perform no filtering.}
 
 \item{rmNeg}{remove genes with all negative abundances}
-
-\item{algorithim.args}{list of algorithm arguments}
-
-\item{returBn}{By default, returns the bn class object}
 }
 \description{
 The main function for scstruc package.
 }
 \details{
+\code{algorithm}: inference algorithm (two-stage or one-stage)
 if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
 \code{hurdle}: returned object of HurdleNormal::fitHurdle.
 \code{undir}: Undirected network with the best BIC.

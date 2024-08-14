@@ -26,6 +26,21 @@ markerCoefs(
 \item{cell_label}{cell label for fitting}
 
 \item{cell_column}{which column represents cell types}
+
+\item{sample_column}{sample column in colData()}
+
+\item{tentative_fix}{if Boruta, perform tentative fix 
+if unconfirmed features are present}
+
+\item{return_mat}{return matrix used for classification}
+
+\item{verbose}{control logging}
+
+\item{returnChar}{return character vector of confirmed features}
+
+\item{xgboost}{perform xgboost instead of Boruta}
+
+\item{xgboostArgs}{parameters passed to xgboost function}
 }
 \description{
 identify marker regulatory relationships based on 

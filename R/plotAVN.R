@@ -18,11 +18,12 @@
 #' will be used to highlight the edge
 #' @param highlightColor highlight color for ggfx
 #' @param highlightExpand expand parameter for ggfx
+#' @param highlightSigma sigma paramter for ggfx
 #' @export
 plotAVN <- function(str, edge=geom_edge_link,
     ew="strength", ec="direction", layout="kk", degreeMode="all",
     sizeDegree=TRUE, sizeRange=c(3, 6), data=NULL,
-    highlightColor="tomato", highlightExpand=5,
+    highlightColor="tomato", highlightExpand=5, highlightSigma=2,
     highlightEdges=NULL, largestComponents=TRUE, threshold=NULL) {
     if (!is.null(highlightEdges)) {
         if (!requireNamespace("ggfx")) {
@@ -78,7 +79,7 @@ plotAVN <- function(str, edge=geom_edge_link,
         gg <- gg + ggfx::with_outer_glow(do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]], "filter"=.data[["highlight"]]),
                                     "arrow"=arrow(length=unit(2,"mm"), type="closed"),
                                     "start_cap"=circle(5,"mm"),
-                                    "end_cap"=circle(5,"mm"))), colour=highlightColor, expand=highlightExpand)
+                                    "end_cap"=circle(5,"mm"))), colour=highlightColor, expand=highlightExpand, sigma=highlightSigma)
         gg <- gg + do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]], "filter"=!.data[["highlight"]]),
                                     "arrow"=arrow(length=unit(2,"mm"), type="closed"),
                                     "start_cap"=circle(5,"mm"),

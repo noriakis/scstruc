@@ -15,10 +15,13 @@
 #' @param highlightEdgeWidth highlight edge width
 #' @param showText show the node name
 #' @export
+#' @importFrom tidygraph to_components
+#' @importFrom ggplot2 scale_size
+#' @importFrom ggraph theme_graph
 plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
     largestComponents=TRUE, sizeRange=c(3,6), edgeArgs=list(), showText=TRUE,
     degreeMode="all", highlightEdges=NULL, highlightEdgeWidth=1) {
-      
+    
     if (is.null(edgeArgs[["color"]])) {
           edgeArgs[["color"]] <- "grey80"
     }

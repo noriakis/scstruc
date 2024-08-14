@@ -5,6 +5,7 @@
 #' 
 #' 
 #' @details
+#' \code{algorithm}: inference algorithm (two-stage or one-stage)
 #' if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
 #' \code{hurdle}: returned object of HurdleNormal::fitHurdle.
 #' \code{undir}: Undirected network with the best BIC.
@@ -17,7 +18,7 @@
 #' @param algorithm inference algorithm of BN
 #' If you want to use CCDr algorithm, specify `ccdr` or `ccdr.boot`.
 #' If you use CCDr algorithm, the \code{bn} object is returned.
-#' @param algorithim.args list of algorithm arguments
+#' @param algorithm.args list of algorithm arguments
 #' @param clusterLabel (experimental) aggregate the count across this cluster to speed up computation
 #' @param useAssay use assay, default to logcounts
 #' @param input default to NULL, if specified use this input matrix for inference.
@@ -28,11 +29,14 @@
 #' @param label label column
 #' @param changeSymbol automatically change the node name of input matrix to gene symbol
 #' @param symbolColumn if changeSymbol is TRUE, use `symbolColumn` in rowData of the input object.
-#' @param returBn By default, returns the bn class object
+#' @param returnBn By default, returns the bn class object
 #' @param returnData By default, return the data used for the inference.
 #' @param barcodeColumn barcode for cell identification
 #' @importFrom dplyr %>%
 #' @importFrom tidygraph %E>% %N>%
+#' @importFrom methods is
+#' @importFrom stats BIC as.formula coef coefficients
+#' @importFrom stats filter gaussian nobs sd setNames summary.glm
 #' @examples
 #' library(scran)
 #' library(scstruc)

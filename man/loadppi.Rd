@@ -6,6 +6,11 @@
 \usage{
 loadppi(org = "mm", database = "string")
 }
+\arguments{
+\item{org}{org, mm or hsa}
+
+\item{database}{string or biogrid}
+}
 \description{
 The igraph represenatation of the STRING database.
 The file was downloaded from https://string-db.org/cgi/download, with the organism
@@ -13,4 +18,7 @@ corresponding to Homo sapiens or Mus musculus. The network was subset by the com
 and attached to the package.
 
 Szklarczyk D, Gable AL, Lyon D, Junge A, Wyder S, Huerta-Cepas J, Simonovic M, Doncheva NT, Morris JH, Bork P, Jensen LJ, Mering CV. STRING v11: protein-protein association networks with increased coverage, supporting functional discovery in genome-wide experimental datasets. Nucleic Acids Res. 2019 Jan 8;47(D1):D607-D613. doi: 10.1093/nar/gky1131. PMID: 30476243; PMCID: PMC6323986.
+}
+\examples{
+db <- loadppi()
 }

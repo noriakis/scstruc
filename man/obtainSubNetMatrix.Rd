@@ -4,11 +4,17 @@
 \alias{obtainSubNetMatrix}
 \title{obtainSubNetMatrix}
 \usage{
-obtainSubNetMatrix(df, spe, func = "sum", use_assay = "logcounts")
+obtainSubNetMatrix(df, spe, func = "sum", useAssay = "logcounts")
 }
 \arguments{
 \item{df}{the results of `strucValues` (specifying the bn object)}
+
+\item{spe}{SingleCellExperiment object}
+
+\item{func}{how to summarize subnetwork abundance}
+
+\item{useAssay}{which assay to use}
 }
 \description{
-obtainSubNetMatrix
+obtain subnetwork abundance matrix
 }

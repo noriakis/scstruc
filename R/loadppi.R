@@ -7,12 +7,18 @@
 #' Szklarczyk D, Gable AL, Lyon D, Junge A, Wyder S, Huerta-Cepas J, Simonovic M, Doncheva NT, Morris JH, Bork P, Jensen LJ, Mering CV. STRING v11: protein-protein association networks with increased coverage, supporting functional discovery in genome-wide experimental datasets. Nucleic Acids Res. 2019 Jan 8;47(D1):D607-D613. doi: 10.1093/nar/gky1131. PMID: 30476243; PMCID: PMC6323986.
 #' 
 #' @export
+#' @param org org, mm or hsa
+#' @param database string or biogrid
+#' @examples
+#' db <- loadppi()
 loadppi <- function(org="mm", database="string") {
     # if(is.null(cache$table)) {
     if (database=="string") {
       tb = readRDS(system.file("extdata", "ppi_mm_900.rds", package = "scstruc"))
-    } else {
+    } else if (database=="biogrid") {
       tb = readRDS(system.file("extdata", "ppi_mm_biogrid.rds", package = "scstruc"))
+    } else {
+      stop("`database` argument should be string or biogrid")
     }
     tb
 }
@@ -27,6 +33,8 @@ loadppi <- function(org="mm", database="string") {
 #' @param org organism name (mm, or hsa)
 #' @param return_net returns the intersected igraph object
 #' @export
+#' @examples
+#' intersectPpi(c("Gene1->Gene2"))
 intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
   if (is.vector(edge_names)) {
       enn <- length(edge_names)

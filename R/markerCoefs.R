@@ -6,6 +6,15 @@
 #' @param classif_label which label to be used for classification
 #' @param cell_label cell label for fitting
 #' @param cell_column which column represents cell types
+#' @param sample_column sample column in colData()
+#' @param tentative_fix if Boruta, perform tentative fix 
+#' if unconfirmed features are present
+#' @param return_mat return matrix used for classification
+#' @param verbose control logging
+#' @param returnChar return character vector of confirmed features
+#' @param xgboost perform xgboost instead of Boruta
+#' @param xgboostArgs parameters passed to xgboost function
+#' @export
 markerCoefs <- function(coef_mat, classif_label="group",
 	cell_label=NULL, cell_column="label", sample_column="Sample",
     tentative_fix=TRUE, return_mat=FALSE, verbose=FALSE, returnChar=TRUE,

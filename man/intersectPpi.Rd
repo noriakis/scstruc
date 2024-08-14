@@ -17,3 +17,6 @@ intersectPpi(edge_names, org = "mm", return_net = FALSE)
 Examine intersection of PPI.
 Named vector of edge number, intersection number and proportion will be returned.
 }
+\examples{
+intersectPpi(c("Gene1->Gene2"))
+}
