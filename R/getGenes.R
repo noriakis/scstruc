@@ -12,7 +12,7 @@ getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=org.Mm.eg.db, type="SYMBOL
       mutate(
         symbol = mapIds(orgDb, eg, type, "ENTREZID")
       )
-    inc <- as.character(path_eg %>% filter(pathway == paste0("path:", pid)) %>% pull(symbol))
+    inc <- as.character(path_eg %>% dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(symbol))
     inc
 }
 

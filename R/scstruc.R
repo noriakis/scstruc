@@ -36,7 +36,7 @@
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
 #' @importFrom stats BIC as.formula coef coefficients
-#' @importFrom stats filter gaussian nobs sd setNames summary.glm
+#' @importFrom stats gaussian nobs sd setNames summary.glm
 #' @examples
 #' library(scran)
 #' library(scstruc)
