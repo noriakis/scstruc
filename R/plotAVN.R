@@ -13,11 +13,22 @@
 #' @param degreeMode degree mode in igraph::degree
 #' @param largestComponents take largest components automatically
 #' @param threshold threshold for averaged network
+#' @param highlightEdges highlight edges, two-column matrix is expected
+#' If highlight is specified, ggfx::with_outer_glow 
+#' will be used to highlight the edge
+#' @param highlightColor highlight color for ggfx
+#' @param highlightExpand expand parameter for ggfx
 #' @export
 plotAVN <- function(str, edge=geom_edge_link,
     ew="strength", ec="direction", layout="kk", degreeMode="all",
     sizeDegree=TRUE, sizeRange=c(3, 6), data=NULL,
-    largestComponents=TRUE, threshold=NULL) {
+    highlightColor="tomato", highlightExpand=5,
+    highlightEdges=NULL, largestComponents=TRUE, threshold=NULL) {
+    if (!is.null(highlightEdges)) {
+        if (!requireNamespace("ggfx")) {
+            stop("Please install ggfx")
+        }
+    }
     if (as.character(ew)=="coef" & is.null(data)) {
         stop("if specified coef, please provide data")
     }
@@ -53,12 +64,33 @@ plotAVN <- function(str, edge=geom_edge_link,
         g <- g %E>% mutate(direction1=direction)
         ec <- "direction1"
     }
+
+    if (!is.null(highlightEdges)) {
+        highchar <- paste0(highlightEdges[,1], "->", highlightEdges[,2])
+        nl <- g %N>% pull(name)
+        g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
+          mutate(highlight=paste0(fromn, "->", ton) %in% highchar)
+    }
+
     gg <- ggraph(g, layout=layout)
     ## Directed arcs
-    gg <- gg + do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]]),
-                                "arrow"=arrow(length=unit(2,"mm"), type="closed"),
-                                "start_cap"=circle(5,"mm"),
-                                "end_cap"=circle(5,"mm")))
+    if (!is.null(highlightEdges)) {
+        gg <- gg + ggfx::with_outer_glow(do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]], "filter"=.data[["highlight"]]),
+                                    "arrow"=arrow(length=unit(2,"mm"), type="closed"),
+                                    "start_cap"=circle(5,"mm"),
+                                    "end_cap"=circle(5,"mm"))), colour=highlightColor, expand=highlightExpand)
+        gg <- gg + do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]], "filter"=!.data[["highlight"]]),
+                                    "arrow"=arrow(length=unit(2,"mm"), type="closed"),
+                                    "start_cap"=circle(5,"mm"),
+                                    "end_cap"=circle(5,"mm")))
+
+    } else {
+        gg <- gg + do.call(edge, list("mapping"=aes("width"=.data[[ew]], "color"=.data[[ec]]),
+                                    "arrow"=arrow(length=unit(2,"mm"), type="closed"),
+                                    "start_cap"=circle(5,"mm"),
+                                    "end_cap"=circle(5,"mm")))
+    }
+
     if (sizeDegree) {
         gg <- gg + geom_node_point(aes(size=degree, color=degree))
     } else {

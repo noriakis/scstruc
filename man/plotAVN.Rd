@@ -14,6 +14,9 @@ plotAVN(
   sizeDegree = TRUE,
   sizeRange = c(3, 6),
   data = NULL,
+  highlightColor = "tomato",
+  highlightExpand = 5,
+  highlightEdges = NULL,
   largestComponents = TRUE,
   threshold = NULL
 )
@@ -38,6 +41,14 @@ if coef, data to be fitted must be provided}
 \item{sizeRange}{node size range}
 
 \item{data}{data to fit the paramter on averaged network}
+
+\item{highlightColor}{highlight color for ggfx}
+
+\item{highlightExpand}{expand parameter for ggfx}
+
+\item{highlightEdges}{highlight edges, two-column matrix is expected
+If highlight is specified, ggfx::with_outer_glow 
+will be used to highlight the edge}
 
 \item{largestComponents}{take largest components automatically}
 
