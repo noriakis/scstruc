@@ -6,15 +6,40 @@
     included_var_index
 }
 
-.glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL, s=NULL) {
+.glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL, s=NULL, onlyBIC=FALSE) {
     ## This corresponds to L1MB
     fit <- glmnet(X, y, alpha=1, family="gaussian")
     tLL <- fit$nulldev - fit$nulldev * (1-fit$dev.ratio)
     k <- fit$df
     n <- nobs(fit)
     BIC <- log(n)*k - tLL
+    if (onlyBIC) {
+        bicdf <- data.frame(lambda=fit$lambda, BIC=BIC)
+        bicplot <- ggplot(bicdf, aes(x=lambda, y=BIC)) + 
+            geom_point() +  
+            geom_hline(color="red", yintercept=BIC[which.min(BIC)])+
+            cowplot::theme_cowplot()
+        return(list("fit"=fit,
+            "data"=bicdf,
+        "plot"=bicplot))
+    }
     included_var_index <- which(as.numeric(fit$beta[,which.min(BIC)])!=0)
     included_var_index
+}
+
+#' glmnetBICpath
+#' return glmnet BIC path for lambdas
+#' @export
+#' @param data data for fitting
+#' @param nn node name for Y
+#' @examples
+#' data(gaussian.test)
+#' glmnetBICpath(gaussian.test, "A")$plot
+glmnetBICpath <- function(data, nn) {
+    nodes <- colnames(data)
+    X <- data[, setdiff(nodes, nn)] %>% as.matrix()
+    y <- data[, nn]
+    .glmnetBIC(X, y, onlyBIC=TRUE)
 }
 
 
