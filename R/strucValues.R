@@ -1,14 +1,27 @@
 #' @title strucValues
 #' @description Fit the network parameters using SingleCellExperiment object and bn object.
-#' 
+#' @param spe SingleCellExperiment object
+#' @param labels label in colData. e.g., if `label` corresponding to cell cluster is specified,
+#' the parameters will be fitted per cell basis. Multiple labels can be specified like
+#' c("label", "SampleID") for `bn` object.
+#' @param bn bn object
+#' @param net tbl_graph object
+#' @param exclude_label if specified, this label will be omitted from the fitting
+#' @param summarize_func if `net` is provided, the summarization of subnetwork is performed by this function.
+#' @param variation_func if `net` is provided, the summarization of subnetwork is performed by this function.
+#' @param barcode barcode ID for cell
+#' @param fit.hurdle fit the parameter based on hurdle model
 #' @export
-strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
-	summarize_func=mean, variation_func=sd, bn=NULL, barcode="barcode_id", assay="logcounts",
-    verbose=FALSE) {
-    if (is.null(bn) & is.null(global_tbl_graph)) {stop("Please supply either of tbl_graph or bn")}
-    if (!is.null(bn)) {return(.strucValuesCoef(spe, bn, labels, exclude_label, barcode, assay, verbose))}
-    gedges <- global_tbl_graph |> activate(edges) |> data.frame()
-    gnnames <- global_tbl_graph |> activate(nodes) |> pull(name)
+strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
+	summarize_func=mean, variation_func=sd, barcode="barcode_id", assay="logcounts",
+    verbose=FALSE, fit.hurdle=FALSE) {
+    if (is.null(bn) & is.null(net)) {stop("Please supply either of tbl_graph or bn")}
+    if (!is.null(bn)) {
+        return(.strucValuesCoef(spe, bn, labels, exclude_label,
+            barcode, assay, verbose, fit.hurdle))
+    }
+    gedges <- net |> activate(edges) |> data.frame()
+    gnnames <- net |> activate(nodes) |> pull(name)
     gedges$from <- gnnames[gedges$from]
     gedges$to <- gnnames[gedges$to]
     meta <- colData(spe) |> data.frame()    
@@ -42,7 +55,8 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 }
 
 #' @noRd
-.strucValuesCoef <- function(spe, bn, labels, exclude_label, barcode, assay, verbose) {
+.strucValuesCoef <- function(spe, bn, labels, exclude_label,
+    barcode, assay, verbose, fit.hurdle) {
     cat("Coefficient calculation per specified group:", paste0(labels, collapse=", "), "\n")
     logc <- spe@assays@data[[assay]]
     ## In case
@@ -64,8 +78,11 @@ strucValues <- function(spe, global_tbl_graph=NULL, labels, exclude_label=NA,
 	      which(colData(spe)[[barcode]] %in% df[[barcode]])] |>
 	      as.matrix() |> t() |>
 	      data.frame(check.names=FALSE)
-
-	    fitted <- bnlearn::bn.fit(bn, fit_df)
+        if (fit.hurdle) {
+            fitted <- bn.fit.hurdle(bn, fit_df)
+        } else {
+            fitted <- bnlearn::bn.fit(bn, fit_df)
+        }
 	    all_genes <- names(fitted)
 	    all_genes_edges <- do.call(rbind, lapply(all_genes, function(gene) {
 	        tmp_coef <- fitted[[gene]]$coefficients

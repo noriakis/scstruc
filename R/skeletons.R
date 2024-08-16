@@ -1,13 +1,57 @@
 
+#' When the excessive zero, some folds contain only the value zero
+#' which throws an error in cv.ncvreg and cv.glmnet.
+#' This function ignores the error and returns no candidate when the
+#' function raises an error.
+#' @noRd
+#' @importFrom ncvreg cv.ncvreg
 .ncvregCV <- function(X, y, nFolds, algorithm, s=NULL) {
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
-    fit <- cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
-    included_var_index <- as.numeric(which(fit$fit$beta[, fit$min][-1]!=0))
-    included_var_index
+    tryCatch({
+        fit <- cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
+        included_var_index <- as.numeric(which(fit$fit$beta[, fit$min][-1]!=0))
+        included_var_index
+        return(included_var_index)
+        },
+        error = function(e) {
+            cat_subtle("\n", e, "\n")
+            cat_subtle("If constant error, return no candidate for this node\n")
+            return(NULL)
+        },
+        finally={}
+    )
+
 }
 
+#' @noRd
+#' @importFrom caret createFolds
+#' @importFrom glmnet cv.glmnet
+.glmnetCV <- function(X, y, nFolds=5, algorithm=NULL,
+    s="lambda.min", standardize=TRUE) {
+
+    tryCatch({
+        fit <- cv.glmnet(X %>% as.matrix(), y,
+            alpha=1, family="gaussian", nFolds=nFolds,
+            standardize=standardize)
+        numcoef <- coef(fit, s=s)[,1]
+        numcoef <- numcoef[2:length(numcoef)]
+        included_var_index <- which(numcoef!=0)
+        return(included_var_index)
+        },
+        error = function(e) {
+            cat_subtle("\n", e, "\n")
+            cat_subtle("If constant error, return no candidate for this node\n")
+            return(NULL)
+        },
+        finally={}
+    )
+}
+
+
+#' @noRd
+#' @importFrom glmnet glmnet
 .glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL, s=NULL, onlyBIC=FALSE) {
-    ## This corresponds to L1MB
+    ## This corresponds to L1MB in Schmidt et al. 2007. AAAI.
     fit <- glmnet(X, y, alpha=1, family="gaussian")
     tLL <- fit$nulldev - fit$nulldev * (1-fit$dev.ratio)
     k <- fit$df
@@ -19,9 +63,11 @@
             geom_point() +  
             geom_hline(color="red", yintercept=BIC[which.min(BIC)])+
             cowplot::theme_cowplot()
-        return(list("fit"=fit,
-            "data"=bicdf,
-        "plot"=bicplot))
+        return(
+            list("fit"=fit,
+                "data"=bicdf,
+                "plot"=bicplot)
+        )
     }
     included_var_index <- which(as.numeric(fit$beta[,which.min(BIC)])!=0)
     included_var_index
@@ -42,7 +88,7 @@ glmnetBICpath <- function(data, nn) {
     .glmnetBIC(X, y, onlyBIC=TRUE)
 }
 
-
+#' @noRd
 .glmmTMB <- function(nodes, nn, data, formula= ~ 1) {
     pred <- setdiff(nodes, nn)
     if (length(pred) == 0) {
@@ -60,6 +106,7 @@ glmnetBICpath <- function(data, nn) {
     row.names(tbl[tbl[,4]<0.05,])
 }
 
+#' @noRd
 .plasso <- function(X, y, lambda=0.1, nFolds=NULL, algorithm=NULL, s=NULL) {
     cat_subtle("Precision lasso lambda: ", lambda, "\n")
     fit <- plasso_fit(X %>% as.matrix(), y, lambda=lambda, maxIter=100, gamma=0.5, eps=1e-6)
@@ -68,15 +115,24 @@ glmnetBICpath <- function(data, nn) {
     included_var_index
 }
 
-.glmnetCV <- function(X, y, nFolds=5, algorithm=NULL, s="lambda.min") {
-    fit <- cv.glmnet(X %>% as.matrix(), y,
-        alpha=1, family="gaussian", nfolds=nFolds)
-    numcoef <- coef(fit, s=s)[,1]
-    numcoef <- numcoef[2:length(numcoef)]
-    included_var_index <- which(numcoef!=0)
-    included_var_index
+
+#' For reproducibility, CV folds are created by caret
+#' (Not in use)
+#' @noRd
+returnFolds <- function(y, nFolds) {
+    flds <- caret::createFolds(y,
+        k=nFolds, list=TRUE, returnTrain=FALSE)
+    foldids = rep(0,length(y))
+    for (i in seq_len(nFolds)) {
+        unval <- unique(y[flds[[paste0("Fold",i)]]])
+        if (length(unval) == 1) {message("A fold containing constants!")}
+        foldids[flds[[paste0("Fold",i)]]] = i
+    }
+    return(foldids)
 }
 
+
+#' @noRd
 .L0CV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
     fit=L0Learn::L0Learn.cvfit(x=X %>% as.matrix(), y=y, penalty="L0",
         nFolds=nFolds, algorithm="CD")
@@ -88,7 +144,7 @@ glmnetBICpath <- function(data, nn) {
     return(included_var_index)
 }
 
-
+#' @noRd
 .L0LXCV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
     fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=algorithm, nFolds=nFolds, algorithm="CD")
@@ -107,8 +163,8 @@ glmnetBICpath <- function(data, nn) {
     included_var_index
 }
 
+#' @noRd
 .MASTHurdle <- function(nodes, nn, data, formula= ~ 1) {
-
     pred <- setdiff(nodes, nn)
     if (length(pred) == 0) {
         model = paste(nn, "~ 1")
@@ -172,14 +228,25 @@ glmmtmb.bic <- function(node, parents, data, args) {
 #' @noRd
 #' @importFrom MAST zlm
 hurdle.bic <- function(node, parents, data, args) {
-
-    if (length(parents) == 0) {
-        model = paste(node, "~ 1")
+    if (args$cdrAdjustment) {
+        cdr <- rowSums(data>0)
+        data[["cdr"]] <- scale(cdr)
+    }
+    if (length(parents)==0) {
+        if (args$cdrAdjustment) {
+            mod <- paste0(node, " ~ cdr")
+        } else {
+            mod <- paste0(node, " ~ 1")
+        }
     } else {
-        model = paste(node, "~", paste(parents, collapse = "+"))
+        if (args$cdrAdjustment) {
+            mod <- paste0(node, "~", paste0(parents, collapse=" + "), " + cdr")
+        } else {
+            mod <- paste0(node, "~", paste0(parents, collapse=" + "))
+        }
     }
     # cat("Fitting ZLM:", model, "\n")
-    fit <- MAST::zlm(as.formula(model), sca=data)
+    fit <- MAST::zlm(as.formula(mod), sca=data)
     if (is.null(fit$cont)) return(-Inf)
     bic.sum <- -1 * (BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$cont)) + 
         BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))
@@ -213,30 +280,50 @@ BIC.zlm.bayesglm <- function(obj) {
 #' @importFrom MAST zlm
 hurdle.aic <- function(node, parents, data, args) {
 
-    if (length(parents) == 0) {
-        model = paste(node, "~ 1")
-    } else {
-        model = paste(node, "~", paste(parents, collapse = "+"))
+    if (args$cdrAdjustment) {
+        cdr <- rowSums(data>0)
+        data[["cdr"]] <- scale(cdr)
     }
-    # cat("Fitting ZLM:", model, "\n")
+    if (length(parents)==0) {
+        if (args$cdrAdjustment) {
+            mod <- paste0(node, "~ cdr")
+        } else {
+            mod <- paste0(node, " ~ 1")
+        }
+    } else {
+        if (args$cdrAdjustment) {
+            mod <- paste0(node, "~", paste0(parents, collapse=" + "), " + cdr")
+        } else {
+            mod <- paste0(node, "~", paste0(parents, collapse=" + "))
+        }
+    }
 
-    fit <- MAST::zlm(as.formula(model), sca=data)
+    fit <- MAST::zlm(as.formula(mod), sca=data)
     if (is.null(fit$cont)) return(-Inf)    
     aic.sum <- -1 * (fit$cont$aic + fit$disc$aic)
-    return(aic.sum)    
+    return(aic.sum)
 
 }
 
 #' skeleton.reg
 #' 
-#' Two-stage approach for regularization-based structure learning.
-#' Currently, this function is experimental as 
-#' it uses non-exported functions in `bnlearn`.
+#' Two-stage approach for penalized regression-based structure learning.
+#' Currently, this function is experimental as it uses non-exported functions in `bnlearn`.
 #' 
-#' @param s effective only in glmnet, lambda.min or lambda.1se
+#' @param data data for the inference, features in column
+#' @param algorithm algorithm name in penalized regression
+#' @param whitelist whitelisting arcs
+#' @param blacklist blacklisting arcs
+#' @param nFolds CV parameter, default to 5
+#' @param verbose control logging
+#' @param s effective only in CV-based lambda selection, lambda.min or lambda.1se
+#' @param maximize which score-function to use in maximization phase
+#' @param maximize.args maximization arguments
+#' @param returnArcs return the undirected network in igraph format
 #' @export
 skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
-    nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list()) {
+    nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list(),
+    returnArcs=FALSE) {
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, "\n")
         cat_subtle("Input for structure learning: n ", dim(data)[1], "p ", dim(data)[2], "\n")
@@ -293,6 +380,11 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
     mb <- bnlearn:::bn.recovery(mb, nodes = nodes)
 
     arcs <- bnlearn:::nbr2arcs(mb)
+
+    if (returnArcs) {
+        return(igraph::graph_from_edgelist(arcs))
+    }
+
     res <- list(learning = list("method"="scstruc",
         "blacklist"=list(blacklist)),
         nodes = bnlearn:::cache.structure(names(mb), arcs = arcs),
@@ -307,3 +399,4 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
     # hc_res <- hc(data, start=start, blacklist=constraints)
     return(struc_res)
 }
+

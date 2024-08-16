@@ -6,11 +6,11 @@ Description: The library infers the gene regulatory network based on Bayesian ne
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), bnlearn, igraph, ggraph
+    R (>= 4.3.0), bnlearn, igraph, ggraph, dplyr, KEGGREST,
+    glmnet, tidygraph, ggplot2, scran
 Imports:
-    ggplot2, tidygraph, scran,
-    RcppArmadillo, Rcpp, MAST, dplyr, methods,
-    KEGGREST, glmnet, ncvreg, data.table, AnnotationDbi, knitr
+    RcppArmadillo, Rcpp, MAST, methods,
+    ncvreg, data.table, AnnotationDbi, knitr
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

@@ -13,14 +13,32 @@ skeleton.reg(
   verbose = FALSE,
   s = "lambda.min",
   maximize = "hc",
-  maximize.args = list()
+  maximize.args = list(),
+  returnArcs = FALSE
 )
 }
 \arguments{
-\item{s}{effective only in glmnet, lambda.min or lambda.1se}
+\item{data}{data for the inference, features in column}
+
+\item{algorithm}{algorithm name in penalized regression}
+
+\item{whitelist}{whitelisting arcs}
+
+\item{blacklist}{blacklisting arcs}
+
+\item{nFolds}{CV parameter, default to 5}
+
+\item{verbose}{control logging}
+
+\item{s}{effective only in CV-based lambda selection, lambda.min or lambda.1se}
+
+\item{maximize}{which score-function to use in maximization phase}
+
+\item{maximize.args}{maximization arguments}
+
+\item{returnArcs}{return the undirected network in igraph format}
 }
 \description{
-Two-stage approach for regularization-based structure learning.
-Currently, this function is experimental as 
-it uses non-exported functions in `bnlearn`.
+Two-stage approach for penalized regression-based structure learning.
+Currently, this function is experimental as it uses non-exported functions in `bnlearn`.
 }

@@ -1,7 +1,9 @@
 #' @title markerCoefs
 #' @description identify marker regulatory relationships based on 
-#' fitted coefficient matrix.
+#' fitted coefficient matrix. The return value of `strucValues` function
+#' is expected as input.
 #' @details Users can choose XGBoost or Boruta algorithm.
+#' 
 #' @param coef_mat returned value of `strucValues`
 #' @param classif_label which label to be used for classification
 #' @param cell_label cell label for fitting

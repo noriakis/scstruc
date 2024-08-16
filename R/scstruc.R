@@ -32,7 +32,7 @@
 #' @param returnBn By default, returns the bn class object
 #' @param returnData By default, return the data used for the inference.
 #' @param barcodeColumn barcode for cell identification
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% mutate
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
 #' @importFrom stats BIC as.formula coef coefficients

@@ -44,7 +44,8 @@ if unconfirmed features are present}
 }
 \description{
 identify marker regulatory relationships based on 
-fitted coefficient matrix.
+fitted coefficient matrix. The return value of `strucValues` function
+is expected as input.
 }
 \details{
 Users can choose XGBoost or Boruta algorithm.

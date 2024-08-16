@@ -20,6 +20,7 @@ ic-dag, melancon or ordered. default to melancon.}
 bn object and bn.fit object
 }
 \description{
-generate random.graph based on gene node name and returns the 
+generate random.graph based on
+randomly subset gene node name and returns the 
 fitted network based on the user-provided data
 }

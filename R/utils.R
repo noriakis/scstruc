@@ -1,4 +1,57 @@
 
+#' @title bn.fit.hurdle
+#' @description make a pseudo bn.fit object using continuous part of Hurdle model.
+#' @details You should not use `rbn` or relevant functions for logic sampling 
+#' to this object as  the logistic regression part of the model will 
+#' not be taken into account.
+#' @param x bn object
+#' @param data data to be fitted
+#' @param cdrAdjustment adjust for cellular detection rate based on `data`
+#' @export
+#' @examples
+#' data(gaussian.test)
+#' test.bn <- hc(gaussian.test)
+#' bn.fit.hurdle(test.bn, gaussian.test)
+bn.fit.hurdle <- function(x, data, cdrAdjustment=FALSE) {
+    
+    cdr <- rowSums(data>0)
+    data[["cdr"]] <- scale(cdr)
+
+    fits <- lapply(names(x$nodes), function(nn) {
+        parents <- x$nodes[[nn]]$parents
+        if (length(parents)==0) {
+            if (cdrAdjustment) {
+                mod <- paste0(nn, "~ cdr")
+            } else {
+                mod <- paste0(nn, " ~ 1")
+            }
+        } else {
+            if (cdrAdjustment) {
+                mod <- paste0(nn, "~", paste0(parents, collapse=" + "), " + cdr")
+            } else {
+                mod <- paste0(nn, "~", paste0(parents, collapse=" + "))
+            }
+        }
+        fit <- MAST::zlm(as.formula(mod), data=data)
+        res <- list()
+        res[["node"]] <- nn
+        res[["parents"]] <- parents
+        res[["children"]] <- x$nodes[[nn]]$children
+        coefs <- coef(fit$cont)
+        coefs <- coefs[names(coefs)!="cdr"]
+        res[["coefficients"]] <- coefs
+        res[["residuals"]] <- fit$cont$residuals
+        res[["sd"]] <- sd(fit$cont$residuals)
+        res[["fitted.values"]] <- fit$cont$fitted.values
+        ## Additionally storing fitted object
+        res[["fitted"]] <- fit
+        class(res) <- c("bn.fit.gnode")
+        res
+    }) %>% setNames(names(x$nodes))
+    class(fits) <- c(class(fits), "bn.fit", "bn.fit.gnet")
+    return(fits)
+}
+
 
 
 #' sel.genes.kegg.ora
@@ -27,6 +80,21 @@ cat_subtle <- function(...) cat(pillar::style_subtle(paste0(...)))
 shdmat <- function(netlist) {
     sapply(netlist, function(x) sapply(netlist, function(y) bnlearn::shd(x,y)))
 }
+
+#' sidmat
+#' @param netlist list of bn
+#' @export
+sidmat <- function(netlist) {
+   sapply(netlist, function(x) {
+       sapply(netlist, function(y) {
+           rawadj.x <- as_adj(as.igraph(x))
+           rawadj.y <- as_adj(as.igraph(y))
+           sid <- SID::structIntervDist(rawadj.x, rawadj.y)$sid
+           return(sid)
+       })
+    })
+}
+
 
 #' @noRd
 removeAllNegative <- function(input) {

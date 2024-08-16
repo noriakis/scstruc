@@ -1,5 +1,6 @@
 #' @title gen
-#' @description generate random.graph based on gene node name and returns the 
+#' @description generate random.graph based on
+#' randomly subset gene node name and returns the 
 #' fitted network based on the user-provided data
 #' @param n sample number
 #' @param data data to be fitted

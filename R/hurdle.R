@@ -1,8 +1,10 @@
 #' @noRd
 #' @importFrom data.table :=
+#' @param cdrAdjustment if TRUE, perform cellular detection rate adjustment based on the count of zero per gene.
+#' This will apply to graphical model inference in `fitHurdle` and scoring function in HC phase.
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
-	noMessages=TRUE) {
+	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=hc) {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -10,11 +12,18 @@
 	if (removeAllZero) {
 		data <- data[, !apply(data==0, 2, function(x) sum(x)==nrow(data))]
 	}
+	if (cdrAdjustment) {
+		cdr <- rowSums(data>0)
+		covariates <- cbind(1, scale(cdr))		
+	}
 
 	retl <- list()
 	if (is.null(skeleton)) {
 		## Fit model
 		hurdle.args[["samp"]] <- data
+		if (is.null(hurdle.args[["fixed"]]) & cdrAdjustment) {
+			hurdle.args[["fixed"]] <- covariates
+		}
 		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
@@ -42,12 +51,13 @@
 	bl <- bnlearn:::arcs.to.be.added(arcs, V(g)$name)
 
 	if (is.null(score)) {
-		net <- hc(data[,inc_node_undir],
+		net <- maximizeFun(data[,inc_node_undir],
 			debug=debug, blacklist=bl)
 	} else {
-		net <- hc(data[,inc_node_undir],
+		net <- maximizeFun(data[,inc_node_undir],
 	         blacklist=bl, debug=debug,
-	         score="custom-score", fun=score)		
+	         score="custom-score", fun=score,
+	         args=list("cdrAdjustment"=cdrAdjustment))
 	}
 	retl[["bn"]] <- net
 	retl[["data"]] <- data[, inc_node_undir]
