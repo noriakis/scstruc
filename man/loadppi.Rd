@@ -7,7 +7,7 @@
 loadppi(org = "mm", database = "string")
 }
 \arguments{
-\item{org}{org, mm or hsa}
+\item{org}{organism, mm or hsa}
 
 \item{database}{string or biogrid}
 }

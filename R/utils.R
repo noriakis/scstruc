@@ -128,14 +128,14 @@ convert_to_tbl_graph <- function(bn) {
 #' bn_fit_to_igraph
 #' 
 #' This function coverts the bn.fit object to igraph object.
-#' The nodes with no parents or nodes will not be included in the resulting igraph.
+#' The nodes with no parents and children will not be included in the resulting igraph.
 #' The coefficient value is stored in `coef` attribute of resulting graph.
 #' 
 #' @param graph bn.fit object
-#' 
+#' @param preserve preserve the node with no parents and children
 #' @export
-bn_fit_to_igraph <- function(graph) {
-	igraph::graph_from_data_frame(do.call(rbind, lapply(names(graph), function(i) {
+bn_fit_to_igraph <- function(graph, preserve=FALSE) {
+	tmp <- igraph::graph_from_data_frame(do.call(rbind, lapply(names(graph), function(i) {
 	    tmp <- graph[[i]]
 	    if (length(tmp$coefficients)>1) {
 	        tmp <- data.frame(tmp$coefficients[2:length(tmp$coefficients)]) %>%
@@ -145,6 +145,16 @@ bn_fit_to_igraph <- function(graph) {
 	        return(tmp[,c("from","to","coef")])
 	    }
 	})))
+    if (!preserve) {
+        return(tmp)
+    }
+    tmp <- tmp %>% as_tbl_graph()
+    inName <- tmp %N>% pull(name)
+    dinn <-setdiff(names(graph), inName)
+    
+    if (length(dinn)==0) {return(tmp %>% as.igraph())}
+
+    tmp %>% bind_nodes(data.frame(name=dinn)) %>% as.igraph()
 }
 
 #' 

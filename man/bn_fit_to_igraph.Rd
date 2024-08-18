@@ -4,13 +4,15 @@
 \alias{bn_fit_to_igraph}
 \title{bn_fit_to_igraph}
 \usage{
-bn_fit_to_igraph(graph)
+bn_fit_to_igraph(graph, preserve = FALSE)
 }
 \arguments{
 \item{graph}{bn.fit object}
+
+\item{preserve}{preserve the node with no parents and children}
 }
 \description{
 This function coverts the bn.fit object to igraph object.
-The nodes with no parents or nodes will not be included in the resulting igraph.
+The nodes with no parents and children will not be included in the resulting igraph.
 The coefficient value is stored in `coef` attribute of resulting graph.
 }

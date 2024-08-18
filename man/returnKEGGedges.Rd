@@ -4,12 +4,12 @@
 \alias{returnKEGGedges}
 \title{returnKEGGedges}
 \usage{
-returnKEGGedges(pathID, ggkeggArgs)
+returnKEGGedges(pathID, args)
 }
 \arguments{
 \item{pathID}{pathway ID}
 
-\item{ggkeggArgs}{arguments of ggkegg::pathway}
+\item{args}{arguments of ggkegg::pathway}
 }
 \description{
 return directed igraph object
