@@ -26,7 +26,8 @@ evaluateMetrics(
 
 \item{N}{number of samples to be drawn from `fitted` by `rbn` function.}
 
-\item{algos}{algorithm names}
+\item{algos}{algorithm names
+(For CCDr, hurdle, and MMHC, please specify other arguments)}
 
 \item{mmhc}{perform comparison with MMHC implemented in bnlearn with
 alphas specified in `alphas` argument.}

@@ -26,8 +26,9 @@
     } else if (algorithm == "Hurdle") {
         algorithm.args[["data"]] <- input
         return(do.call(.Hurdle, algorithm.args))
+    ## Constraint-based algos are omitted currently
     } else if (algorithm %in% c("mmhc","rsmax2","h2pc","hc","tabu")) {
-        cat_subtle("Using default bnlearn algorithm\n")
+        cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
         algorithm.args[["x"]] <- input
         net <- do.call(algorithm, algorithm.args)
         return(net)

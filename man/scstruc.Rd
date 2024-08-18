@@ -16,12 +16,12 @@ scstruc(
   clusterLabel = NULL,
   verbose = FALSE,
   useAssay = "logcounts",
-  barcodeColumn = "row",
   changeSymbol = TRUE,
   symbolColumn = "Symbol",
   input = NULL,
-  nonzero = 1,
-  rmNeg = FALSE
+  zeroFilt = 1,
+  rmNeg = FALSE,
+  returnOnlyData = FALSE
 )
 }
 \arguments{
@@ -49,18 +49,20 @@ If you use CCDr algorithm, the \code{bn} object is returned.}
 
 \item{useAssay}{use assay, default to logcounts}
 
-\item{barcodeColumn}{barcode for cell identification}
-
 \item{changeSymbol}{automatically change the node name of input matrix to gene symbol}
 
 \item{symbolColumn}{if changeSymbol is TRUE, use `symbolColumn` in rowData of the input object.}
 
 \item{input}{default to NULL, if specified use this input matrix for inference.}
 
-\item{nonzero}{parameter to filter the genes with many zeros.
-By default perform no filtering.}
+\item{zeroFilt}{parameter to filter the genes with many zeros.
+Genes with the sum of zero expression cells <= the number of all cells * `zeroFilt`
+will be used as input. By default perform no filtering (1).
+This filter will be performed *after* the genes and cells subset by the other parameters.}
 
 \item{rmNeg}{remove genes with all negative abundances}
+
+\item{returnOnlyData}{return only the data, not performing inference.}
 }
 \description{
 The main function for scstruc package.

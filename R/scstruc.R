@@ -23,15 +23,17 @@
 #' @param useAssay use assay, default to logcounts
 #' @param input default to NULL, if specified use this input matrix for inference.
 #' @param rmNeg remove genes with all negative abundances
-#' @param nonzero parameter to filter the genes with many zeros.
-#' By default perform no filtering.
+#' @param zeroFilt parameter to filter the genes with many zeros.
+#' Genes with the sum of zero expression cells <= the number of all cells * `zeroFilt`
+#' will be used as input. By default perform no filtering (1).
+#' This filter will be performed *after* the genes and cells subset by the other parameters.
 #' @param verbose used for logging.
 #' @param label label column
 #' @param changeSymbol automatically change the node name of input matrix to gene symbol
 #' @param symbolColumn if changeSymbol is TRUE, use `symbolColumn` in rowData of the input object.
 #' @param returnBn By default, returns the bn class object
 #' @param returnData By default, return the data used for the inference.
-#' @param barcodeColumn barcode for cell identification
+#' @param returnOnlyData return only the data, not performing inference.
 #' @importFrom dplyr %>% mutate
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
@@ -50,13 +52,19 @@ scstruc <- function(spe, candidateGenes, label=NULL,
 	algorithm.args=list(), returnBn=TRUE,
     returnData=TRUE, clusterLabel=NULL,
     verbose=FALSE, useAssay="logcounts",
-    barcodeColumn="row", changeSymbol=TRUE,
-    symbolColumn="Symbol", input=NULL,
-    nonzero=1, rmNeg=FALSE) {
+    changeSymbol=TRUE, symbolColumn="Symbol", input=NULL,
+    zeroFilt=1, rmNeg=FALSE, returnOnlyData=FALSE) {
     ## .getInput for global label
+    if (is.null(label) & !is.null(labelName)) {
+        cat_subtle("label column name not specified, defaulting to `label`\n")
+        label <- "label"
+    }
     if (is.null(input)) {
-        input <- .getInput(spe, candidateGenes, label, labelName, useAssay, barcodeColumn, clusterLabel, verbose,
-            changeSymbol, symbolColumn, nonzero, rmNeg)
+        input <- .getInput(spe, candidateGenes, label, labelName, useAssay, clusterLabel, verbose,
+            changeSymbol, symbolColumn, zeroFilt, rmNeg)
+    }
+    if (returnOnlyData) {
+        return(input)
     }
     global_graph <- .getStruc(input, algorithm, algorithm.args, verbose)
 

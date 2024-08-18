@@ -24,6 +24,7 @@
 #' alphas specified in `alphas` argument.
 #' @param alphas alpha to be used in the restricting phase of MMHC.
 #' @param algos algorithm names
+#' (For CCDr, hurdle, and MMHC, please specify other arguments)
 #' @param hurdle perform inference based on Hurdle model, default to FALSE.
 #' Some scoring functions used in the function cannot calculate scores
 #' if the feature abundances are all negative. In this case, these scores will be omitted.
@@ -49,6 +50,13 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
     if ("ccdr" %in% algos) {
       stop("Cannot specify CCDr in this argument, please choose `ccdr` argument as TRUE")
     }
+    if ("ccdr.boot" %in% algos) {
+      stop("Cannot specify CCDr in this argument, please choose `ccdr` argument as TRUE")
+    }
+    if ("Hurdle" %in% algos) {
+      stop("Cannot specify Hurdle in this argument, please choose `hurdle` argument as TRUE")
+    }
+
     if (length(algorithm.args)!=0) {
         if (length(algorithm.args)!=length(algos)){
             stop("Length of algos and algorithm.args does not match")
