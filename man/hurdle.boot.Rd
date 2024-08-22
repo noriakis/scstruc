@@ -10,7 +10,10 @@ hurdle.boot(
   m = nrow(data),
   score = NULL,
   removeAllZero = FALSE,
-  debug = FALSE
+  debug = FALSE,
+  skeleton = NULL,
+  maximizeFun = hc,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -25,6 +28,14 @@ hurdle.boot(
 \item{removeAllZero}{remove all zero genes in replicates}
 
 \item{debug}{passed to maximize function}
+
+\item{skeleton}{if skeleton is provided, the bootstrap is based on
+these skeleton. This corresponds to hurdle fitted object.}
+
+\item{maximizeFun}{maximization function (default to HC)}
+
+\item{verbose}{logging in scstruc, for bnlearn debugging, change the 
+argument `debug`}
 }
 \value{
 bn.strength

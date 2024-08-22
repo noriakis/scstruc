@@ -39,7 +39,6 @@ ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gam
     	st <- custom.strength(net_list, nodes)
     	st
     })
-    
 
     names(res) <- as.character(lambdas[lambdas %in% all_lambdas])
     res

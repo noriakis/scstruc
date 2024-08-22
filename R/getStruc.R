@@ -1,14 +1,23 @@
+#' In `ccdr`, one network with best BIC will be returned (if algorithm.args[["bestScore"]] is NULL)
+#' In `ccdr.boot`, we cannot see whether the resulting averaged network is DAG, so returning all the network for lambdas.
 #' @noRd
 .getStruc <- function(input, algorithm, algorithm.args, verbose) {
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, " selected\n")        
     }
     if (algorithm=="ccdr") {
-        cat_subtle("Returning the bn per lambda from result of ccdr.run\n")
+        if (is.null(algorithm.args[["bestScore"]])) {
+            pickBest <- TRUE
+        } else {
+            if (!algorithm.args[["bestScore"]]) {
+                pickBest <- FALSE
+            }
+        }
+        algorithm.args[["bestScore"]] <- NULL
         dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
         algorithm.args[["data"]] <- dat
         if (is.null(algorithm.args[["lambdas.length"]]) & is.null(algorithm.args[["lambdas"]])) {
-            cat("Setting `lambdas.length` to 10\n")
+            cat_subtle("Setting `lambdas.length` to 10\n")
             algorithm.args[["lambdas.length"]] = 10
         }
         ccdr.res <- do.call(ccdrAlgorithm::ccdr.run, algorithm.args)
@@ -18,7 +27,21 @@
         names(bn.res) <- lapply(seq_along(ccdr.res), function(x) {
             ccdr.res[[x]]$lambda
         }) %>% unlist()
-        return(bn.res)
+
+        if (pickBest) {
+            cat_subtle("Returning best scored network only, specify algorithm.args=list(bestScore=FALSE) to return all the network\n")
+            bestind <- names(which.max(lapply(bn.res, function(tt) {
+                score(tt,  input %>% data.frame())
+            })))
+            if (length(bestind)==1) {
+                return(bn.res[[bestind]])
+            } else {
+                return(bn.res[bestind])
+            }
+        } else {
+            cat_subtle("Returning the bn per lambda from result of ccdr.run\n")
+            return(bn.res)                
+        }
     } else if (algorithm=="ccdr.boot") {
         cat_subtle("Returning the list of bn.strength\n")
         algorithm.args[["data"]] <- input
@@ -26,6 +49,9 @@
     } else if (algorithm == "Hurdle") {
         algorithm.args[["data"]] <- input
         return(do.call(.Hurdle, algorithm.args))
+    } else if (algorithm == "Hurdle.boot") {
+        algorithm.args[["data"]] <- input
+        return(do.call(hurdle.boot, algorithm.args))
     ## Constraint-based algos are omitted currently
     } else if (algorithm %in% c("mmhc","rsmax2","h2pc","hc","tabu")) {
         cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")

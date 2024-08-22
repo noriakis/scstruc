@@ -6,12 +6,12 @@ Description: The library infers the gene regulatory network based on Bayesian ne
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), bnlearn, igraph, ggraph, dplyr, KEGGREST,
+    R (>= 4.3.0), bnlearn, igraph, ggraph, dplyr,
     glmnet, tidygraph, ggplot2, scran
 Imports:
     RcppArmadillo, Rcpp, MAST, methods,
     ncvreg, data.table, AnnotationDbi, knitr
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, caret, KEGGREST
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 URL: https://github.com/noriakis/scstruc

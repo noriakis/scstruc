@@ -66,13 +66,15 @@ This filter will be performed *after* the genes and cells subset by the other pa
 }
 \description{
 The main function for scstruc package.
+Perform input subset, structure learning.
 }
 \details{
 \code{algorithm}: inference algorithm (two-stage or one-stage)
 if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
 \code{hurdle}: returned object of HurdleNormal::fitHurdle.
-\code{undir}: Undirected network with the best BIC.
+\code{undir}: Undirected network with the best (lowest) BIC.
 \code{bn}: bn object
+if \code{ccdr}, the list of network for multiple lambdas will be returned
 }
 \examples{
 library(scran)

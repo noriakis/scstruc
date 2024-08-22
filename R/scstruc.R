@@ -2,14 +2,15 @@
 #' 
 #' @description
 #' The main function for scstruc package.
-#' 
+#' Perform input subset, structure learning.
 #' 
 #' @details
 #' \code{algorithm}: inference algorithm (two-stage or one-stage)
 #' if \code{Hurdle} algorithm is specified, it returns the list of \code{hurdle}, \code{undir}, \code{bn}.
 #' \code{hurdle}: returned object of HurdleNormal::fitHurdle.
-#' \code{undir}: Undirected network with the best BIC.
+#' \code{undir}: Undirected network with the best (lowest) BIC.
 #' \code{bn}: bn object
+#' if \code{ccdr}, the list of network for multiple lambdas will be returned
 #' 
 #' @param spe SingleCellExperiment, SpatialExpetiment object
 #' @param candidateGenes candidate genes to be used.
@@ -68,7 +69,7 @@ scstruc <- function(spe, candidateGenes, label=NULL,
     }
     global_graph <- .getStruc(input, algorithm, algorithm.args, verbose)
 
-    if (algorithm %in% c("ccdr","ccdr.boot","Hurdle")) {
+    if (algorithm %in% c("ccdr","ccdr.boot","Hurdle","Hurdle.boot")) {
         if (returnData) {
             return(list("net"=global_graph, "data"=input))
         } else {

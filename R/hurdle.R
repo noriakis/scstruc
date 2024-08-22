@@ -4,7 +4,7 @@
 #' This will apply to graphical model inference in `fitHurdle` and scoring function in HC phase.
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
-	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=hc) {
+	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=hc, onlyBn=TRUE) {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -61,5 +61,9 @@
 	}
 	retl[["bn"]] <- net
 	retl[["data"]] <- data[, inc_node_undir]
-	return(retl)
+	if (onlyBn) {
+		return(net)
+	} else {
+		return(retl)
+	}
 }

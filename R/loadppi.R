@@ -100,21 +100,35 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
 
 #' @title returnKEGGedges
 #' @description return directed igraph object
+#' @details this function tries to extract DAG from KEGG PATHWAY,
+#' and not necessarily succeed.
 #' @param pathID pathway ID
 #' @param args arguments of ggkegg::pathway
+#' @param bn if TRUE, try to convert to bn object, but if failed, return igraph
 #' @details The function uses ggkegg to obtain and parse KEGG PATHWAY information
 #' using KEGG RESTful API.  There should be type `gene` in the node data of pathway
 #' this returns the directed relationship described in the pathway
 #' @export
 #' @importFrom dplyr filter select
-returnKEGGedges <- function(pathID, args) {
+getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE) {
     if (!requireNamespace("ggkegg")) {
         stop("Needs ggkegg. Please install from Bioconductor.")
     }
     args[["pid"]] <- pathID
     pway <- do.call(ggkegg::pathway, args)
     gs <- pway %N>% dplyr::filter(type=="gene")
+    if (largestComponents) {
+      comps <- gs %>% to_components()
+      ind <- which.max(lapply(comps, function(x) {x %N>% data.frame() %>% dim() %>% purrr::pluck(1)}))
+      gs <- comps[[ind]]      
+    }
     nname <- gs %N>% data.frame() %>% dplyr::pull(graphics_name) %>% strsplit(",") %>% sapply("[",1)
-    gs %E>% mutate(fromn = nname[from], ton=nname[to]) %>% data.frame() %>% mutate(from=fromn, to=ton) %>%
-        dplyr::select(-fromn) %>% dplyr::select(-ton) %>% igraph::graph_from_data_frame(directed=TRUE)
+    ig <- gs %E>% mutate(fromn = nname[from], ton=nname[to]) %>% data.frame() %>% mutate(from=fromn, to=ton) %>%
+        dplyr::select(-fromn) %>% dplyr::select(-ton) %>% igraph::graph_from_data_frame(directed=TRUE) %>% simplify()
+    if (bn) {
+      as.bn(ig)
+    } else {
+      ig
+    }
+
 }
