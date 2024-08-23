@@ -38,9 +38,20 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list
 
 
 #' sid.bn
-#' @noRd
-sid.bn <- function(true.bn, est.bn) {
-  res <- SID::structIntervDist(as_adjacency_matrix(as.igraph(true.bn)),
+#' @description given the bn object, calculate SID between them.
+#' @export
+sid.bn <- function(true.bn, est.bn, twoway=FALSE) {
+  if (twoway) {
+      res1 <- SID::structIntervDist(as_adjacency_matrix(as.igraph(true.bn)),
                                as_adjacency_matrix(as.igraph(est.bn)))
-  res$sid
+      res2 <- SID::structIntervDist(as_adjacency_matrix(as.igraph(est.bn)),
+                               as_adjacency_matrix(as.igraph(true.bn)))
+      return((res1$sid+res2$sid)/2)
+
+  } else {
+      res <- SID::structIntervDist(as_adjacency_matrix(as.igraph(true.bn)),
+                                   as_adjacency_matrix(as.igraph(est.bn)))
+      return(res$sid)
+
+  }
 }

@@ -7,6 +7,7 @@
 interVal(
   data,
   algos = c("hc", "mmhc"),
+  algorithm.args = list(list(), list()),
   mode = "shd",
   r = 10,
   ss = 100,
