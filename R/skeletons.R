@@ -326,7 +326,7 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
     returnArcs=FALSE) {
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, "\n")
-        cat_subtle("Input for structure learning: n ", dim(data)[1], "p ", dim(data)[2], "\n")
+        cat_subtle("Input for structure learning: n ", dim(data)[1], " p ", dim(data)[2], "\n")
     }
     nodes <- colnames(data)
     penFun <- dplyr::case_when(

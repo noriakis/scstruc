@@ -110,7 +110,8 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
 #' this returns the directed relationship described in the pathway
 #' @export
 #' @importFrom dplyr filter select
-getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE) {
+getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
+  removeCycle=FALSE) {
     if (!requireNamespace("ggkegg")) {
         stop("Needs ggkegg. Please install from Bioconductor.")
     }
@@ -118,13 +119,27 @@ getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE) {
     pway <- do.call(ggkegg::pathway, args)
     gs <- pway %N>% dplyr::filter(type=="gene")
     if (largestComponents) {
-      comps <- gs %>% to_components()
-      ind <- which.max(lapply(comps, function(x) {x %N>% data.frame() %>% dim() %>% purrr::pluck(1)}))
-      gs <- comps[[ind]]      
+        comps <- gs %>% to_components()
+        ind <- which.max(lapply(comps, function(x) {x %N>% data.frame() %>% dim() %>% purrr::pluck(1)}))
+        gs <- comps[[ind]]      
     }
-    nname <- gs %N>% data.frame() %>% dplyr::pull(graphics_name) %>% strsplit(",") %>% sapply("[",1)
+    nname <- gs %N>% data.frame() %>% dplyr::pull(graphics_name) %>% strsplit(",") %>% sapply("[",1) %>% strsplit("\\.\\.\\.") %>% sapply("[", 1)
     ig <- gs %E>% mutate(fromn = nname[from], ton=nname[to]) %>% data.frame() %>% mutate(from=fromn, to=ton) %>%
         dplyr::select(-fromn) %>% dplyr::select(-ton) %>% igraph::graph_from_data_frame(directed=TRUE) %>% simplify()
+
+
+    if (removeCycle) {
+      ## Use feedback_arc_set to find minimum feedback
+      es <- feedback_arc_set(ig)
+      # es.dat <- do.call(rbind, as_ids(es) %>% strsplit("\\|"))
+      if (length(es)==0) {
+
+      } else {
+        cat_subtle("Removing ", paste0(as_ids(es), collapse=", "), "\n")
+        ig <- delete_edges(ig, es)
+      }
+
+    }
     if (bn) {
       as.bn(ig)
     } else {
