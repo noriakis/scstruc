@@ -1,5 +1,17 @@
-#' interVal
+#' @title interVal
+#' @description Performs `Intersection-Validation` approach to the data.
+#' @param data data (row names as genes and columns as samples)
+#' @param algos algorithms to be evaluated.
+#' @param algorithm.args list of lists to be passed to algos
+#' @param mode shd or sid
+#' @param r number of iteration
 #' @param ss sample size
+#' @param verbose control verbosity
+#' @param returnA0 returns the A0 (intersection of inferred networks)
+#' @return summarized statistics
+#' @examples
+#' data(gaussian.test)
+#' interVal(head(gaussian.test))
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list()),
     mode="shd", r=10, ss=100, verbose=FALSE, returnA0=FALSE) {
     if (length(algos)!=length(algorithm.args)) {

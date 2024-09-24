@@ -4,7 +4,13 @@
 \alias{getKEGGedges}
 \title{returnKEGGedges}
 \usage{
-getKEGGedges(pathID, args = list(), largestComponents = TRUE, bn = TRUE)
+getKEGGedges(
+  pathID,
+  args = list(),
+  largestComponents = TRUE,
+  bn = TRUE,
+  removeCycle = FALSE
+)
 }
 \arguments{
 \item{pathID}{pathway ID}

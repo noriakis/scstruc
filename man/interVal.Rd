@@ -16,8 +16,29 @@ interVal(
 )
 }
 \arguments{
+\item{data}{data (row names as genes and columns as samples)}
+
+\item{algos}{algorithms to be evaluated.}
+
+\item{algorithm.args}{list of lists to be passed to algos}
+
+\item{mode}{shd or sid}
+
+\item{r}{number of iteration}
+
 \item{ss}{sample size}
+
+\item{verbose}{control verbosity}
+
+\item{returnA0}{returns the A0 (intersection of inferred networks)}
+}
+\value{
+summarized statistics
 }
 \description{
-interVal
+Performs `Intersection-Validation` approach to the data.
+}
+\examples{
+data(gaussian.test)
+interVal(head(gaussian.test))
 }
