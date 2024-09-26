@@ -11,6 +11,8 @@
         } else {
             if (!algorithm.args[["bestScore"]]) {
                 pickBest <- FALSE
+            } else {
+                pickBest <- TRUE
             }
         }
         algorithm.args[["bestScore"]] <- NULL
@@ -31,7 +33,7 @@
         if (pickBest) {
             cat_subtle("Returning best scored network only, specify algorithm.args=list(bestScore=FALSE) to return all the network\n")
             bestind <- names(which.max(lapply(bn.res, function(tt) {
-                score(tt,  input %>% data.frame())
+                score(tt,  data.frame(input, check.names=FALSE)[names(tt$nodes), ])
             })))
             if (length(bestind)==1) {
                 return(bn.res[[bestind]])
