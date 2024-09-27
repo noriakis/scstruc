@@ -57,7 +57,7 @@ strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
 #' @noRd
 .strucValuesCoef <- function(spe, bn, labels, exclude_label,
     barcode, assay, verbose, fit.hurdle) {
-    cat("Coefficient calculation per specified group:", paste0(labels, collapse=", "), "\n")
+    cat_subtle("Coefficient calculation per specified group: ", paste0(labels, collapse=", "), "\n")
     logc <- spe@assays@data[[assay]]
     ## In case
     if ("Symbol" %in% colnames(rowData(spe))) {
