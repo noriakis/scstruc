@@ -13,7 +13,8 @@ hurdle.boot(
   debug = FALSE,
   skeleton = NULL,
   maximizeFun = hc,
-  verbose = FALSE
+  verbose = FALSE,
+  return.all = FALSE
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ these skeleton. This corresponds to hurdle fitted object.}
 
 \item{verbose}{logging in scstruc, for bnlearn debugging, change the 
 argument `debug`}
+
+\item{return.all}{return all the network in bootstrapping}
 }
 \value{
 bn.strength

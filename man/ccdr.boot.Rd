@@ -10,7 +10,8 @@ ccdr.boot(
   m = nrow(data),
   lambdas.length = 20,
   alpha = 2,
-  gamma = 2
+  gamma = 2,
+  return.all = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ ccdr.boot(
 \item{alpha}{passed to ccdr.run, default to 2}
 
 \item{gamma}{passed to ccdr.run, default to 2}
+
+\item{return.all}{return all the network}
 }
 \value{
 list of the bn.strength per lambda

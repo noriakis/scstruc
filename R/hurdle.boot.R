@@ -14,10 +14,11 @@
 #' @param maximizeFun maximization function (default to HC)
 #' @param verbose logging in scstruc, for bnlearn debugging, change the 
 #' argument `debug`
+#' @param return.all return all the network in bootstrapping
 #' @export
 #' @return bn.strength 
 hurdle.boot <- function(data, R=200, m=nrow(data), score=NULL, removeAllZero=FALSE,
-    debug=FALSE, skeleton=NULL, maximizeFun=hc, verbose=FALSE) {
+    debug=FALSE, skeleton=NULL, maximizeFun=hc, verbose=FALSE, return.all=FALSE) {
     nodes = names(data)
     perRun <- list()
     for (r in seq_len(R)) {
@@ -31,6 +32,9 @@ hurdle.boot <- function(data, R=200, m=nrow(data), score=NULL, removeAllZero=FAL
             removeAllZero=removeAllZero, debug=debug, skeleton=skeleton,
             maximizeFun=maximizeFun)$bn
         perRun[[r]] <- run
+    }
+    if (return.all) {
+        return(perRun)
     }
 	st <- custom.strength(perRun, nodes)
     return(st)

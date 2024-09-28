@@ -12,10 +12,11 @@
 #' @param lambdas.length passed to generate.lambdas
 #' @param alpha passed to ccdr.run, default to 2
 #' @param gamma passed to ccdr.run, default to 2
+#' @param return.all return all the network
 #' @export
 #' @return list of the bn.strength per lambda
 #' 
-ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gamma=2) {
+ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gamma=2, return.all=FALSE) {
     nodes = names(data)
     ## Use same lambda for all replicate (probably not needed)
     ## Set alpha to be sufficiently large
@@ -32,7 +33,9 @@ ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gam
         perRun[[r]] <- run
     }
     all_lambdas <- Reduce(intersect, lapply(perRun, function(pr) {unlist(lapply(pr, function(x) x$lambda))}))
-    
+    if (return.all) {
+        return(perRun)
+    }
     
     res <- lapply(which(lambdas %in% all_lambdas), function(l) {
     	net_list <- lapply(perRun, function(pr) {sparsebnUtils::to_bn(pr[[l]])$edges})
