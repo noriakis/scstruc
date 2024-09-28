@@ -1,0 +1,36 @@
+#' metrics
+#' 
+#' Calculate and return metrics
+#' 
+#' @param inferred named list of bn object
+#' @param reference reference bn object
+#' @return data.frame storing evaluation results
+metrics <- function(reference, inferred) {
+    if (is.null(inferred)) {
+        stop("The inferred list should be named.")
+    }
+    res <- do.call(rbind, lapply(names(inferred), function(x) {
+        cur_net <- inferred[[x]]
+        s0 <- dim(reference$arcs)[1]
+        edges <- dim(cur_net$arcs)[1]
+        comp <- bnlearn::compare(cur_net, reference)
+
+        tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
+        pre <- tp/(tp+fp); rec <- tp/(tp+fn)
+        fv <- 2*(pre*rec)/(pre+rec)
+
+        sid <- sid.bn(reference, cur_net, twoway=TRUE)
+        c(
+            x, s0, edges,
+            # KL(bn.fit(cur_net, input), fitted),
+            # BIC(cur_net, input),
+            bnlearn::shd(cur_net, reference),
+            tp, fp, fn, tp/s0, pre, rec, fv , sid
+        )
+    })) %>% data.frame()
+    res <- res %>%  `colnames<-`(c("algo","s0","edges","SHD","TP",
+        "FP","FN","TPR","Precision","Recall","Fvalue","SID")) %>%
+        mutate_at(2:ncol(res), as.numeric)
+    # res <- res %>% mutate(BICnorm = (BIC - min(BIC)) / (max(BIC) - min(BIC)))
+    return(res)
+}
