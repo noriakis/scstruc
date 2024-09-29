@@ -30,7 +30,7 @@ hurdle.boot <- function(data, R=200, m=nrow(data), score=NULL, removeAllZero=FAL
         replicate = data[resampling, , drop = FALSE]
         run <- .Hurdle(replicate, score=score,
             removeAllZero=removeAllZero, debug=debug, skeleton=skeleton,
-            maximizeFun=maximizeFun)$bn
+            maximizeFun=maximizeFun)
         perRun[[r]] <- run
     }
     if (return.all) {
