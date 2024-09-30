@@ -9,9 +9,10 @@
 #' @param verbose control verbosity
 #' @param returnA0 returns the A0 (intersection of inferred networks)
 #' @return summarized statistics
+#' @export
 #' @examples
 #' data(gaussian.test)
-#' interVal(head(gaussian.test))
+#' interVal(head(gaussian.test, n=50), ss=10)
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list()),
     mode="shd", r=10, ss=100, verbose=FALSE, returnA0=FALSE) {
     if (length(algos)!=length(algorithm.args)) {

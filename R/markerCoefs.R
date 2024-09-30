@@ -48,6 +48,12 @@ markerCoefs <- function(coef_mat, classif_label="group",
 
     ## We do not use impXgboost in Boruta as not recommended.
     if (xgboost) {
+        if (!requireNamespace("xgboost")) {
+            stop("Needs xgboost installation")
+        } else {
+            requireNamespace("Boruta")
+
+        }
         trueLabel <- unique(as.character(mydata$classif_label))[2]
         cat_subtle("True label will be: ", trueLabel, "\n")
         vec <- as.numeric(mydata$classif_label==trueLabel)
@@ -57,13 +63,19 @@ markerCoefs <- function(coef_mat, classif_label="group",
         }
         xgboostArgs[["data"]] <- mydata %>% as.matrix()
         xgboostArgs[["label"]] <- vec
-        res <- do.call(xgboost::xgboost, xgboostArgs)
+        res <- do.call(xgboost, xgboostArgs)
         importance <- xgb.importance(feature_names = colnames(mydata), model = res)
         return(list("xgboost"=res, "importance"=importance, "data"=mydata))
     } else {
+        if (!requireNamespace("Boruta")) {
+            stop("Needs Boruta installation")
+        } else {
+            requireNamespace("Boruta")
+        }
+
         mydata[is.na(mydata)] <- 0
         cat_subtle("Performing Boruta algorithm ...\n")
-        brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
+        brt <- Boruta(classif_label ~ ., data=mydata)
         if (tentative_fix) {
             brt_fixed <- TentativeRoughFix(brt)
         } else {

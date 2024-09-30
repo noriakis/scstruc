@@ -13,6 +13,17 @@ sel.genes.kegg.ora(
   organism = "hsa"
 )
 }
+\arguments{
+\item{genes}{query genes}
+
+\item{orgDb}{organism database object}
+
+\item{keyType}{key type of genes}
+
+\item{sel}{select the number of pathways, sorted by p-value}
+
+\item{organism}{organism ID in KEGG, default to hsa}
+}
 \description{
 sel.genes.kegg.ora
 select genes based on KEGG over-representation analysis

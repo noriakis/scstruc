@@ -19,6 +19,14 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
     mode="average", ID="ID", verbose=TRUE) {
     if (!requireNamespace("SuperCell", quietly = TRUE)) {
         stop("SuperCell package needed to compute the metacell abundance. Please visit https://github.com/GfellerLab/SuperCell")
+    } else {
+        requireNamespace("SuperCell")
+    }
+    if (!requireNamespace("Matrix", quietly = TRUE)) {
+        stop("Matrix package needed to compute the metacell abundance. Please visit https://github.com/GfellerLab/SuperCell")
+    } else {
+        requireNamespace("Matrix")
+        t <- Matrix::t
     }
     if (is.null(genes)) {
         genes <- getTopHVGs(sce, prop=prop)
@@ -28,7 +36,7 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
     row.names(GE) <- rowData(sce)[[ID]]
 
     if (pca) {
-        pcs <- stats::prcomp(Matrix::t(GE[genes, ]), rank. = rank)$x
+        pcs <- stats::prcomp(t(GE[genes, ]), rank. = rank)$x
         SC <- SCimplify_from_embedding(
           X = pcs, 
           k.knn = k.knn, 

@@ -38,6 +38,7 @@
 #' @importFrom dplyr %>% mutate
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
+#' @import scran
 #' @importFrom stats BIC as.formula coef coefficients
 #' @importFrom stats gaussian nobs sd setNames summary.glm
 #' @examples

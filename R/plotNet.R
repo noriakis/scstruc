@@ -15,6 +15,8 @@
 #' @param highlightEdgeWidth highlight edge width
 #' @param showText show the node name
 #' @export
+#' @import ggplot2
+#' @import tidygraph
 #' @importFrom tidygraph to_components
 #' @importFrom ggplot2 scale_size
 #' @importFrom ggraph theme_graph

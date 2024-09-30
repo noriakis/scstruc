@@ -1,4 +1,5 @@
 #' @noRd
+#' @importFrom SingleCellExperiment rowData colData
 .getInput <- function(sce,
     candidate_genes, label, x,
     use_assay,

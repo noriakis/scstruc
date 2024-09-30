@@ -19,6 +19,8 @@
 #' @param highlightColor highlight color for ggfx
 #' @param highlightExpand expand parameter for ggfx
 #' @param highlightSigma sigma paramter for ggfx
+#' @importFrom ggplot2 arrow
+#' @import ggraph
 #' @export
 plotAVN <- function(str, edge=geom_edge_link,
     ew="strength", ec="direction", layout="kk", degreeMode="all",

@@ -40,5 +40,5 @@ Performs `Intersection-Validation` approach to the data.
 }
 \examples{
 data(gaussian.test)
-interVal(head(gaussian.test))
+interVal(head(gaussian.test, n=50), ss=10)
 }

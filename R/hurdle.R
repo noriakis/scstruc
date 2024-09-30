@@ -1,10 +1,13 @@
 #' @noRd
 #' @importFrom data.table :=
+#' @importFrom bnlearn hc
+#' @importFrom igraph V
 #' @param cdrAdjustment if TRUE, perform cellular detection rate adjustment based on the count of zero per gene.
 #' This will apply to graphical model inference in `fitHurdle` and scoring function in HC phase.
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
-	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=hc, onlyBn=TRUE) {
+	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=bnlearn::hc,
+	onlyBn=TRUE) {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -24,17 +27,17 @@
 		if (is.null(hurdle.args[["fixed"]]) & cdrAdjustment) {
 			hurdle.args[["fixed"]] <- covariates
 		}
-		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
+		suppressMessages(hurdle <- do.call(HurdleNormal::fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
 	}
 
 	## Best model selection
 	BIC_etc <- hurdle$BIC_etc
-	BIC_etc[BIC<=min(BIC),isMin := TRUE][,idx:=.I]
+	# BIC_etc[BIC<=min(BIC),isMin := TRUE][,idx:=.I]
 
 	ind <- which.min(BIC_etc$BIC)
-	g <- graph.adjacency(abs(hurdle$adjMat[[ind]])>0, mode='max')
+	g <- igraph::graph.adjacency(abs(hurdle$adjMat[[ind]])>0, mode='max')
 	retl[["hurdle"]] <- hurdle
 	retl[["undir"]] <- g
 

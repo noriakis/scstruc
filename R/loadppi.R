@@ -80,8 +80,8 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
       return(list("string"=ints, "biogrid"=ints.biogrid))
     }
 
-    inten <- as_edgelist(ints) %>% dim() %>% purrr::pluck(1)
-    inten.biogrid <- as_edgelist(ints.biogrid) %>% dim() %>% purrr::pluck(1)
+    inten <- dim(as_edgelist(ints))[1]
+    inten.biogrid <- dim(as_edgelist(ints.biogrid))[1]
 
     # cat(inten / enn, "\n")
     vec <- c(enn, inten, inten / enn, "string")
@@ -98,52 +98,3 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
     return(df)
 }
 
-#' @title returnKEGGedges
-#' @description return directed igraph object
-#' @details this function tries to extract DAG from KEGG PATHWAY,
-#' and not necessarily succeed.
-#' @param pathID pathway ID
-#' @param args arguments of ggkegg::pathway
-#' @param bn if TRUE, try to convert to bn object, but if failed, return igraph
-#' @details The function uses ggkegg to obtain and parse KEGG PATHWAY information
-#' using KEGG RESTful API.  There should be type `gene` in the node data of pathway
-#' this returns the directed relationship described in the pathway
-#' @export
-#' @importFrom dplyr filter select
-getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
-  removeCycle=FALSE) {
-    if (!requireNamespace("ggkegg")) {
-        stop("Needs ggkegg. Please install from Bioconductor.")
-    }
-    args[["pid"]] <- pathID
-    pway <- do.call(ggkegg::pathway, args)
-    gs <- pway %N>% dplyr::filter(type=="gene")
-    if (largestComponents) {
-        comps <- gs %>% to_components()
-        ind <- which.max(lapply(comps, function(x) {x %N>% data.frame() %>% dim() %>% purrr::pluck(1)}))
-        gs <- comps[[ind]]      
-    }
-    nname <- gs %N>% data.frame() %>% dplyr::pull(graphics_name) %>% strsplit(",") %>% sapply("[",1) %>% strsplit("\\.\\.\\.") %>% sapply("[", 1)
-    ig <- gs %E>% mutate(fromn = nname[from], ton=nname[to]) %>% data.frame() %>% mutate(from=fromn, to=ton) %>%
-        dplyr::select(-fromn) %>% dplyr::select(-ton) %>% igraph::graph_from_data_frame(directed=TRUE) %>% simplify()
-
-
-    if (removeCycle) {
-      ## Use feedback_arc_set to find minimum feedback
-      es <- feedback_arc_set(ig)
-      # es.dat <- do.call(rbind, as_ids(es) %>% strsplit("\\|"))
-      if (length(es)==0) {
-
-      } else {
-        cat_subtle("Removing ", paste0(as_ids(es), collapse=", "), "\n")
-        ig <- delete_edges(ig, es)
-      }
-
-    }
-    if (bn) {
-      as.bn(ig)
-    } else {
-      ig
-    }
-
-}

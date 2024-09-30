@@ -56,12 +56,23 @@ bn.fit.hurdle <- function(x, data, cdrAdjustment=FALSE) {
 
 #' sel.genes.kegg.ora
 #' select genes based on KEGG over-representation analysis
+#' @param genes query genes
+#' @param orgDb organism database object
+#' @param keyType key type of genes
+#' @param sel select the number of pathways, sorted by p-value
+#' @param organism organism ID in KEGG, default to hsa
 #' @export
 sel.genes.kegg.ora <- function(genes, orgDb=org.Hs.eg.db, keyType="ENSEMBL", sel=NULL, organism="hsa") {
+  if (!requireNamespace("AnnotationDbi")) {
+    stop("Needs AnnotationDbi installation")
+  }
+  if (!requireNamespace("clusterProfiler")) {
+    stop("Needs clusterProfiler installation")
+  }
   input <- AnnotationDbi::mapIds(orgDb, genes, column="ENTREZID", keytype=keyType, multiVals="first") %>%
     as.character()
   input <- input[!is.na(input)]
-  ora <- clusterProfiler::enrichKEGG(input, organism=organism)
+  ora <- enrichKEGG(input, organism=organism)
   if (!is.null(sel)) {
     cat(ora@result[sel, ]$Description, "\n")
     ora <- ora@result[sel, ]$geneID %>% strsplit("/") %>% unlist()

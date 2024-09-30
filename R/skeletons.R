@@ -4,8 +4,10 @@
 #' This function ignores the error and returns no candidate when the
 #' function raises an error.
 #' @noRd
-#' @importFrom ncvreg cv.ncvreg
 .ncvregCV <- function(X, y, nFolds, algorithm, s=NULL) {
+    if (!requireNamespace("ncvreg")) {
+        stop("Needs ncvreg installation")
+    }
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
     tryCatch({
         fit <- cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
@@ -79,6 +81,7 @@
 #' @param data data for fitting
 #' @param nn node name for Y
 #' @examples
+#' library(ggplot2)
 #' data(gaussian.test)
 #' glmnetBICpath(gaussian.test, "A")$plot
 glmnetBICpath <- function(data, nn) {
@@ -134,6 +137,11 @@ returnFolds <- function(y, nFolds) {
 
 #' @noRd
 .L0CV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
+    if (!requireNamespace("L0Learn")) {
+        stop("Needs installation of L0Learn")
+    } else {
+        requireNamespace("L0Learn")
+    }
     fit=L0Learn::L0Learn.cvfit(x=X %>% as.matrix(), y=y, penalty="L0",
         nFolds=nFolds, algorithm="CD")
     lambdaIndex <- which.min(fit$cvMeans[[1]])
@@ -146,6 +154,11 @@ returnFolds <- function(y, nFolds) {
 
 #' @noRd
 .L0LXCV <- function(X, y, nFolds=5, algorithm=NULL, s=NULL) {
+    if (!requireNamespace("L0Learn")) {
+        stop("Needs installation of L0Learn")
+    } else {
+        requireNamespace("L0Learn")
+    }
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
     fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=algorithm, nFolds=nFolds, algorithm="CD")
     ## Choose gamma which have the lowest PE

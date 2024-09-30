@@ -17,6 +17,7 @@ glmnetBICpath
 return glmnet BIC path for lambdas
 }
 \examples{
+library(ggplot2)
 data(gaussian.test)
 glmnetBICpath(gaussian.test, "A")$plot
 }
