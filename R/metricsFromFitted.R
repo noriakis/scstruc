@@ -1,9 +1,10 @@
-#' @title evaluateMetrics
+#' @title metricsFromFitted
 #' 
 #' @description 
 #' Evaluate various metrics comparing reference network and inferred network.
 #' The inference will be performed based on randomly generated data from 
-#' fitted Bayesian network (`bn.fit` object).
+#' fitted Bayesian network (`bn.fit` object). For the already calculated networks,
+#' please use `metrics()` function.
 #' 
 #' The description of metrics is as follows:
 #' 
@@ -40,7 +41,7 @@
 #' @param return_data return data
 #' @param lambdas.length lambda length in CCDr algorithm
 #' @export
-evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
+metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
     org="mm", return_data=FALSE,
     algorithm.args=list(), hurdle=FALSE,
@@ -86,14 +87,14 @@ evaluateMetrics <- function(fitted, N, algos=c("glmnet_CV"),
         e <- Sys.time()
         tim <- as.numeric(e-s, unit="secs")
         cat_subtle("Hurdle BIC ", tim, "\n")
-        alls[[paste0("Hurdle_BIC")]] <- list(net$bn, tim)
+        alls[[paste0("Hurdle_BIC")]] <- list(net, tim)
 
         s <- Sys.time()
         net <- .Hurdle(input, score=hurdle.bic)
         e <- Sys.time()
         tim <- as.numeric(e-s, unit="secs")
         cat_subtle("Hurdle zBIC ", tim, "\n")
-        alls[[paste0("Hurdle_zBIC")]] <- list(net$bn, tim)
+        alls[[paste0("Hurdle_zBIC")]] <- list(net, tim)
 
     }
     if (mmhc) {

@@ -17,3 +17,9 @@ data.frame storing evaluation results
 \description{
 Calculate and return metrics
 }
+\examples{
+library(bnlearn)
+data(gaussian.test)
+ref <- hc(head(gaussian.test))
+metrics(ref, list("ref1"=ref,"ref2"=ref))
+}

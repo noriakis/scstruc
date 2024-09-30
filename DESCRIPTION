@@ -10,7 +10,7 @@ Depends:
 Imports:
     Rcpp, MAST, methods,
     data.table, ggraph, dplyr,
-    glmnet, tidygraph, ggplot2, caret,
+    glmnet, tidygraph, ggplot2,
     pillar, SID, SingleCellExperiment
 Suggests:
     ncvreg, AnnotationDbi,

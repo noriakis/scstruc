@@ -1,10 +1,15 @@
-#' metrics
+#' @title metrics
 #' 
-#' Calculate and return metrics
+#' @description Calculate and return metrics
 #' 
 #' @param inferred named list of bn object
 #' @param reference reference bn object
 #' @return data.frame storing evaluation results
+#' @examples
+#' library(bnlearn)
+#' data(gaussian.test)
+#' ref <- hc(head(gaussian.test))
+#' metrics(ref, list("ref1"=ref,"ref2"=ref))
 metrics <- function(reference, inferred) {
     if (is.null(inferred)) {
         stop("The inferred list should be named.")

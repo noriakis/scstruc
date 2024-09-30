@@ -26,7 +26,6 @@
 }
 
 #' @noRd
-#' @importFrom caret createFolds
 #' @importFrom glmnet cv.glmnet
 .glmnetCV <- function(X, y, nFolds=5, algorithm=NULL,
     s="lambda.min", standardize=TRUE) {
@@ -122,17 +121,17 @@ glmnetBICpath <- function(data, nn) {
 #' For reproducibility, CV folds are created by caret
 #' (Not in use)
 #' @noRd
-returnFolds <- function(y, nFolds) {
-    flds <- caret::createFolds(y,
-        k=nFolds, list=TRUE, returnTrain=FALSE)
-    foldids = rep(0,length(y))
-    for (i in seq_len(nFolds)) {
-        unval <- unique(y[flds[[paste0("Fold",i)]]])
-        if (length(unval) == 1) {message("A fold containing constants!")}
-        foldids[flds[[paste0("Fold",i)]]] = i
-    }
-    return(foldids)
-}
+# returnFolds <- function(y, nFolds) {
+#     flds <- caret::createFolds(y,
+#         k=nFolds, list=TRUE, returnTrain=FALSE)
+#     foldids = rep(0,length(y))
+#     for (i in seq_len(nFolds)) {
+#         unval <- unique(y[flds[[paste0("Fold",i)]]])
+#         if (length(unval) == 1) {message("A fold containing constants!")}
+#         foldids[flds[[paste0("Fold",i)]]] = i
+#     }
+#     return(foldids)
+# }
 
 
 #' @noRd
