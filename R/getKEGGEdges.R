@@ -1,7 +1,5 @@
 #' @title returnKEGGedges
 #' @description return directed igraph object
-#' @details this function tries to extract DAG from KEGG PATHWAY,
-#' and not necessarily succeed.
 #' @param pathID pathway ID
 #' @param args arguments of ggkegg::pathway
 #' @param bn if TRUE, try to convert to bn object, but if failed, return igraph
@@ -9,7 +7,9 @@
 #' @param removeCycle remove cycle using feedback_arc_set()
 #' @details The function uses ggkegg to obtain and parse KEGG PATHWAY information
 #' using KEGG RESTful API.  There should be type `gene` in the node data of pathway
-#' this returns the directed relationship described in the pathway
+#' this returns the directed relationship described in the pathway.
+#' The function tries to extract DAG from KEGG PATHWAY, and not necessarily succeed.
+#' The first part of graphics name in the graph is taken as the representative gene name.
 #' @export
 #' @importFrom dplyr filter select
 #' @importFrom igraph feedback_arc_set

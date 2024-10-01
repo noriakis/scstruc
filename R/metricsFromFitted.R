@@ -35,7 +35,7 @@
 #' The network node name should be symbol for calculating the intersection.
 #' Also, `database` and `org` argument should be specified based on the node name.
 #' @param org passed to `intersectPpi` function
-#' @param sid compute SID, needs package SID in CRAN.
+#' @param sid compute SID
 #' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
@@ -119,7 +119,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     } 
     cat_subtle("Network computing finished", "\n")
     if (sid) {
-        rawadj <- as_adj(as.igraph(rawnet))
+        # rawadj <- as_adj(as.igraph(rawnet))
     }
     res <- do.call(rbind, lapply(names(alls), function(x) {
         cur_net <- alls[[x]][[1]]
@@ -138,17 +138,21 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
             numppi <- NA
         }
         if (sid) {
-            curadj <- as_adj(as.igraph(cur_net))
-            sid <- SID::structIntervDist(rawadj, curadj)$sid
+            # curadj <- as_adj(as.igraph(cur_net))
+            # sid <- SID::structIntervDist(rawadj, curadj)$sid
+            sid.val <- bnlearn::sid(cur_net, rawnet)
+            sid.val.2 <- bnlearn::sid(rawnet, cur_net)
+            sid.val.sym <- (sid.val + sid.val.2) / 2
+
         } else {
-            sid <- NA
+            sid.val.sym <- NA
         }
         c(
             x, s0, edges,
             KL(bn.fit(cur_net, input), fitted),
             BIC(cur_net, input),
             bnlearn::shd(cur_net, rawnet),
-            tp, fp, fn, tp/s0, pre, rec, fv , sid, numppi, tim
+            tp, fp, fn, tp/s0, pre, rec, fv , sid.val.sym, numppi, tim
         )
     })) %>% data.frame()
     res <- res %>%  `colnames<-`(c("algo","s0","edges","KL","BIC","SHD","TP",

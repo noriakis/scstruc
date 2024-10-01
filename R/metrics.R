@@ -24,13 +24,14 @@ metrics <- function(reference, inferred) {
         pre <- tp/(tp+fp); rec <- tp/(tp+fn)
         fv <- 2*(pre*rec)/(pre+rec)
 
-        sid <- sid.bn(reference, cur_net, twoway=TRUE)
+        # sid <- sid.bn(reference, cur_net, twoway=TRUE)
+        sid.val <- (bnlearn::sid(reference, cur_net) + bnlearn::sid(cur_net, reference))/2
         c(
             x, s0, edges,
             # KL(bn.fit(cur_net, input), fitted),
             # BIC(cur_net, input),
             bnlearn::shd(cur_net, reference),
-            tp, fp, fn, tp/s0, pre, rec, fv , sid
+            tp, fp, fn, tp/s0, pre, rec, fv, sid.val
         )
     })) %>% data.frame()
     res <- res %>%  `colnames<-`(c("algo","s0","edges","SHD","TP",

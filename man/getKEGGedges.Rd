@@ -27,10 +27,9 @@ getKEGGedges(
 return directed igraph object
 }
 \details{
-this function tries to extract DAG from KEGG PATHWAY,
-and not necessarily succeed.
-
 The function uses ggkegg to obtain and parse KEGG PATHWAY information
 using KEGG RESTful API.  There should be type `gene` in the node data of pathway
-this returns the directed relationship described in the pathway
+this returns the directed relationship described in the pathway.
+The function tries to extract DAG from KEGG PATHWAY, and not necessarily succeed.
+The first part of graphics name in the graph is taken as the representative gene name.
 }
