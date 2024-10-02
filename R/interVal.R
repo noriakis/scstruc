@@ -7,18 +7,25 @@
 #' @param r number of iteration
 #' @param ss sample size
 #' @param verbose control verbosity
-#' @param returnA0 returns the A0 (intersection of inferred networks)
+#' @param returnA0 returns the A0 (intersection of inferred networks), default to TRUE
+#' @param symmetrize use symmetrized version of SID
 #' @return summarized statistics
 #' @export
 #' @examples
 #' data(gaussian.test)
 #' interVal(head(gaussian.test, n=50), ss=10)
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list()),
-    mode="shd", r=10, ss=100, verbose=FALSE, returnA0=FALSE) {
+    mode="shd", r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE) {
     if (length(algos)!=length(algorithm.args)) {
         stop("length of algos and algorithm.args must match")
     }
+    if (verbose) {
+        cat_subtle("Total of ", length(algos), " algorithms\n")
+    }
 	bns <- lapply(seq_along(algos), function(al) {
+        if (verbose) {
+            cat_subtle("  Algorithm: ", algos[al], "\n")
+        }
 		.getStruc(data, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
 	})
 	A0 <- Reduce(intersection, lapply(bns, function(x) {
@@ -29,13 +36,17 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list
         replicates <- sample(seq_len(nrow(data)), ss)
         tmp <- data[replicates, ]
         inf.nets <- lapply(seq_along(algos), function(al) {
-            .getStruc(data, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
+            .getStruc(tmp, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
         })
         lapply(inf.nets, function(tmpnet) {
             if (mode=="sid") {
-    	          sid.bn(A0.bn, tmpnet) %>% unlist() %>% return()
+                if (symmetrize) {
+                    bnlearn.sid.sym(tmpnet, A0.bn) %>% return()
+                } else {
+                    bnlearn::sid(tmpnet, A0.bn) %>% unlist() %>% return()
+                }
             } else if (mode=="shd") {
-                bnlearn::shd(A0.bn, tmpnet) %>% unlist() %>% return()
+                bnlearn::shd(tmpnet, A0.bn) %>% unlist() %>% return()
             } else {
                 stop("sid or shd should be specified")
             }
@@ -47,4 +58,12 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list
     } else {
         return(sum.stat)
     }
+}
+
+#' @noRd
+#' sid.sym
+bnlearn.sid.sym <- function(net1, net2) {
+    sid1 <- bnlearn::sid(net1, net2)
+    sid2 <- bnlearn::sid(net2, net1)
+    (sid1 + sid2) / 2
 }
