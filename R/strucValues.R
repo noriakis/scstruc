@@ -11,6 +11,8 @@
 #' @param variation_func if `net` is provided, the summarization of subnetwork is performed by this function.
 #' @param barcode barcode ID for cell
 #' @param fit.hurdle fit the parameter based on hurdle model
+#' @param assay use assay
+#' @param verbose control verbosity
 #' @export
 strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
 	summarize_func=mean, variation_func=sd, barcode="barcode_id", assay="logcounts",

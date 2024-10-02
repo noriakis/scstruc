@@ -17,37 +17,17 @@ plotSTWithSummarized(
 \arguments{
 \item{spe}{SpatialExperiment}
 
+\item{gsv}{tbl_graph object}
+
+\item{from_node}{from node}
+
+\item{to_node}{to node}
+
 \item{label}{label in `colData(spe)` that matches the node labels in ig}
 
 \item{sample_id}{sample_id in `spe`, used to subset image}
 
 \item{image_id}{image_id in `spe`, used to subset image}
-
-\item{ig}{igraph or data.frame object containing `from` and `to` column}
-
-\item{edge_width}{edge width in igraph or data.frame}
-
-\item{edge_color}{edge color in igraph or data.frame}
-
-\item{edge_range}{edge width range}
-
-\item{return_tbl_graph}{return tbl graph only}
-
-\item{point_label}{background point label}
-
-\item{cell_cluster_label}{label of each node, should be named vector}
-
-\item{directed}{network is directed or not}
-
-\item{use_ggfx}{use ggfx or not}
-
-\item{point_size}{representative point size}
-
-\item{rep_colour}{representative point colour}
-
-\item{edge_base_colour}{fixed edge colour}
-
-\item{edge_base_width}{fixed edge width}
 }
 \value{
 ggplot

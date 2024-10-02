@@ -35,10 +35,7 @@ plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
 #' Automatic determination of gamma will be supported.
 #' RcppArmadillo version is faster (plasso_fit).
 #'  
-#' @param X matrix
-#' @param y response vector
-#' @export
-#' 
+#' @noRd
 plasso.fit.single <- function(X, y, lambda=1, eps=1e-6, P=NULL,
     maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2) {
     if (!is.matrix(X)) {stop("X must be matrix")}
@@ -101,6 +98,8 @@ plasso.fit.single <- function(X, y, lambda=1, eps=1e-6, P=NULL,
 
 #' plasso.predict
 #' prediction function for precision lasso
+#' @param X prediction vector
+#' @param w coefficient
 #' @export
 plasso.predict <- function(X, w) {
     X0 = rep(1, nrow(X))

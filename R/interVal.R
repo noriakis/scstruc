@@ -60,10 +60,3 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=list(list(),list
     }
 }
 
-#' @noRd
-#' sid.sym
-bnlearn.sid.sym <- function(net1, net2) {
-    sid1 <- bnlearn::sid(net1, net2)
-    sid2 <- bnlearn::sid(net2, net1)
-    (sid1 + sid2) / 2
-}

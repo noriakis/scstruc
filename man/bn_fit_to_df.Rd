@@ -12,3 +12,9 @@ bn_fit_to_df(fitted)
 \description{
 This function coverts the bn.fit object to data.frame
 }
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test)
+struc <- hc(test)
+bn_fit_to_df(bn.fit(struc, test))
+}

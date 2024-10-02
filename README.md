@@ -3,6 +3,11 @@
 
 # scstruc
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/noriakis/scstruc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/noriakis/scstruc/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+
 The package for analysing the gene regulatory network based on the
 Bayesian network structure of single-cell transcriptomics data. The
 function works with `SingleCellExperiment`.

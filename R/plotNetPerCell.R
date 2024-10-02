@@ -1,7 +1,12 @@
-#' plotNetPerCell
-#' @param values the data.frame output of globalStrucValues(), storing per-cell (per-cluster) parameters.
+#' @title plotNetPerCell
+#' @description The function is for plotting the coefficient inside the graph per cell.
+#' @param values the data.frame output of strucValues(), storing per-cell (per-cluster) parameters.
 #' If needed, values should be subset beforehand for the interesting clusters.
 #' @param net igraph or bn object
+#' @param avn averaged network
+#' @param str strength object
+#' @param lyt layout
+#' @param size_degree whether to size the nodes using the centrality_degree()
 #' @export
 plotNetPerCell <- function(
     values,

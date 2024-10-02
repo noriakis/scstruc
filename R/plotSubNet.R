@@ -8,6 +8,18 @@
 #' @param cell_column if you need to plot per cell basis, specify cell column,
 #' along with cell label
 #' @param coef_cutoff edge with value below this thrshold will not be drawn.
+#' @param with_hist histology image plotting
+#' @param spe SpatialExperiment class object
+#' @param label name in spe
+#' @param node_size node size
+#' @param show which label to show
+#' @param layout layout in ggraph
+#' @param cell_label cell label name in cell_column
+#' @param cell_column cell column name
+#' @param coef_cutoff coefficient cutoff to be plotted
+#' @param sort sort the label
+#' @param highlight_edge edge highlighting
+#' @return ggplot
 #' @export
 plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     with_hist=FALSE, spe=NULL, label="label", node_size=3, show=NULL,

@@ -12,7 +12,8 @@ interVal(
   r = 10,
   ss = 100,
   verbose = FALSE,
-  returnA0 = FALSE
+  returnA0 = TRUE,
+  symmetrize = FALSE
 )
 }
 \arguments{
@@ -30,7 +31,9 @@ interVal(
 
 \item{verbose}{control verbosity}
 
-\item{returnA0}{returns the A0 (intersection of inferred networks)}
+\item{returnA0}{returns the A0 (intersection of inferred networks), default to TRUE}
+
+\item{symmetrize}{use symmetrized version of SID}
 }
 \value{
 summarized statistics

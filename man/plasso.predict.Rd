@@ -7,6 +7,11 @@ prediction function for precision lasso}
 \usage{
 plasso.predict(X, w)
 }
+\arguments{
+\item{X}{prediction vector}
+
+\item{w}{coefficient}
+}
 \description{
 plasso.predict
 prediction function for precision lasso

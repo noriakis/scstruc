@@ -10,7 +10,7 @@ ggraph.compare(nets, lyt = "kk")
 \arguments{
 \item{nets}{(named) list of bn object}
 
-\item{layout}{layout in ggraph}
+\item{lyt}{layout in ggraph}
 }
 \value{
 ggplot2 object
@@ -18,4 +18,10 @@ ggplot2 object
 \description{
 ggraph.compare
 compare two bn object based on parallel edges
+}
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test, 10)
+nets <- list("hc"=hc(test), "mmhc"=mmhc(test))
+# ggraph.compare(nets)
 }

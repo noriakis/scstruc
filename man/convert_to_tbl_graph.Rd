@@ -17,3 +17,8 @@ tbl_graph
 convert_to_tbl_graph
 convert bn object to tbl_graph object
 }
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test)
+convert_to_tbl_graph(hc(test))
+}

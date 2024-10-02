@@ -25,13 +25,30 @@ plotSubNet(
 
 \item{candidate_node_id}{candidate node id to subset}
 
-\item{cell_label}{if you need to plot per cell basis, specify cell label,
-along with cell column}
+\item{sort}{sort the label}
 
-\item{cell_column}{if you need to plot per cell basis, specify cell column,
-along with cell label}
+\item{with_hist}{histology image plotting}
 
-\item{coef_cutoff}{edge with value below this thrshold will not be drawn.}
+\item{spe}{SpatialExperiment class object}
+
+\item{label}{name in spe}
+
+\item{node_size}{node size}
+
+\item{show}{which label to show}
+
+\item{layout}{layout in ggraph}
+
+\item{cell_label}{cell label name in cell_column}
+
+\item{cell_column}{cell column name}
+
+\item{highlight_edge}{edge highlighting}
+
+\item{coef_cutoff}{coefficient cutoff to be plotted}
+}
+\value{
+ggplot
 }
 \description{
 plot subnetwork centered to specified gene

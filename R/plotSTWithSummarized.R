@@ -3,22 +3,12 @@
 #' Overlay igraph network on histology image
 #' 
 #' @param spe SpatialExperiment
-#' @param ig igraph or data.frame object containing `from` and `to` column
+#' @param gsv tbl_graph object
+#' @param from_node from node
+#' @param to_node to node
 #' @param label label in `colData(spe)` that matches the node labels in ig
-#' @param edge_width edge width in igraph or data.frame
-#' @param edge_color edge color in igraph or data.frame
-#' @param edge_range edge width range
 #' @param sample_id sample_id in `spe`, used to subset image
 #' @param image_id image_id in `spe`, used to subset image
-#' @param return_tbl_graph return tbl graph only
-#' @param point_label background point label
-#' @param cell_cluster_label label of each node, should be named vector
-#' @param directed network is directed or not
-#' @param use_ggfx use ggfx or not
-#' @param point_size representative point size
-#' @param rep_colour representative point colour
-#' @param edge_base_colour fixed edge colour
-#' @param edge_base_width fixed edge width
 #' @export
 #' @return ggplot
 #' 

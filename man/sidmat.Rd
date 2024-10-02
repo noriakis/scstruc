@@ -12,3 +12,8 @@ sidmat(netlist)
 \description{
 sidmat
 }
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test, 10)
+sidmat(list(hc(test), mmhc(test)))
+}

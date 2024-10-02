@@ -23,6 +23,8 @@ plotSTWithNum(
 \item{sample_id}{sample_id in `spe`, used to subset image}
 
 \item{image_id}{image_id in `spe`, used to subset image}
+
+\item{point_size}{point size}
 }
 \value{
 ggplot

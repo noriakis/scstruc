@@ -7,6 +7,7 @@
 #' @param label label in `colData(spe)` that matches the node labels in ig
 #' @param sample_id sample_id in `spe`, used to subset image
 #' @param image_id image_id in `spe`, used to subset image
+#' @param point_size point size
 #' @export
 #' @return ggplot
 #' 

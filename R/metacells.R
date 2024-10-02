@@ -3,7 +3,8 @@
 #' @description Return the metacell abundance matrix
 #' Should provide SingleCellExperiment with logcounts data filled.
 #' 
-#' @param GE gene (row) to cell (column) matrix, like log-normalized
+#' @param sce sce object
+#' @param rank rank to be used in prcomp
 #' @param pca use PCA or not
 #' @param prop if genes are not specified, `getTopHVGs` will run based on 
 #' proportion.

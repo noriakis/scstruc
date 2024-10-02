@@ -5,6 +5,7 @@
 #' @param inferred named list of bn object
 #' @param reference reference bn object
 #' @return data.frame storing evaluation results
+#' @export
 #' @examples
 #' library(bnlearn)
 #' data(gaussian.test)

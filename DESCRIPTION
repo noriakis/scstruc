@@ -19,7 +19,7 @@ Suggests:
     cowplot, ggfx, ggkegg, patchwork,
     sparsebnUtils, tidyr, Boruta, 
     testthat (>= 3.0.0), L0Learn, SuperCell,
-    clusterProfiler, xgboost, knitr
+    clusterProfiler, xgboost, knitr, SID
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

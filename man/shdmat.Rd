@@ -12,3 +12,8 @@ shdmat(netlist)
 \description{
 shdmat
 }
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test, 10)
+shdmat(list(hc(test), mmhc(test)))
+}

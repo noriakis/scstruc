@@ -15,15 +15,22 @@ plotST(
 \arguments{
 \item{spe}{SpatialExperiment}
 
-\item{label}{label in `colData(spe)` that matches the node labels in ig}
+\item{label}{label in `colData(spe)`}
 
 \item{sample_id}{sample_id in `spe`, used to subset image}
 
 \item{image_id}{image_id in `spe`, used to subset image}
+
+\item{point_size}{point size}
 }
 \value{
 ggplot
 }
 \description{
 Overlay histology images
+}
+\examples{
+# library(SpatialExperiment)
+# example(read10xVisium, echo = FALSE)
+# plotST(spe, "in_tissue")
 }

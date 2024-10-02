@@ -37,6 +37,10 @@ c("label", "SampleID") for `bn` object.}
 
 \item{barcode}{barcode ID for cell}
 
+\item{assay}{use assay}
+
+\item{verbose}{control verbosity}
+
 \item{fit.hurdle}{fit the parameter based on hurdle model}
 }
 \description{

@@ -3,12 +3,16 @@
 #' Overlay histology images
 #' 
 #' @param spe SpatialExperiment
-#' @param label label in `colData(spe)` that matches the node labels in ig
+#' @param label label in `colData(spe)`
 #' @param sample_id sample_id in `spe`, used to subset image
 #' @param image_id image_id in `spe`, used to subset image
+#' @param point_size point size
 #' @export
 #' @return ggplot
-#' 
+#' @examples
+#' # library(SpatialExperiment)
+#' # example(read10xVisium, echo = FALSE)
+#' # plotST(spe, "in_tissue")
 plotST <- function(spe, label="label",
     sample_id=NULL, image_id=NULL, point_size=1.5) {
     stopifnot(

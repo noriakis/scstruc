@@ -1,3 +1,44 @@
+#' @noRd
+bn.recovery.2 <- function(mb) {
+    newmb <- list()
+    nodes <- names(mb)
+    for (node in nodes) {
+        new <- list("mb"=c(), "nbr"=c())
+        new[["mb"]] <- mb[[node]]$mb
+        for (node2 in nodes) {
+            c1 <- node2 %in% mb[[node]]$nbr
+            c2 <- node %in% mb[[node2]]$nbr
+            c3 <- c1 + c2
+            if (c3 == 0) {} else if (c3 == 2) {new[["nbr"]] <- c(new[["nbr"]], node2)} else {}
+        }
+        newmb[[node]] <- new
+    }
+    return(newmb)
+}
+
+
+#' @noRd
+arcs.to.be.added.2 <- function(arcs, nodes) {
+    p <- length(nodes)
+    mat <- matrix(1, nrow=p, ncol=p)
+    row.names(mat) <- nodes
+    colnames(mat) <- nodes
+    for (nr in seq_len(nrow(arcs))) {
+        tmp <- arcs[nr, ]
+        a <- tmp[1]; b <- tmp[2]
+        mat[a, b] <- 0
+        mat[b, a] <- 0
+    }
+    igraph::as_edgelist(igraph::graph_from_adjacency_matrix(mat,diag = FALSE))
+}
+
+
+#' @noRd
+bnlearn.sid.sym <- function(net1, net2) {
+    sid1 <- bnlearn::sid(net1, net2)
+    sid2 <- bnlearn::sid(net2, net1)
+    (sid1 + sid2) / 2
+}
 
 #' @title bn.fit.hurdle
 #' @description make a pseudo bn.fit object using continuous part of Hurdle model.
@@ -88,6 +129,10 @@ cat_subtle <- function(...) cat(pillar::style_subtle(paste0(...)))
 #' shdmat
 #' @param netlist list of bn
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test, 10)
+#' shdmat(list(hc(test), mmhc(test)))
 shdmat <- function(netlist) {
     sapply(netlist, function(x) sapply(netlist, function(y) bnlearn::shd(x,y)))
 }
@@ -95,13 +140,18 @@ shdmat <- function(netlist) {
 #' sidmat
 #' @param netlist list of bn
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test, 10)
+#' sidmat(list(hc(test), mmhc(test)))
 sidmat <- function(netlist) {
    sapply(netlist, function(x) {
        sapply(netlist, function(y) {
-           rawadj.x <- as_adj(as.igraph(x))
-           rawadj.y <- as_adj(as.igraph(y))
-           sid <- SID::structIntervDist(rawadj.x, rawadj.y)$sid
-           return(sid)
+           # rawadj.x <- as_adj(as.igraph(x))
+           # rawadj.y <- as_adj(as.igraph(y))
+           # sid <- SID::structIntervDist(rawadj.x, rawadj.y)$sid
+           val <- bnlearn::sid(x, y)
+           return(val)
        })
     })
 }
@@ -129,6 +179,10 @@ removeAllNegative <- function(input) {
 #' @param bn bn object
 #' @return tbl_graph
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test)
+#' convert_to_tbl_graph(hc(test))
 convert_to_tbl_graph <- function(bn) {
     bn |> 
     bnlearn::as.igraph() |>
@@ -145,6 +199,11 @@ convert_to_tbl_graph <- function(bn) {
 #' @param graph bn.fit object
 #' @param preserve preserve the node with no parents and children
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test)
+#' struc <- hc(test)
+#' bn_fit_to_igraph(bn.fit(struc, test))
 bn_fit_to_igraph <- function(graph, preserve=FALSE) {
 	tmp <- igraph::graph_from_data_frame(do.call(rbind, lapply(names(graph), function(i) {
 	    tmp <- graph[[i]]
@@ -174,8 +233,12 @@ bn_fit_to_igraph <- function(graph, preserve=FALSE) {
 #' This function coverts the bn.fit object to data.frame
 #' 
 #' @param fitted bn.fit object
-#' 
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test)
+#' struc <- hc(test)
+#' bn_fit_to_df(bn.fit(struc, test))
 bn_fit_to_df <- function(fitted) {
     do.call(rbind, lapply(names(fitted), function(x) {
         tmp.n <- names(fitted[[x]]$coefficients)

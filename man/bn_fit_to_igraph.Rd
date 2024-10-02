@@ -16,3 +16,9 @@ This function coverts the bn.fit object to igraph object.
 The nodes with no parents and children will not be included in the resulting igraph.
 The coefficient value is stored in `coef` attribute of resulting graph.
 }
+\examples{
+data(gaussian.test)
+test <- head(gaussian.test)
+struc <- hc(test)
+bn_fit_to_igraph(bn.fit(struc, test))
+}

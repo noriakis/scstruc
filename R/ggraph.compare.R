@@ -1,9 +1,14 @@
 #' ggraph.compare
 #' compare two bn object based on parallel edges
 #' @param nets (named) list of bn object
-#' @param layout layout in ggraph
+#' @param lyt layout in ggraph
 #' @return ggplot2 object
 #' @export
+#' @examples
+#' data(gaussian.test)
+#' test <- head(gaussian.test, 10)
+#' nets <- list("hc"=hc(test), "mmhc"=mmhc(test))
+#' # ggraph.compare(nets)
 ggraph.compare <- function(nets, lyt="kk") {
     if (is.null(names(nets))) {
         gn <- paste0("graph", seq_len(length(nets)))

@@ -14,5 +14,5 @@ sid.bn(true.bn, est.bn, twoway = FALSE)
 \item{twoway}{return the sid(true.bn, est.bn) + sid(est.bn, true.bn) divided by 2}
 }
 \description{
-given the bn object, calculate SID between them.
+given the bn object, calculate SID between them using the original implementation.
 }
