@@ -18,3 +18,26 @@ ges.pcalg <- function(data, args=NULL) {
 	bn <- bnlearn::as.bn(ig)
 	return(bn)	
 }
+
+#' lingam.pcalg
+#' Perform LiNGAM implemented in pcalg
+#' @param data data
+#' @param args arguments to pcalg::ges
+#' @export
+#' @importFrom pcalg ges
+lingam.pcalg <- function(data, args=NULL) {
+    if (is.null(args)) {
+        args <- list()
+    }
+    args[["X"]] <- data
+    fit <- do.call(pcalg::lingam, args)
+
+    g <- fit$Bpruned
+
+    row.names(g) <- colnames(data)
+    colnames(g) <- colnames(data)
+
+    ig <- igraph::graph_from_adjacency_matrix(g, mode="directed",weighted = TRUE, diag=TRUE)
+    bn <- bnlearn::as.bn(ig)
+    return(bn)  
+}

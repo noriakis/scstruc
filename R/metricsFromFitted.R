@@ -40,13 +40,14 @@
 #' @param return_net return list of whole BN
 #' @param return_data return data
 #' @param ges perform ges evaluation
+#' @param lingam perform lingam evaluation
 #' @param lambdas.length lambda length in CCDr algorithm
 #' @export
 metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
     org="mm", return_data=FALSE,
     algorithm.args=list(), hurdle=FALSE,
-    ccdr=TRUE, return_net=FALSE,
+    ccdr=TRUE, return_net=FALSE, lingam=FALSE,
     lambdas.length=10, sid=FALSE, ges=FALSE) {
 
     if ("ccdr" %in% algos) {
@@ -107,6 +108,16 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         cat_subtle("GES ", tim, "\n")
         alls[[paste0("GES")]] <- list(net, tim)
     }
+    
+    if (lingam) {
+        s <- Sys.time()
+        net <- lingam.pcalg(input)
+        e <- Sys.time()
+        tim <- as.numeric(e-s, unit="secs")
+        cat_subtle("LiNGAM ", tim, "\n")
+        alls[[paste0("LiNGAM")]] <- list(net, tim)
+    }
+
 
     if (mmhc) {
         for (al in alphas) {

@@ -17,6 +17,7 @@ metricsFromFitted(
   hurdle = FALSE,
   ccdr = TRUE,
   return_net = FALSE,
+  lingam = FALSE,
   lambdas.length = 10,
   sid = FALSE,
   ges = FALSE
@@ -53,6 +54,8 @@ if the feature abundances are all negative. In this case, these scores will be o
 `lambdas.length` argument.}
 
 \item{return_net}{return list of whole BN}
+
+\item{lingam}{perform lingam evaluation}
 
 \item{lambdas.length}{lambda length in CCDr algorithm}
 
