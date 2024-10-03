@@ -9,7 +9,7 @@ plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
     if (!is.matrix(X)) {stop("X must be matrix")}
 	rlam <- 1e-2
 	nn <- nrow(X)
-	lambdas <- sparsebnUtils::generate.lambdas(lambda.max = sqrt(nn),
+	lambdas <- generate.lambdas(lambda.max = sqrt(nn),
        lambdas.ratio = rlam,
        lambdas.length = as.integer(lambdas.length),
        scale = "log")

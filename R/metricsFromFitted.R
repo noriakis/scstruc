@@ -109,11 +109,11 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     }
     if (ccdr) {
         s <- Sys.time()
-        ccdr <- ccdr.run(sparsebnUtils::sparsebnData(input, type="continuous"),
+        ccdr <- ccdr.run(sparsebnData(input, type="continuous"),
             lambdas.length=lambdas.length)
         e <- Sys.time()
         for (i in ccdr) {
-            alls[[paste0("ccdr_",round(i$lambda,3))]] <- list(sparsebnUtils::to_bn(i)$edges,
+            alls[[paste0("ccdr_",round(i$lambda,3))]] <- list(to_bn(i)$edges,
                                                as.numeric(e-s, unit="secs"))
         }    
     } 

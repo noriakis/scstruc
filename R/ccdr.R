@@ -10,15 +10,15 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
         }
     }
     algorithm.args[["bestScore"]] <- NULL
-    dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
+    dat <- sparsebnData(input %>% as.matrix(), type = "continuous")
     algorithm.args[["data"]] <- dat
     if (is.null(algorithm.args[["lambdas.length"]]) & is.null(algorithm.args[["lambdas"]])) {
         cat_subtle("Setting `lambdas.length` to 10\n")
         algorithm.args[["lambdas.length"]] = 10
     }
-    ccdr.res <- do.call(ccdrAlgorithm::ccdr.run, algorithm.args)
+    ccdr.res <- do.call(ccdr.run, algorithm.args)
     bn.res <- lapply(seq_along(ccdr.res), function(x) {
-        sparsebnUtils::to_bn(ccdr.res[[x]]$edges)
+        to_bn(ccdr.res[[x]]$edges)
     })
     names(bn.res) <- lapply(seq_along(ccdr.res), function(x) {
         ccdr.res[[x]]$lambda

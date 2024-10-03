@@ -6,7 +6,7 @@ Description: The library infers the gene regulatory network based on Bayesian ne
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), bnlearn (>= 5.1.0),
+    R (>= 4.3.0), bnlearn,
     igraph, scran
 Imports:
     Rcpp, MAST, methods,
@@ -15,9 +15,8 @@ Imports:
     pillar, SingleCellExperiment
 Suggests:
     ncvreg, AnnotationDbi,
-    HurdleNormal, Matrix, ccdrAlgorithm,
-    cowplot, ggfx, ggkegg, patchwork,
-    sparsebnUtils, tidyr, Boruta, 
+    Matrix, cowplot, ggfx, ggkegg, patchwork,
+    tidyr, Boruta, 
     testthat (>= 3.0.0), L0Learn, SuperCell,
     clusterProfiler, xgboost, knitr, SID
 LinkingTo: Rcpp, RcppArmadillo
