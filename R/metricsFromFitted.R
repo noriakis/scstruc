@@ -39,6 +39,7 @@
 #' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
+#' @param ges perform ges evaluation
 #' @param lambdas.length lambda length in CCDr algorithm
 #' @export
 metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
@@ -46,7 +47,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     org="mm", return_data=FALSE,
     algorithm.args=list(), hurdle=FALSE,
     ccdr=TRUE, return_net=FALSE,
-    lambdas.length=10, sid=FALSE) {
+    lambdas.length=10, sid=FALSE, ges=FALSE) {
 
     if ("ccdr" %in% algos) {
       stop("Cannot specify CCDr in this argument, please choose `ccdr` argument as TRUE")
@@ -76,7 +77,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         list(net, tim)
     })
     names(alls) <- algos
-  
+
     if (hurdle) {
         ## Two types of scores will be tested
         ## Hurdle object can be passed to .Hurdle, but
@@ -97,6 +98,16 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         alls[[paste0("Hurdle_zBIC")]] <- list(net, tim)
 
     }
+
+    if (ges) {
+        s <- Sys.time()
+        net <- ges.pcalg(input)
+        e <- Sys.time()
+        tim <- as.numeric(e-s, unit="secs")
+        cat_subtle("GES ", tim, "\n")
+        alls[[paste0("GES")]] <- list(net, tim)
+    }
+
     if (mmhc) {
         for (al in alphas) {
             s <- Sys.time()

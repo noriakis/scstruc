@@ -18,7 +18,8 @@ metricsFromFitted(
   ccdr = TRUE,
   return_net = FALSE,
   lambdas.length = 10,
-  sid = FALSE
+  sid = FALSE,
+  ges = FALSE
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ if the feature abundances are all negative. In this case, these scores will be o
 \item{lambdas.length}{lambda length in CCDr algorithm}
 
 \item{sid}{compute SID}
+
+\item{ges}{perform ges evaluation}
 }
 \description{
 Evaluate various metrics comparing reference network and inferred network.

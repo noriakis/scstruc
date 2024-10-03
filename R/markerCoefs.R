@@ -51,7 +51,7 @@ markerCoefs <- function(coef_mat, classif_label="group",
         if (!requireNamespace("xgboost")) {
             stop("Needs xgboost installation")
         } else {
-            requireNamespace("Boruta")
+            requireNamespace("xgboost")
 
         }
         trueLabel <- unique(as.character(mydata$classif_label))[2]
@@ -63,7 +63,7 @@ markerCoefs <- function(coef_mat, classif_label="group",
         }
         xgboostArgs[["data"]] <- mydata %>% as.matrix()
         xgboostArgs[["label"]] <- vec
-        res <- do.call(xgboost, xgboostArgs)
+        res <- do.call(xgboost::xgboost, xgboostArgs)
         importance <- xgb.importance(feature_names = colnames(mydata), model = res)
         return(list("xgboost"=res, "importance"=importance, "data"=mydata))
     } else {
