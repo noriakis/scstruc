@@ -36,6 +36,7 @@
 #' Also, `database` and `org` argument should be specified based on the node name.
 #' @param org passed to `intersectPpi` function
 #' @param sid compute SID
+#' @param sid_sym compute symmetrized version of SID
 #' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
@@ -46,7 +47,7 @@
 metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,
     org="mm", return_data=FALSE,
-    algorithm.args=list(), hurdle=FALSE,
+    algorithm.args=list(), hurdle=FALSE, sid_sym=FALSE,
     ccdr=TRUE, return_net=FALSE, lingam=FALSE,
     lambdas.length=10, sid=FALSE, ges=FALSE) {
 
@@ -140,9 +141,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         }    
     } 
     cat_subtle("Network computing finished", "\n")
-    if (sid) {
-        # rawadj <- as_adj(as.igraph(rawnet))
-    }
+
     res <- do.call(rbind, lapply(names(alls), function(x) {
         cur_net <- alls[[x]][[1]]
         tim <- alls[[x]][[2]]
@@ -162,10 +161,13 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         if (sid) {
             # curadj <- as_adj(as.igraph(cur_net))
             # sid <- SID::structIntervDist(rawadj, curadj)$sid
-            sid.val <- bnlearn::sid(cur_net, rawnet)
-            sid.val.2 <- bnlearn::sid(rawnet, cur_net)
-            sid.val.sym <- (sid.val + sid.val.2) / 2
-
+            if (sid_sym) {
+                sid.val <- bnlearn::sid(cur_net, rawnet)
+                sid.val.2 <- bnlearn::sid(rawnet, cur_net)
+                sid.val.sym <- (sid.val + sid.val.2) / 2
+            } else {
+                sid.val.sym <- bnlearn::sid(cur_net, rawnet)
+            }
         } else {
             sid.val.sym <- NA
         }
