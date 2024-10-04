@@ -21,7 +21,10 @@ scstruc(
   input = NULL,
   zeroFilt = 1,
   rmNeg = FALSE,
-  returnOnlyData = FALSE
+  returnOnlyData = FALSE,
+  boot = FALSE,
+  R = 200,
+  m = NULL
 )
 }
 \arguments{
@@ -63,6 +66,10 @@ This filter will be performed *after* the genes and cells subset by the other pa
 \item{rmNeg}{remove genes with all negative abundances}
 
 \item{returnOnlyData}{return only the data, not performing inference.}
+
+\item{boot}{bootstrapping specification}
+
+\item{R}{when boot is TRUE, use as replicate number}
 }
 \description{
 The main function for scstruc package.

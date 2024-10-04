@@ -1,41 +1,34 @@
 #' In `ccdr`, one network with best BIC will be returned (if algorithm.args[["bestScore"]] is NULL)
 #' In `ccdr.boot`, we cannot see whether the resulting averaged network is DAG, so returning all the network for lambdas.
 #' @noRd
-.getStruc <- function(input, algorithm, algorithm.args, verbose) {
+.getStruc <- function(input, algorithm, algorithm.args, verbose, boot=FALSE, R=200, m=NULL) {
+    pens <- c("glmnet_CV","glmnet_BIC","MCP_CV","SCAD_CV","L0_CV","L0L1_CV","L0L2_CV","plasso")
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, " selected\n")        
     }
-    if (algorithm=="ccdr") {
-        return(ccdr(input, algorithm, algorithm.args, verbose))
-    } else if (algorithm=="ccdr.boot") {
-        cat_subtle("Returning the list of bn.strength\n")
+    if (boot) {
+        cat_subtle("Bootstrapping specified\n")
+        if (is.null(m)) {
+            m = nrow(input)
+        }
         algorithm.args[["data"]] <- input
-        return(do.call(scstruc::ccdr.boot, algorithm.args))         
-    } else if (algorithm == "Hurdle") {
-        algorithm.args[["data"]] <- input
-        return(do.call(.Hurdle, algorithm.args))
-    } else if (algorithm == "Hurdle.boot") {
-        algorithm.args[["data"]] <- input
-        return(do.call(hurdle.boot, algorithm.args))
-    ## Constraint-based algos are omitted currently
-    } else if (algorithm %in% c("mmhc","rsmax2","h2pc","hc","tabu")) {
-        cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
-        algorithm.args[["x"]] <- input
-        net <- do.call(algorithm, algorithm.args)
-        return(net)
-    } else {
-        if (grepl("boot", algorithm)) {
-            cat_subtle("Bootstrapping specified\n")
-            algorithm <- strsplit(algorithm, "\\.") %>% sapply("[", 1)
+        algorithm.args[["R"]] <- R
+        algorithm.args[["m"]] <- m
+
+        if (algorithm=="ccdr") {
+            cat_subtle("Returning the list of bn.strength\n")
+            return(do.call(scstruc::ccdr.boot, algorithm.args))
+        } else if (algorithm=="Hurdle") {
+            return(do.call(hurdle.boot, algorithm.args))
+        } else if (algorithm %in% c("lingam","ges")) {
+            algorithm.args[["fun"]] <- algorithm
+            return(do.call(pcalg.boot, algorithm.args))
+        } else if (algorithm %in% pens) {
             nodes <- names(input)
             perRun <- list()
-            m <- nrow(input) ## m determined
-            if (is.null(algorithm.args[["R"]])) {
-                cat_subtle("R not specified in bootstrapping, default to 100\n")
-                algorithm.args[["R"]] <- 100
-            }
-            R <- algorithm.args[["R"]]
+            algorithm.args[["m"]] <- NULL
             algorithm.args[["R"]] <- NULL
+
             for (r in seq_len(R)) {
                 if (verbose) {cat_subtle(r)}
                 resampling = sample(nrow(input), m, replace = TRUE)
@@ -46,15 +39,31 @@
                 perRun[[r]] <- repnet
             }
             if (verbose) {cat_subtle("\n")}
-            net <- custom.strength(perRun, nodes)                
+            return(custom.strength(perRun, nodes))
         } else {
+            algorithm.args[["algorithm"]] <- algorithm
+            return(do.call(boot.strength, algorithm.args))
+        }
+    } else {
+        if (algorithm=="ccdr") {
+            return(ccdr(input, algorithm, algorithm.args, verbose))         
+        } else if (algorithm == "Hurdle") {
+            algorithm.args[["data"]] <- input
+            return(do.call(.Hurdle, algorithm.args))
+        } else if (algorithm %in% pens) {
             algorithm.args[["verbose"]] <- verbose
             algorithm.args[["data"]] <- input
             # algorithm.args[["restrict"]] <- "mmpc"
             # algorithm.args[["maximize"]] <- "hc"
             algorithm.args[["algorithm"]] <- algorithm
-            net <- do.call(skeleton.reg, algorithm.args)                
+            net <- do.call(skeleton.reg, algorithm.args)
+            return(net)    
+        } else {
+            ## Constraint-based algos are omitted currently
+            cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
+            algorithm.args[["x"]] <- input
+            net <- do.call(algorithm, algorithm.args)
+            return(net)
         }
-        return(net)
     }
 }

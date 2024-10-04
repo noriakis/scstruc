@@ -35,6 +35,8 @@
 #' @param returnBn By default, returns the bn class object
 #' @param returnData By default, return the data used for the inference.
 #' @param returnOnlyData return only the data, not performing inference.
+#' @param boot bootstrapping specification
+#' @param R when boot is TRUE, use as replicate number
 #' @importFrom dplyr %>% mutate
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
@@ -55,7 +57,8 @@ scstruc <- function(spe, candidateGenes, label=NULL,
     returnData=TRUE, clusterLabel=NULL,
     verbose=FALSE, useAssay="logcounts",
     changeSymbol=TRUE, symbolColumn="Symbol", input=NULL,
-    zeroFilt=1, rmNeg=FALSE, returnOnlyData=FALSE) {
+    zeroFilt=1, rmNeg=FALSE, returnOnlyData=FALSE,
+    boot=FALSE, R=200, m=NULL) {
     ## .getInput for global label
     if (is.null(label) & !is.null(labelName)) {
         cat_subtle("label column name not specified, defaulting to `label`\n")
@@ -68,15 +71,8 @@ scstruc <- function(spe, candidateGenes, label=NULL,
     if (returnOnlyData) {
         return(input)
     }
-    global_graph <- .getStruc(input, algorithm, algorithm.args, verbose)
+    global_graph <- .getStruc(input, algorithm, algorithm.args, verbose, boot, R, m)
 
-    if (algorithm %in% c("ccdr","ccdr.boot","Hurdle","Hurdle.boot")) {
-        if (returnData) {
-            return(list("net"=global_graph, "data"=input))
-        } else {
-            return(global_graph)
-        }
-    }
     if (returnBn) {
         if (returnData) {
             return(list("net"=global_graph, "data"=input))
@@ -84,7 +80,7 @@ scstruc <- function(spe, candidateGenes, label=NULL,
             return(global_graph)
         }
     }
-    ## When not returning bn object, return tbl_graph
+    ## When not returning bn object, try to return tbl_graph
     global_tbl_graph <- global_graph |> 
         bnlearn::as.igraph() |>
         tidygraph::as_tbl_graph()
