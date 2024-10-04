@@ -15,6 +15,7 @@ metricsFromFitted(
   return_data = FALSE,
   algorithm.args = list(),
   hurdle = FALSE,
+  sid_sym = FALSE,
   ccdr = TRUE,
   return_net = FALSE,
   lingam = FALSE,
@@ -49,6 +50,8 @@ Also, `database` and `org` argument should be specified based on the node name.}
 \item{hurdle}{perform inference based on Hurdle model, default to FALSE.
 Some scoring functions used in the function cannot calculate scores
 if the feature abundances are all negative. In this case, these scores will be omitted.}
+
+\item{sid_sym}{compute symmetrized version of SID}
 
 \item{ccdr}{perform comparison with CCDr algorithm with lambda length specified in 
 `lambdas.length` argument.}

@@ -4,12 +4,14 @@
 \alias{metrics}
 \title{metrics}
 \usage{
-metrics(reference, inferred)
+metrics(reference, inferred, sid_sym = FALSE)
 }
 \arguments{
 \item{reference}{reference bn object}
 
 \item{inferred}{named list of bn object}
+
+\item{sid_sym}{symmetric version of sid will be computed}
 }
 \value{
 data.frame storing evaluation results

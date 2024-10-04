@@ -102,21 +102,26 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     }
 
     if (ges) {
-        s <- Sys.time()
-        net <- ges.pcalg(input)
-        e <- Sys.time()
-        tim <- as.numeric(e-s, unit="secs")
-        cat_subtle("GES ", tim, "\n")
-        alls[[paste0("GES")]] <- list(net, tim)
+        tryCatch({
+            s <- Sys.time()
+            net <- ges.pcalg(input)
+            e <- Sys.time()
+            tim <- as.numeric(e-s, unit="secs")
+            cat_subtle("GES ", tim, "\n")
+            alls[[paste0("GES")]] <- list(net, tim)
+            
+        }, error= function(e) print(e))
     }
     
     if (lingam) {
-        s <- Sys.time()
-        net <- lingam.pcalg(input)
-        e <- Sys.time()
-        tim <- as.numeric(e-s, unit="secs")
-        cat_subtle("LiNGAM ", tim, "\n")
-        alls[[paste0("LiNGAM")]] <- list(net, tim)
+        tryCatch({
+            s <- Sys.time()
+            net <- lingam.pcalg(input)
+            e <- Sys.time()
+            tim <- as.numeric(e-s, unit="secs")
+            cat_subtle("LiNGAM ", tim, "\n")
+            alls[[paste0("LiNGAM")]] <- list(net, tim)
+        }, error = function(e) print(e))
     }
 
 
