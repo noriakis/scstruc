@@ -50,6 +50,14 @@
         } else if (algorithm == "Hurdle") {
             algorithm.args[["data"]] <- input
             return(do.call(.Hurdle, algorithm.args))
+        } else if (algorithm %in% c("lingam","ges")) {
+            if (algorithm=="lingam") {
+                algorithm.args[["data"]] <- input
+                return(do.call(lingam.pcalg, algorithm.args))
+            } else {
+                algorithm.args[["data"]] <- input
+                return(do.call(ges.pcalg, algorithm.args))                
+            }
         } else if (algorithm %in% pens) {
             algorithm.args[["verbose"]] <- verbose
             algorithm.args[["data"]] <- input
