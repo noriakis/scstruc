@@ -37,7 +37,10 @@ lingam.pcalg <- function(data, args=NULL) {
     row.names(g) <- colnames(data)
     colnames(g) <- colnames(data)
 
-    ig <- igraph::graph_from_adjacency_matrix(g, mode="directed",weighted = TRUE, diag=TRUE)
+    ## Bpruned : a p \times p matrix B of linear coefficients,
+    ## where B_{i,j} corresponds to a directed edge from j to i.
+    ig <- igraph::graph_from_adjacency_matrix(g %>% t(),
+        mode="directed",weighted = TRUE, diag=TRUE)
     bn <- bnlearn::as.bn(ig)
     return(bn)  
 }
