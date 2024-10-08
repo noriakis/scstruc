@@ -4,10 +4,12 @@
 \alias{sidmat}
 \title{sidmat}
 \usage{
-sidmat(netlist)
+sidmat(netlist, SID.cran = FALSE)
 }
 \arguments{
 \item{netlist}{list of bn}
+
+\item{SID.cran}{use implementation in package SID}
 }
 \description{
 sidmat

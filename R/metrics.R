@@ -5,6 +5,7 @@
 #' @param inferred named list of bn object
 #' @param reference reference bn object
 #' @param sid_sym symmetric version of sid will be computed
+#' @param SID.cran use implementation in package SID
 #' @return data.frame storing evaluation results
 #' @export
 #' @examples
@@ -12,7 +13,7 @@
 #' data(gaussian.test)
 #' ref <- hc(head(gaussian.test))
 #' metrics(ref, list("ref1"=ref,"ref2"=ref))
-metrics <- function(reference, inferred, sid_sym=FALSE) {
+metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE) {
     if (is.null(inferred)) {
         stop("The inferred list should be named.")
     }
@@ -26,11 +27,17 @@ metrics <- function(reference, inferred, sid_sym=FALSE) {
         pre <- tp/(tp+fp); rec <- tp/(tp+fn)
         fv <- 2*(pre*rec)/(pre+rec)
 
-        # sid <- sid.bn(reference, cur_net, twoway=TRUE)
-        if (sid_sym) {
-            sid.val <- (bnlearn::sid(reference, cur_net) + bnlearn::sid(cur_net, reference))/2
+        if (SID.cran) {
+            sid.val <- SID.sid(reference, cur_net, sid_sym)
         } else {
-            sid.val <- bnlearn::sid(cur_net, reference)
+            ###
+            # bnlearn implementation
+            ###
+            if (sid_sym) {
+                sid.val <- (bnlearn::sid(reference, cur_net) + bnlearn::sid(cur_net, reference))/2
+            } else {
+                sid.val <- bnlearn::sid(cur_net, reference)
+            }
         }
 
         c(

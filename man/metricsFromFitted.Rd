@@ -13,6 +13,7 @@ metricsFromFitted(
   ppi = FALSE,
   org = "mm",
   return_data = FALSE,
+  SID.cran = FALSE,
   algorithm.args = list(),
   hurdle = FALSE,
   sid_sym = FALSE,
@@ -44,6 +45,8 @@ Also, `database` and `org` argument should be specified based on the node name.}
 \item{org}{passed to `intersectPpi` function}
 
 \item{return_data}{return data}
+
+\item{SID.cran}{use package SID for calculation of SID}
 
 \item{algorithm.args}{algorithm args (currently not used in the function)}
 

@@ -40,6 +40,20 @@ bnlearn.sid.sym <- function(net1, net2) {
     (sid1 + sid2) / 2
 }
 
+
+#' @noRd
+SID.sid <- function(trueBn, estBn, sym=FALSE) {
+    rawadj.t <- as_adj(as.igraph(trueBn))
+    rawadj.e <- as_adj(as.igraph(estBn))
+    sid <- structIntervDist(rawadj.t, rawadj.e)$sid
+    if (sym) {
+        sid2 <- structIntervDist(rawadj.e, rawadj.t)$sid
+        return((sid + sid2)/2)
+    }
+    return(sid)
+}
+
+
 #' @title bn.fit.hurdle
 #' @description make a pseudo bn.fit object using continuous part of Hurdle model.
 #' @details You should not use `rbn` or relevant functions for logic sampling 
@@ -139,18 +153,23 @@ shdmat <- function(netlist) {
 
 #' sidmat
 #' @param netlist list of bn
+#' @param SID.cran use implementation in package SID
 #' @export
 #' @examples
 #' data(gaussian.test)
 #' test <- head(gaussian.test, 10)
 #' sidmat(list(hc(test), mmhc(test)))
-sidmat <- function(netlist) {
+sidmat <- function(netlist, SID.cran=FALSE) {
    sapply(netlist, function(x) {
        sapply(netlist, function(y) {
+            if (SID.cran) {
+                val <- SID.sid(x, y)
+            } else {
+                val <- bnlearn::sid(x, y)
+            }
            # rawadj.x <- as_adj(as.igraph(x))
            # rawadj.y <- as_adj(as.igraph(y))
            # sid <- SID::structIntervDist(rawadj.x, rawadj.y)$sid
-           val <- bnlearn::sid(x, y)
            return(val)
        })
     })
