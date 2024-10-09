@@ -7,7 +7,7 @@
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
 	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=bnlearn::hc,
-	onlyBn=TRUE) {
+	onlyBn=TRUE, parallel=TRUE) {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -27,6 +27,7 @@
 		if (is.null(hurdle.args[["fixed"]]) & cdrAdjustment) {
 			hurdle.args[["fixed"]] <- covariates
 		}
+		hurdle.args[["parallel"]] <- parallel
 		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
