@@ -9,14 +9,14 @@ Depends:
     R (>= 4.3.0), bnlearn,
     igraph, scran
 Imports:
-    Rcpp, MAST, methods,
+    Rcpp, MAST, methods, pcalg,
     data.table, ggraph, dplyr,
     glmnet, tidygraph, ggplot2,
     pillar, SingleCellExperiment
 Suggests:
     ncvreg, AnnotationDbi,
     Matrix, cowplot, ggfx, ggkegg, patchwork,
-    tidyr, Boruta, pcalg, BiocStyle,
+    tidyr, Boruta, BiocStyle,
     testthat (>= 3.0.0), L0Learn, SuperCell,
     clusterProfiler, xgboost, knitr, SID
 LinkingTo: Rcpp, RcppArmadillo
