@@ -14,7 +14,7 @@
 #' ref <- hc(head(gaussian.test))
 #' metrics(ref, list("ref1"=ref,"ref2"=ref))
 metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE) {
-    if (is.null(inferred)) {
+    if (is.null(names(inferred))) {
         stop("The inferred list should be named.")
     }
     res <- do.call(rbind, lapply(names(inferred), function(x) {
@@ -39,16 +39,19 @@ metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE) {
                 sid.val <- bnlearn::sid(cur_net, reference)
             }
         }
+        rn <- length(reference$nodes)
+        inn <- length(cur_net$nodes)
 
         c(
-            x, s0, edges,
+            x, rn, inn, s0, edges,
             # KL(bn.fit(cur_net, input), fitted),
             # BIC(cur_net, input),
             bnlearn::shd(cur_net, reference),
             tp, fp, fn, tp/s0, pre, rec, fv, sid.val
         )
     })) %>% data.frame()
-    res <- res %>%  `colnames<-`(c("algo","s0","edges","SHD","TP",
+    res <- res %>%  `colnames<-`(c("algo","referenceNode", "InferenceNode",
+        "s0","edges","SHD","TP",
         "FP","FN","TPR","Precision","Recall","Fvalue","SID")) %>%
         mutate_at(2:ncol(res), as.numeric)
     # res <- res %>% mutate(BICnorm = (BIC - min(BIC)) / (max(BIC) - min(BIC)))
