@@ -17,7 +17,7 @@
 #' time: time needed in structure learning (sec)
 #' 
 #' Time will be calculated by differences in Sys.time() and will be displayed after
-#' algorithms' name
+#' algorithms' name. As an external software, GENIE3 will be tested if specified.
 #' 
 #' @param fitted reference network that is parameter fitted
 #' @param N number of samples to be drawn from `fitted` by `rbn` function.
@@ -35,9 +35,11 @@
 #' The network node name should be symbol for calculating the intersection.
 #' Also, `database` and `org` argument should be specified based on the node name.
 #' @param org passed to `intersectPpi` function
+#' @param genie test genie3 for the comparison
+#' @param genie.threshold genie3 threshold value. The weight has no statistical meanings,
+#' so the value should be chosen carefully.
 #' @param sid compute SID
 #' @param sid_sym compute symmetrized version of SID
-#' @param algorithm.args algorithm args (currently not used in the function)
 #' @param return_net return list of whole BN
 #' @param return_data return data
 #' @param SID.cran use package SID for calculation of SID
@@ -50,6 +52,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     org="mm", return_data=FALSE, SID.cran=FALSE,
     algorithm.args=list(), hurdle=FALSE, sid_sym=FALSE,
     ccdr=TRUE, return_net=FALSE, lingam=FALSE,
+    genie=FALSE, genie.threshold=seq(0,1,0.1),
     lambdas.length=10, sid=FALSE, ges=FALSE) {
 
     if ("ccdr" %in% algos) {
@@ -62,11 +65,11 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
       stop("Cannot specify Hurdle in this argument, please choose `hurdle` argument as TRUE")
     }
 
-    if (length(algorithm.args)!=0) {
-        if (length(algorithm.args)!=length(algos)){
-            stop("Length of algos and algorithm.args does not match")
-        }
-    }
+    # if (length(algorithm.args)!=0) {
+    #     if (length(algorithm.args)!=length(algos)){
+    #         stop("Length of algos and algorithm.args does not match")
+    #     }
+    # }
 
     rawnet <- as.bn(bn_fit_to_igraph(fitted))
     input <- rbn(fitted, N)
@@ -82,9 +85,12 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     names(alls) <- algos
 
     if (hurdle) {
+        ###
         ## Two types of scores will be tested
         ## Hurdle object can be passed to .Hurdle, but
-        ## for evaluation of time, raw calculation will be performed.
+        ## for evaluation of inferencetime,
+        ## raw calculation will be performed.
+        ###
 
         s <- Sys.time()
         net <- .Hurdle(input, score=NULL)
@@ -100,6 +106,36 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         cat_subtle("Hurdle zBIC ", tim, "\n")
         alls[[paste0("Hurdle_zBIC")]] <- list(net, tim)
 
+    }
+
+    if (genie) {
+        genie.input <- input %>% t()
+        s <- Sys.time()
+        gra <- GENIE3(genie.input)
+        e <- Sys.time()
+        nets <- lapply(genie.threshold, function(th) {
+            tmp <- gra
+            tmp[tmp < th] <- 0
+            tmp.net <- graph_from_adjacency_matrix(tmp, weighted = TRUE)
+            if (is.dag(tmp.net)) {
+                return(bnlearn::as.bn(tmp.net))
+            } else {
+                return(NA)
+            }
+        })
+        names(nets) <- genie.threshold
+        if (sum(unlist(lapply(nets, function(net) {is.na(net)}))) == length(genie.threshold)) {
+            cat_subtle("GENIE3 All threshold results in non-DAG\n")
+        } else {
+            tim <- as.numeric(e-s, unit="secs")
+            cat_subtle("GENIE3 ", tim, "\n")
+            for (nn in names(nets)) {
+                genie.net <- nets[[nn]]
+                if (!is.na(genie.net)) {
+                    alls[[paste0("GENIE3_",nn)]] <- list(genie.net, tim)
+                }
+            }
+        }
     }
 
     if (ges) {

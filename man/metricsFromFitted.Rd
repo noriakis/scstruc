@@ -20,6 +20,8 @@ metricsFromFitted(
   ccdr = TRUE,
   return_net = FALSE,
   lingam = FALSE,
+  genie = FALSE,
+  genie.threshold = seq(0, 1, 0.1),
   lambdas.length = 10,
   sid = FALSE,
   ges = FALSE
@@ -48,8 +50,6 @@ Also, `database` and `org` argument should be specified based on the node name.}
 
 \item{SID.cran}{use package SID for calculation of SID}
 
-\item{algorithm.args}{algorithm args (currently not used in the function)}
-
 \item{hurdle}{perform inference based on Hurdle model, default to FALSE.
 Some scoring functions used in the function cannot calculate scores
 if the feature abundances are all negative. In this case, these scores will be omitted.}
@@ -62,6 +62,11 @@ if the feature abundances are all negative. In this case, these scores will be o
 \item{return_net}{return list of whole BN}
 
 \item{lingam}{perform lingam evaluation}
+
+\item{genie}{test genie3 for the comparison}
+
+\item{genie.threshold}{genie3 threshold value. The weight has no statistical meanings,
+so the value should be chosen carefully.}
 
 \item{lambdas.length}{lambda length in CCDr algorithm}
 
@@ -86,5 +91,5 @@ SID: structural intervention distance (if specified)
 time: time needed in structure learning (sec)
 
 Time will be calculated by differences in Sys.time() and will be displayed after
-algorithms' name
+algorithms' name. As an external software, GENIE3 will be tested if specified.
 }
