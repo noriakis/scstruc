@@ -9,9 +9,12 @@ load.grnboost2 <- function(filename, minmax=TRUE,
         df$importance <- minmaxFn(df$importance)
     } else {
     }
+    g <- igraph::graph_from_data_frame(df[, c("TF","target","importance")])
+    adj <- as_adj(g, attr="importance")
     lapply(thresholds, function(th) {
-        tmp <- df[df[["importance"]]>th, ]
-        tmpg <- igraph::graph_from_data_frame(tmp[, c("TF","target","importance")])
+        adj[adj<th] <- 0
+        tmpg <- igraph::graph_from_adjacency_matrix(adj, weighted=TRUE)
+        
         if (igraph::is_dag(tmpg)) {
             if (length(V(tmpg))!=0) {
                 return(bnlearn::as.bn(tmpg))
