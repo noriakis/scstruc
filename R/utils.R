@@ -1,4 +1,30 @@
 #' @noRd
+load.grnboost2 <- function(filename, minmax=TRUE,
+                           thresholds=seq(0, 1, 0.1)) {
+    minmaxFn <- function(x, na.rm = TRUE) {
+        return((x- min(x)) /(max(x)-min(x)))
+    }
+    df <- read.table(filename, sep="\t", header=1)
+    if (minmax) {
+        df$importance <- minmaxFn(df$importance)
+    } else {
+    }
+    lapply(thresholds, function(th) {
+        tmp <- df[df[["importance"]]>th, ]
+        tmpg <- igraph::graph_from_data_frame(tmp[, c("TF","target","importance")])
+        if (igraph::is_dag(tmpg)) {
+            if (length(V(tmpg))!=0) {
+                return(bnlearn::as.bn(tmpg))
+            } else {
+                return(NA)
+            }
+        } else {
+            return(NA)
+        }
+    }) %>% setNames(paste0("GRNBoost2_",thresholds))
+}
+
+#' @noRd
 bn.recovery.2 <- function(mb) {
     newmb <- list()
     nodes <- names(mb)
