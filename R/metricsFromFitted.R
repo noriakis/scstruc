@@ -131,7 +131,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
             cat_subtle("GENIE3 ", tim, "\n")
             for (nn in names(nets)) {
                 genie.net <- nets[[nn]]
-                if (!is.na(genie.net)) {
+                if (is(genie.net, "bn")) {
                     alls[[paste0("GENIE3_",nn)]] <- list(genie.net, tim)
                 }
             }

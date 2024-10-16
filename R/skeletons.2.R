@@ -82,3 +82,53 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
     # hc_res <- hc(data, start=start, blacklist=constraints)
     return(struc_res)
 }
+
+
+#' @noRd
+skeleton.from.ig <- function(net, data, maximize="hc",
+    maximize.args=list(), returnArcs=FALSE) {
+    nodes <- names(V(net))
+
+    mb <- lapply(names(V(net)), function(nn) {
+       tmp <- names(neighborhood(net, 1, nn)[[1]])
+       tmp[tmp!=nn]
+    })
+    names(mb) <- nodes
+
+    mb <- lapply(names(mb), function(node) {
+        if (length(mb[[node]])!=0) {
+            list(nbr=mb[[node]], mb=mb[[node]])
+        } else {
+            list(nbr=character(0), mb=character(0))
+        }
+    }) %>% setNames(nodes)
+
+    for (node in nodes) {
+        ## Corresponding to fake.markov.blanket
+        dif <- setdiff(unique(lapply(mb[[node]]$nbr, function(current) {mb[[current]]$nbr}) %>% unlist(),
+            mb[[node]]$nbr), node)
+        mb[[node]]$mb <- dif
+    }
+
+    mb <- bn.recovery.2(mb)
+
+    arcs <- do.call(rbind, lapply(names(mb), function(node) {
+        candidate <- mb[[node]]$nbr
+        cbind(rep(node, length(candidate)), candidate)
+    }))
+    arcs <- arcs[!duplicated(arcs),]
+
+    if (returnArcs) {
+        return(igraph::graph_from_edgelist(arcs))
+    }
+
+    ## No blacklisting in this version
+    constraints <- arcs.to.be.added.2(arcs, nodes)
+    start <- empty.graph(nodes = nodes)
+    maximize.args[["x"]] <- data
+    maximize.args[["start"]] <- start
+    maximize.args[["blacklist"]] <- constraints
+    struc_res <- do.call(maximize, maximize.args)
+    # hc_res <- hc(data, start=start, blacklist=constraints)
+    return(struc_res)
+}
