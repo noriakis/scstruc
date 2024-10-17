@@ -8,7 +8,6 @@ interVal(
   data,
   algos = c("hc", "mmhc"),
   algorithm.args = NULL,
-  mode = "shd",
   r = 10,
   ss = 100,
   verbose = FALSE,
@@ -23,8 +22,6 @@ interVal(
 \item{algos}{algorithms to be evaluated.}
 
 \item{algorithm.args}{list of lists to be passed to algos}
-
-\item{mode}{shd or sid}
 
 \item{r}{number of iteration}
 

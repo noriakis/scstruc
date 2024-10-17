@@ -3,7 +3,6 @@
 #' @param data data (row names as genes and columns as samples)
 #' @param algos algorithms to be evaluated.
 #' @param algorithm.args list of lists to be passed to algos
-#' @param mode shd or sid
 #' @param r number of iteration
 #' @param ss sample size
 #' @param verbose control verbosity
@@ -16,7 +15,7 @@
 #' data(gaussian.test)
 #' interVal(head(gaussian.test, n=50), ss=10)
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
-    mode="shd", r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=FALSE) {
+    r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=FALSE) {
     if (is.null(algorithm.args)) {
         algorithm.args <- lapply(seq_len(length(algos)), function(x) return(NULL))
     } else {
@@ -45,36 +44,49 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
         cat("Inferred A0:\n")
         print(A0.bn)
     }
-	subsample.res <- do.call(cbind, lapply(seq_len(r), function(cr) {
-        if (verbose) {cat("Subsample:", cr, "\n")}
+    CNP <- dim(A0.bn$arcs)[1]
+    if (CNP < 15) {
+        message("CNP below 15, the results might not be reliable.")
+    }
+	subsample.res <- lapply(seq_len(r), function(cr) {
+        if (verbose) {cat_subtle("Subsample: ", cr, ", Sample size: ", ss, "\n")}
         replicates <- sample(seq_len(nrow(data)), ss)
         tmp <- data[replicates, ]
         inf.nets <- lapply(seq_along(algos), function(al) {
             .getStruc(tmp, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
         })
-        lapply(inf.nets, function(tmpnet) {
-            if (mode=="sid") {
-                if (SID.cran) {
-                    SID.sid(A0.bn, tmpnet, sym=symmetrize)
-                } else {
-                    if (symmetrize) {
-                        bnlearn.sid.sym(tmpnet, A0.bn) %>% return()
-                    } else {
-                        bnlearn::sid(tmpnet, A0.bn) %>% unlist() %>% return()
-                    }                    
-                }
-            } else if (mode=="shd") {
-                bnlearn::shd(tmpnet, A0.bn) %>% unlist() %>% return()
+        lapply(seq_along(inf.nets), function(tmpnetnum) {
+            tmpnet <- inf.nets[[tmpnetnum]]
+            if (SID.cran) {
+                val <- SID.sid(A0.bn, tmpnet, sym=symmetrize)
             } else {
-                stop("sid or shd should be specified.")
+                if (symmetrize) {
+                    val <- bnlearn.sid.sym(tmpnet, A0.bn)
+                } else {
+                    val <- bnlearn::sid(tmpnet, A0.bn) %>% unlist()
+                }                    
             }
+
+            shd.val <- bnlearn::shd(tmpnet, A0.bn) %>% unlist()
+
+            return(list("algonum"=tmpnetnum,
+                "edgenum"=dim(tmpnet$arcs)[1], "shd"=shd.val, "sid"=val))
         })
-    }))
-    sum.stat <- apply(subsample.res, 1, function(x) mean(as.numeric(x)))
+    })
+
+    long.res <- do.call(rbind, lapply(seq_along(subsample.res), function(x) {
+        do.call(rbind, lapply(subsample.res[[x]], function(xx) {
+            c(x, xx$algonum, xx$shd, xx$sid, xx$edgenum)
+        }))
+    })) %>% data.frame() %>% `colnames<-`(c("R","AlgoNum","SHD","SID","EdgeNumber"))
+
+    sum.stat <- long.res %>% group_by(AlgoNum) %>% summarise(SHD.stat=mean(SHD), SID.stat=mean(SID),
+        en=mean(EdgeNumber))
+    # sum.stat <- apply(subsample.res, 1, function(x) mean(as.numeric(x)))
     if (returnA0) {
-        return(list("A0"=A0.bn, "stat"=sum.stat, "raw.stat"=subsample.res))
+        return(list("A0"=A0.bn, "stat"=sum.stat, "raw.stat"=long.res))
     } else {
-        return(list("stat"=sum.stat, "raw.stat"=subsample.res))
+        return(list("stat"=sum.stat, "raw.stat"=long.res))
     }
 }
 
