@@ -46,6 +46,7 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
         print(A0.bn)
     }
 	subsample.res <- do.call(cbind, lapply(seq_len(r), function(cr) {
+        if (verbose) {cat("Subsample:", cr, "\n")}
         replicates <- sample(seq_len(nrow(data)), ss)
         tmp <- data[replicates, ]
         inf.nets <- lapply(seq_along(algos), function(al) {
