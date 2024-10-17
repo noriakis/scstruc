@@ -7,13 +7,14 @@
 interVal(
   data,
   algos = c("hc", "mmhc"),
-  algorithm.args = list(list(), list()),
+  algorithm.args = NULL,
   mode = "shd",
   r = 10,
   ss = 100,
   verbose = FALSE,
   returnA0 = TRUE,
-  symmetrize = FALSE
+  symmetrize = FALSE,
+  SID.cran = FALSE
 )
 }
 \arguments{
@@ -34,9 +35,11 @@ interVal(
 \item{returnA0}{returns the A0 (intersection of inferred networks), default to TRUE}
 
 \item{symmetrize}{use symmetrized version of SID}
+
+\item{SID.cran}{use SID in CRAN package SID}
 }
 \value{
-summarized statistics
+summarized statistics, bn object of A0, and statistics for all the subsamples
 }
 \description{
 Performs `Intersection-Validation` approach to the data.
