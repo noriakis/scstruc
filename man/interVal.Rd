@@ -13,7 +13,8 @@ interVal(
   verbose = FALSE,
   returnA0 = TRUE,
   symmetrize = FALSE,
-  SID.cran = FALSE
+  SID.cran = FALSE,
+  output = NULL
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ interVal(
 \item{symmetrize}{use symmetrized version of SID}
 
 \item{SID.cran}{use SID in CRAN package SID}
+
+\item{output}{output relevant data to the directory}
 }
 \value{
 summarized statistics, bn object of A0, and statistics for all the subsamples

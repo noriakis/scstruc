@@ -9,13 +9,18 @@
 #' @param returnA0 returns the A0 (intersection of inferred networks), default to TRUE
 #' @param symmetrize use symmetrized version of SID
 #' @param SID.cran use SID in CRAN package SID
+#' @param output output relevant data to the directory
 #' @return summarized statistics, bn object of A0, and statistics for all the subsamples
 #' @export
 #' @examples
 #' data(gaussian.test)
 #' interVal(head(gaussian.test, n=50), ss=10)
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
-    r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=FALSE) {
+    r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=FALSE,
+    output=NULL) {
+    if (!is.null(output)) {
+        write.table(data, file=paste0(output, "/raw-data.txt"), sep="\t")
+    }
     if (is.null(algorithm.args)) {
         algorithm.args <- lapply(seq_len(length(algos)), function(x) return(NULL))
     } else {
@@ -40,6 +45,10 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
     	as.igraph(x)
 	}))
 	A0.bn <- as.bn(A0)
+    if (!is.null(output)) {
+        save(A0.bn, file=paste0(output, "/A0.rda"))
+        save(bns, file=paste0(output, "/all-bns.rda"))
+    }
     if (verbose) {
         cat("Inferred A0:\n")
         print(A0.bn)
@@ -52,9 +61,15 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
         if (verbose) {cat_subtle("Subsample: ", cr, ", Sample size: ", ss, "\n")}
         replicates <- sample(seq_len(nrow(data)), ss)
         tmp <- data[replicates, ]
+
         inf.nets <- lapply(seq_along(algos), function(al) {
             .getStruc(tmp, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
         })
+
+        if (!is.null(output)) {
+            write.table(tmp, file=paste0(output, "/subsample-data-",cr,".txt"), sep="\t")
+            save(tmp, file=paste0(output, "/subsample-inf-net-",cr,".rda"))
+        }
         lapply(seq_along(inf.nets), function(tmpnetnum) {
             tmpnet <- inf.nets[[tmpnetnum]]
             if (SID.cran) {
@@ -79,7 +94,9 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
             c(x, xx$algonum, xx$shd, xx$sid, xx$edgenum)
         }))
     })) %>% data.frame() %>% `colnames<-`(c("R","AlgoNum","SHD","SID","EdgeNumber"))
-
+    if (!is.null(output)) {
+        write.table(long.res, file=paste0(output, "/raw-results.txt"), sep="\t")
+    }
     sum.stat <- long.res %>% group_by(AlgoNum) %>% summarise(SHD.stat=mean(SHD), SID.stat=mean(SID),
         en=mean(EdgeNumber))
     # sum.stat <- apply(subsample.res, 1, function(x) mean(as.numeric(x)))
