@@ -1,3 +1,59 @@
+#' Performs PIDC inference based on Julia implementation, using JuliaCall
+#' You should have already done `julia_setup` in JuliaCall
+#' @noRd
+pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
+    NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
+    bestBIC=TRUE) {
+    if (!dir.exists(tmp)) {
+        cat("Creating ", tmp, "\n")
+        dir.create(tmp)
+    }
+    write.table(t(data), paste0(tmp,"/data.txt"), quote=FALSE)
+    julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
+                      NetworkInference_HOME,'"))'))
+    julia_eval("using NetworkInference")
+    julia_eval("using CSV")
+    julia_eval("using Tables")
+    julia_eval("algorithm = PIDCNetworkInference()")
+    julia_eval(paste0('dataset_name = string("', paste0(tmp,"/data.txt"), '")'))
+    julia_eval("@time genes = get_nodes(dataset_name);")
+    julia_eval("@time network = InferredNetwork(algorithm, genes);")
+    for (th in thresholds) {
+        cat("Outputting", th, "\n")
+        julia_eval(paste0('adjacency_matrix, labels_to_ids, ids_to_labels = get_adjacency_matrix(network,', th,')'))
+        julia_eval(paste0('output_name = string("', tmp, "/data-",th,".csv", '")'))
+        julia_eval("CSV.write(output_name, Tables.table(adjacency_matrix), writeheader=false)")
+    }
+    results <- list()
+    bics <- list()
+    for (th in thresholds) {
+        cat("Inference ", th, "\n")
+        mat <- read.table(paste0(tmp, "/data-", th, ".csv"), sep=",")
+        mat[mat=="true"] <- 1
+        mat[mat=="false"] <- 0
+        
+        row.names(mat) <- colnames(data)
+        colnames(mat) <- colnames(data)
+        
+        net <- igraph::graph_from_adjacency_matrix(as.matrix(mat), mode="undirected")
+        ###
+        # Inference part
+        ###
+        bn <- scstruc:::skeleton.from.ig(net, data %>% data.frame())
+        results[[as.character(th)]] <- bn
+        bic <- bnlearn::score(bn, data)
+        bics[[as.character(th)]] <- bic
+    }
+    if (bestBIC) {
+        cat("Best BIC is ", names(results)[which.max(bics)], "\n")
+        return(results[[names(results)[which.max(bics)]]])
+    } else {
+        return(results)
+    }
+
+}
+
+
 #' @noRd
 load.grnboost2 <- function(filename, minmax=TRUE,
                            thresholds=seq(0, 1, 0.1)) {
