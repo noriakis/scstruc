@@ -141,14 +141,16 @@ glmnetBICpath <- function(data, nn) {
     } else {
         requireNamespace("L0Learn")
     }
-    fit=L0Learn::L0Learn.cvfit(x=X %>% as.matrix(), y=y, penalty="L0",
-        nFolds=nFolds, algorithm="CD")
-    lambdaIndex <- which.min(fit$cvMeans[[1]])
-    cand_lambda <- fit$fit$lambda[[1]][lambdaIndex]
-    L0coef <- coef(fit$fit, lambda=cand_lambda)
-    vars <- as.numeric(L0coef)[2:length(L0coef)]
-    included_var_index <- which(vars!=0)
-    return(included_var_index)
+    tryCatch({
+        fit=L0Learn::L0Learn.cvfit(x=X %>% as.matrix(), y=y, penalty="L0",
+            nFolds=nFolds, algorithm="CD")
+        lambdaIndex <- which.min(fit$cvMeans[[1]])
+        cand_lambda <- fit$fit$lambda[[1]][lambdaIndex]
+        L0coef <- coef(fit$fit, lambda=cand_lambda)
+        vars <- as.numeric(L0coef)[2:length(L0coef)]
+        included_var_index <- which(vars!=0)
+        return(included_var_index)
+    }, error=function(e) {print(e); return(NULL)})
 }
 
 #' @noRd
@@ -159,20 +161,23 @@ glmnetBICpath <- function(data, nn) {
         requireNamespace("L0Learn")
     }
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
-    fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=algorithm, nFolds=nFolds, algorithm="CD")
-    ## Choose gamma which have the lowest PE
-    min_cvmean <- which.min(lapply(fit$cvMeans, function(cvm) cvm[[which.min(cvm)]]) |> unlist())
-    chosen_gamma <- fit$fit$gamma[[min_cvmean]]
+    tryCatch({
+        fit=L0Learn::L0Learn.cvfit(x=X, y=y, penalty=algorithm, nFolds=nFolds, algorithm="CD")
+        ## Choose gamma which have the lowest PE
+        min_cvmean <- which.min(lapply(fit$cvMeans, function(cvm) cvm[[which.min(cvm)]]) |> unlist())
+        chosen_gamma <- fit$fit$gamma[[min_cvmean]]
 
-    ## Lambda in the selected gamma
-    lambdaList <- fit$fit$lambda[[min_cvmean]]
+        ## Lambda in the selected gamma
+        lambdaList <- fit$fit$lambda[[min_cvmean]]
 
-    ## the lambda with the lowest PE
-    chosen_lambda <- lambdaList[which.min(fit$cvMeans[[min_cvmean]])]
-    L0coef <- coef(fit$fit, gamma=chosen_gamma, lambda=chosen_lambda)[,1]
-    vars <- as.numeric(L0coef)[2:length(L0coef)]
-    included_var_index <- which(vars!=0)
-    included_var_index
+        ## the lambda with the lowest PE
+        chosen_lambda <- lambdaList[which.min(fit$cvMeans[[min_cvmean]])]
+        L0coef <- coef(fit$fit, gamma=chosen_gamma, lambda=chosen_lambda)[,1]
+        vars <- as.numeric(L0coef)[2:length(L0coef)]
+        included_var_index <- which(vars!=0)
+        return(included_var_index)        
+    }, error=function(e) {print(e); return(NULL)})
+
 }
 
 #' @noRd
