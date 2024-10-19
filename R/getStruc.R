@@ -66,6 +66,12 @@
             algorithm.args[["algorithm"]] <- algorithm
             net <- do.call(skeleton.reg, algorithm.args)
             return(net)    
+        } else if (algorithm=="pidc") {
+            ###
+            # Bootstrap is not supported
+            ###
+            algorithm.args[["data"]] <- input
+            net <- do.call(pidc.using.julia, algorithm.args)
         } else {
             ## Constraint-based algos are omitted currently
             cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
