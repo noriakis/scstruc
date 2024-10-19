@@ -4,6 +4,11 @@
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
     bestBIC=TRUE) {
+    ###
+    # Needs to setup Julia environment beforehand
+    # library(JuliaCall)
+    # julia_setup()
+    ###
     if (!dir.exists(tmp)) {
         cat("Creating ", tmp, "\n")
         dir.create(tmp)
