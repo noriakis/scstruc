@@ -74,7 +74,9 @@
             net <- do.call(pidc.using.julia, algorithm.args)
         } else {
             ## Constraint-based algos are omitted currently
-            cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
+            if (verbose) {
+                cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
+            }
             algorithm.args[["x"]] <- input
             net <- do.call(algorithm, algorithm.args)
             return(net)

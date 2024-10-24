@@ -16,8 +16,8 @@
         return(included_var_index)
         },
         error = function(e) {
-            cat_subtle("\n", e, "\n")
-            cat_subtle("If constant error, return no candidate for this node\n")
+            message(e)
+            message("If constant error, return no candidate for this node\n")                
             return(NULL)
         },
         finally={}
@@ -40,8 +40,8 @@
         return(included_var_index)
         },
         error = function(e) {
-            cat_subtle("\n", e, "\n")
-            cat_subtle("If constant error, return no candidate for this node\n")
+            message(e)
+            message("If constant error, return no candidate for this node\n")                
             return(NULL)
         },
         finally={}
@@ -51,7 +51,8 @@
 
 #' @noRd
 #' @importFrom glmnet glmnet
-.glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL, s=NULL, onlyBIC=FALSE) {
+.glmnetBIC <- function(X, y, nFolds=NULL, algorithm=NULL,
+    s=NULL, onlyBIC=FALSE) {
     ## This corresponds to L1MB in Schmidt et al. 2007. AAAI.
     fit <- glmnet(X, y, alpha=1, family="gaussian")
     tLL <- fit$nulldev - fit$nulldev * (1-fit$dev.ratio)
@@ -150,7 +151,7 @@ glmnetBICpath <- function(data, nn) {
         vars <- as.numeric(L0coef)[2:length(L0coef)]
         included_var_index <- which(vars!=0)
         return(included_var_index)
-    }, error=function(e) {print(e); return(NULL)})
+    }, error=function(e) {message(e); return(NULL)})
 }
 
 #' @noRd
@@ -176,7 +177,7 @@ glmnetBICpath <- function(data, nn) {
         vars <- as.numeric(L0coef)[2:length(L0coef)]
         included_var_index <- which(vars!=0)
         return(included_var_index)        
-    }, error=function(e) {print(e); return(NULL)})
+    }, error=function(e) {message(e); return(NULL)})
 
 }
 
