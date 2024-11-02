@@ -8,7 +8,7 @@
 #' if coef, data to be fitted must be provided
 #' @param data data to fit the paramter on averaged network
 #' @param layout layout in ggraph
-#' @param sizeDegree size the node based on degree
+#' @param sizeDegree size and color the node based on degree
 #' @param sizeRange node size range
 #' @param degreeMode degree mode in igraph::degree
 #' @param largestComponents take largest components automatically
@@ -19,12 +19,16 @@
 #' @param highlightColor highlight color for ggfx
 #' @param highlightExpand expand parameter for ggfx
 #' @param highlightSigma sigma paramter for ggfx
+#' @param nodeAttr default to NULL. The node-named vector of continuous values 
+#' should be specified. The nodes are colored according to this value.
+#' @param cextend perform extension of averaged network
 #' @importFrom ggplot2 arrow
 #' @import ggraph
 #' @export
 plotAVN <- function(str, edge=geom_edge_link,
     ew="strength", ec="direction", layout="kk", degreeMode="all",
     sizeDegree=TRUE, sizeRange=c(3, 6), data=NULL,
+    nodeAttr=NULL, cextend=FALSE,
     highlightColor="tomato", highlightExpand=5, highlightSigma=2,
     highlightEdges=NULL, largestComponents=TRUE, threshold=NULL) {
     if (!is.null(highlightEdges)) {
@@ -43,8 +47,11 @@ plotAVN <- function(str, edge=geom_edge_link,
     } else {
         avn <- bnlearn::averaged.network(str, threshold=threshold)
     }
+    if (cextend) {
+    	avn <- bnlearn::cextend(avn)
+    }
     if (!is.null(data)) {
-        fitted <- bn.fit(avn, data)
+        fitted <- bn.fit(avn, data[,names(avn$nodes)])
         avdf <- igraph::as_data_frame(bn_fit_to_igraph(fitted))
     } else {
         ## Find undirected arcs
@@ -74,6 +81,9 @@ plotAVN <- function(str, edge=geom_edge_link,
         g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
           mutate(highlight=paste0(fromn, "->", ton) %in% highchar)
     }
+    if (!is.null(nodeAttr)) {
+    	g <- g %N>% mutate(nodeAttr=nodeAttr[name])
+    }
 
     gg <- ggraph(g, layout=layout)
     ## Directed arcs
@@ -95,9 +105,17 @@ plotAVN <- function(str, edge=geom_edge_link,
     }
 
     if (sizeDegree) {
-        gg <- gg + geom_node_point(aes(size=degree, color=degree))
+    	if (!is.null(nodeAttr)) {
+	        gg <- gg + geom_node_point(aes(size=degree, color=nodeAttr))		
+    	} else {
+	        gg <- gg + geom_node_point(aes(size=degree, color=degree))
+    	}
     } else {
-        gg <- gg + geom_node_point()
+    	if (!is.null(nodeAttr)) {
+	        gg <- gg + geom_node_point(aes(color=nodeAttr))
+    	} else {
+    		gg <- gg + geom_node_point()
+    	}
     }
     if (sizeDegree) {
         gg <- gg + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")  

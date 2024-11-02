@@ -14,6 +14,8 @@ plotAVN(
   sizeDegree = TRUE,
   sizeRange = c(3, 6),
   data = NULL,
+  nodeAttr = NULL,
+  cextend = FALSE,
   highlightColor = "tomato",
   highlightExpand = 5,
   highlightSigma = 2,
@@ -37,11 +39,16 @@ if coef, data to be fitted must be provided}
 
 \item{degreeMode}{degree mode in igraph::degree}
 
-\item{sizeDegree}{size the node based on degree}
+\item{sizeDegree}{size and color the node based on degree}
 
 \item{sizeRange}{node size range}
 
 \item{data}{data to fit the paramter on averaged network}
+
+\item{nodeAttr}{default to NULL. The node-named vector of continuous values 
+should be specified. The nodes are colored according to this value.}
+
+\item{cextend}{perform extension of averaged network}
 
 \item{highlightColor}{highlight color for ggfx}
 
