@@ -61,7 +61,7 @@ Using the bootstrapping, the averaged network is obtained.
 
 ```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
 library(glmnet)
-gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC.boot",
-               changeSymbol=FALSE, algorithm.args=list("R"=20))
+gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC", boot=TRUE,
+               changeSymbol=FALSE, R=20)
 plotAVN(gs2$net, sizeRange=c(1,3))
 ```
