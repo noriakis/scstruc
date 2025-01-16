@@ -28,7 +28,9 @@ pcalg.boot(
 
 \item{return.all}{return all the network in bootstrapping}
 
-\item{debug}{passed to maximize function}
+\item{fun}{pcalg functions, lingam or ges}
+
+\item{args}{args to be passed to the main function of pcalg}
 }
 \value{
 bn.strength

@@ -46,6 +46,8 @@
 #' @param ges perform ges evaluation
 #' @param lingam perform lingam evaluation
 #' @param lambdas.length lambda length in CCDr algorithm
+#' @param algorithm.args arguments to be passed to algorithms,
+#' must be the same length as `algos`.
 #' @export
 metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     mmhc=TRUE, alphas=c(0.001, 0.005, 0.01, 0.05), ppi=FALSE,

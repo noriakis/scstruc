@@ -70,6 +70,8 @@ This filter will be performed *after* the genes and cells subset by the other pa
 \item{boot}{bootstrapping specification}
 
 \item{R}{when boot is TRUE, use as replicate number}
+
+\item{m}{sampling number in bootstrapping}
 }
 \description{
 The main function for scstruc package.

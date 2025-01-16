@@ -50,6 +50,9 @@ Also, `database` and `org` argument should be specified based on the node name.}
 
 \item{SID.cran}{use package SID for calculation of SID}
 
+\item{algorithm.args}{arguments to be passed to algorithms,
+must be the same length as `algos`.}
+
 \item{hurdle}{perform inference based on Hurdle model, default to FALSE.
 Some scoring functions used in the function cannot calculate scores
 if the feature abundances are all negative. In this case, these scores will be omitted.}

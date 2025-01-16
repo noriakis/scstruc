@@ -28,7 +28,7 @@
 			hurdle.args[["fixed"]] <- covariates
 		}
 		hurdle.args[["parallel"]] <- parallel
-		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
+		suppressMessages(hurdle <- do.call(HurdleNormal::fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
 	}
@@ -101,7 +101,7 @@
 		if (is.null(hurdle.args[["fixed"]]) & cdrAdjustment) {
 			hurdle.args[["fixed"]] <- covariates
 		}
-		suppressMessages(hurdle <- do.call(fitHurdle, hurdle.args))
+		suppressMessages(hurdle <- do.call(HurdleNormal::fitHurdle, hurdle.args))
 	} else {
 		hurdle <- skeleton
 	}

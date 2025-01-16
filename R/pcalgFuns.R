@@ -54,10 +54,11 @@ lingam.pcalg <- function(data, args=NULL) {
 #' @param data data (row: sample, column: gene)
 #' @param R replicate number
 #' @param m sampling number
-#' @param debug passed to maximize function
 #' @param return.all return all the network in bootstrapping
 #' @param verbose control verbosity
 #' @param removeAllZero remove all zero genes per replicate
+#' @param fun pcalg functions, lingam or ges
+#' @param args args to be passed to the main function of pcalg
 #' @export
 #' @return bn.strength 
 pcalg.boot <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,

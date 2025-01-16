@@ -50,7 +50,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         ###
         # Inference part
         ###
-        bn <- scstruc:::skeleton.from.ig(net, data %>% data.frame())
+        bn <- skeleton.from.ig(net, data %>% data.frame())
         results[[as.character(th)]] <- bn
         bic <- bnlearn::score(bn, data)
         bics[[as.character(th)]] <- bic

@@ -12,8 +12,7 @@ Imports:
     Rcpp, MAST, methods, pcalg,
     data.table, ggraph, dplyr,
     glmnet, tidygraph, ggplot2,
-    pillar, SingleCellExperiment,
-    SID
+    pillar, SingleCellExperiment
 Suggests:
     ncvreg,
     AnnotationDbi,
@@ -31,7 +30,10 @@ Suggests:
     clusterProfiler,
     xgboost,
     knitr,
-    SID
+    SID,
+    HurdleNormal
+Remotes:
+    amcdavid/HurdleNormal
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

@@ -37,10 +37,14 @@
 #' @param returnOnlyData return only the data, not performing inference.
 #' @param boot bootstrapping specification
 #' @param R when boot is TRUE, use as replicate number
+#' @param m sampling number in bootstrapping
 #' @importFrom dplyr %>% mutate
 #' @importFrom tidygraph %E>% %N>%
 #' @importFrom methods is
 #' @import scran
+#' @importFrom methods new
+#' @importFrom dplyr %>% summarise
+#' @importFrom utils read.table write.table
 #' @importFrom stats BIC as.formula coef coefficients
 #' @importFrom stats gaussian nobs sd setNames summary.glm
 #' @examples
