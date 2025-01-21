@@ -7,7 +7,7 @@ select genes based on KEGG over-representation analysis}
 \usage{
 sel.genes.kegg.ora(
   genes,
-  orgDb = org.Hs.eg.db,
+  orgDb = NULL,
   keyType = "ENSEMBL",
   sel = NULL,
   organism = "hsa"

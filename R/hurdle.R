@@ -119,7 +119,7 @@
 	nodes <- names(V(g))
 
 	mb <- lapply(nodes, function(node) {
-	    nn <- neighborhood(g, 1, nodes=node)[[1]] %>% names()
+	    nn <- igraph::neighborhood(g, 1, nodes=node)[[1]] %>% names()
 	    nn <- nn[nn!=node]
 	    nn
 	}) %>% setNames(nodes)
@@ -170,7 +170,7 @@
     arcs <- arcs[!duplicated(arcs),]
     constraints <- arcs.to.be.added.2(arcs, nodes)
 
-    start <- empty.graph(nodes = nodes)
+    start <- bnlearn::empty.graph(nodes = nodes)
 
 	if (is.null(score)) {
 		net <- maximizeFun(data[,nodes],

@@ -37,7 +37,7 @@
     if (!is.null(cluster_label)) {
         ## First subset to inc_cell, and subsequently aggregate based on `cluster_label`.
         sce <- sce[, inc_cells]# %in% colData(sce)[[barcode_column]]]
-        agg <- aggregateAcrossCells(sce, colData(sce)[[cluster_label]], use.assay.type=use_assay)
+        agg <- scuttle::aggregateAcrossCells(sce, colData(sce)[[cluster_label]], use.assay.type=use_assay)
         input <- agg@assays@data[[use_assay]][intersect(row.names(agg), candidate_genes), ] |>
         as.matrix() |> t() |> 
         data.frame(check.names=FALSE)

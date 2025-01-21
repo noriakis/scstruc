@@ -92,4 +92,5 @@ sce <- mockSCE()
 sce <- logNormCounts(sce)
 included_genes <- sample(row.names(sce), 10)
 gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
+gs.glmnet <- scstruc(sce, included_genes, changeSymbol=FALSE, algorithm="glmnet_BIC")
 }

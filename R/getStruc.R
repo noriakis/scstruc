@@ -1,6 +1,7 @@
 #' In `ccdr`, one network with best BIC will be returned (if algorithm.args[["bestScore"]] is NULL)
 #' In `ccdr.boot`, we cannot see whether the resulting averaged network is DAG, so returning all the network for lambdas.
 #' @noRd
+#' @importFrom bnlearn custom.strength boot.strength
 .getStruc <- function(input, algorithm, algorithm.args, verbose, boot=FALSE, R=200, m=NULL) {
     pens <- c("glmnet_CV","glmnet_BIC","MCP_CV","SCAD_CV","L0_CV","L0L1_CV","L0L2_CV","plasso")
     if (verbose) {
@@ -73,9 +74,8 @@
             algorithm.args[["data"]] <- input
             net <- do.call(pidc.using.julia, algorithm.args)
         } else {
-            ## Constraint-based algos are omitted currently
             if (verbose) {
-                cat_subtle("Using default bnlearn algorithm: ", algorithm," \n")
+                cat_subtle("Using default bnlearn algorithm: ", algorithm, " \n")
             }
             algorithm.args[["x"]] <- input
             net <- do.call(algorithm, algorithm.args)

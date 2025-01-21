@@ -10,7 +10,7 @@
     }
     algorithm <- strsplit(algorithm, "_") %>% vapply("[", 1, FUN.VALUE="a")
     tryCatch({
-        fit <- cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
+        fit <- ncvreg::cv.ncvreg(X, y, alpha=1, penalty=algorithm, nfolds=nFolds)
         included_var_index <- as.numeric(which(fit$fit$beta[, fit$min][-1]!=0))
         included_var_index
         return(included_var_index)
@@ -61,7 +61,7 @@
     BIC <- log(n)*k - tLL
     if (onlyBIC) {
         bicdf <- data.frame(lambda=fit$lambda, BIC=BIC)
-        bicplot <- ggplot(bicdf, aes(x=lambda, y=BIC)) + 
+        bicplot <- ggplot(bicdf, aes(x=.data$lambda, y=.data$BIC)) + 
             geom_point() +  
             geom_hline(color="red", yintercept=BIC[which.min(BIC)])+
             cowplot::theme_cowplot()
@@ -91,23 +91,22 @@ glmnetBICpath <- function(data, nn) {
     .glmnetBIC(X, y, onlyBIC=TRUE)
 }
 
-#' @noRd
-.glmmTMB <- function(nodes, nn, data, formula= ~ 1) {
-    pred <- setdiff(nodes, nn)
-    if (length(pred) == 0) {
-        model = paste(nn, "~ 1")
-    } else {
-        model = paste(nn, "~", paste(pred, collapse = "+"))
-    }
-    fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= formula,
-        family=gaussian)
-    res <- summary(fit)
-    tbl <- data.frame(res$coefficients$cond)
-    tbl <- tbl[2:nrow(tbl),]
-    tbl <- tbl[!is.na(tbl[,4]),]
-    row.names(tbl[tbl[,4]<0.05,])
-}
+# .glmmTMB <- function(nodes, nn, data, formula= ~ 1) {
+#     pred <- setdiff(nodes, nn)
+#     if (length(pred) == 0) {
+#         model = paste(nn, "~ 1")
+#     } else {
+#         model = paste(nn, "~", paste(pred, collapse = "+"))
+#     }
+#     fit <- glmmTMB(as.formula(model), data=data,
+#         ziformula= formula,
+#         family=gaussian)
+#     res <- summary(fit)
+#     tbl <- data.frame(res$coefficients$cond)
+#     tbl <- tbl[2:nrow(tbl),]
+#     tbl <- tbl[!is.na(tbl[,4]),]
+#     row.names(tbl[tbl[,4]<0.05,])
+# }
 
 #' @noRd
 .plasso <- function(X, y, lambda=0.1, nFolds=NULL, algorithm=NULL, s=NULL) {
@@ -225,22 +224,21 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
 
 #' Custom score function for bnlearn, using hurdle model in glmmTMB.
 #' BIC is scaled by -2.
-#' @noRd
-glmmtmb.bic <- function(node, parents, data, args) {
-    ## Using glmmTMB
-    if (length(parents) == 0) {
-        model = paste(node, "~ 1")
-    } else {
-        model = paste(node, "~", paste(parents, collapse = "+"))
-    }
-    # cat("Fitting:", model, "\n")
+# glmmtmb.bic <- function(node, parents, data, args) {
+#     ## Using glmmTMB
+#     if (length(parents) == 0) {
+#         model = paste(node, "~ 1")
+#     } else {
+#         model = paste(node, "~", paste(parents, collapse = "+"))
+#     }
+#     # cat("Fitting:", model, "\n")
 
-    fit <- glmmTMB(as.formula(model), data=data,
-        ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 1))
+#     fit <- glmmTMB(as.formula(model), data=data,
+#         ziformula= ~ 1, family=gaussian, control = glmmTMBControl(parallel = 1))
 
-   - BIC(fit) / 2
+#    - BIC(fit) / 2
 
-}#MY.BIC
+# }#MY.BIC
 
 #' Custom score function for bnlearn, using hurdle model.
 #' @noRd

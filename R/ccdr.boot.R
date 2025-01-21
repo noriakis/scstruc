@@ -17,18 +17,28 @@
 #' @return list of the bn.strength per lambda
 #' 
 ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gamma=2, return.all=FALSE) {
+    if (!requireNamespace("ccdrAlgorithm")) {
+        stop("Needs installation of ccdrAlgorithm")
+    } else {
+        requireNamespace("ccdrAlgorithm")
+    }
+    if (!requireNamespace("sparsebnUtils")) {
+        stop("Needs installation of sparsebnUtils")
+    } else {
+        requireNamespace("sparsebnUtils")
+    }
     nodes = names(data)
     ## Use same lambda for all replicate (probably not needed)
     ## Set alpha to be sufficiently large
-    lambdas <- generate.lambdas(lambda.max=sqrt(nrow(data)), lambdas.ratio=1e-2,
+    lambdas <- sparsebnUtils::generate.lambdas(lambda.max=sqrt(nrow(data)), lambdas.ratio=1e-2,
         lambdas.length=lambdas.length, scale="log")
     perRun <- list()
     for (r in seq_len(R)) {
         resampling = sample(nrow(data), m, replace = TRUE)
         # generate the r-th bootstrap sample.
         replicate = data[resampling, , drop = FALSE]
-        dat <- sparsebnData(replicate, type = "continuous")
-        run <- ccdr.run(data = dat, lambdas=lambdas,
+        dat <- sparsebnUtils::sparsebnData(replicate, type = "continuous")
+        run <- ccdrAlgorithm::ccdr.run(data = dat, lambdas=lambdas,
             alpha=alpha, gamma=gamma, verbose=FALSE)
         perRun[[r]] <- run
     }
@@ -38,8 +48,8 @@ ccdr.boot <- function(data, R=200, m=nrow(data), lambdas.length=20, alpha=2, gam
     }
     
     res <- lapply(which(lambdas %in% all_lambdas), function(l) {
-    	net_list <- lapply(perRun, function(pr) {to_bn(pr[[l]])$edges})
-    	st <- custom.strength(net_list, nodes)
+    	net_list <- lapply(perRun, function(pr) {sparsebnUtils::to_bn(pr[[l]])$edges})
+    	st <- bnlearn::custom.strength(net_list, nodes)
     	st
     })
 

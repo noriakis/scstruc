@@ -4,7 +4,7 @@
 \alias{getGOGenes}
 \title{getGOGenes}
 \usage{
-getGOGenes(GO, orgDb = org.Mm.eg.db, type = "SYMBOL")
+getGOGenes(GO, orgDb = NULL, type = "SYMBOL")
 }
 \arguments{
 \item{GO}{GO ID}

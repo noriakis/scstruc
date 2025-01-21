@@ -5,16 +5,20 @@
 #' @param orgDb organism database
 #' @param type returned ID type of genes
 #' @export
-getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=org.Mm.eg.db, type="SYMBOL") {
+getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=NULL, type="SYMBOL") {
     if (!requireNamespace("AnnotationDbi")) {
       stop("Needs AnnotationDbi installation")
     }
-    path_eg  <- keggLink("pathway", org) %>% 
+    if (is.null(orgDb)) {
+        stop("Please specify annotation database e.g. org.Mm.eg.db")
+    }
+    path_eg  <- KEGGREST::keggLink("pathway", org) %>% 
       tibble(pathway = ., eg = sub(paste0(org,":"), "", names(.))) %>%
       mutate(
         symbol = mapIds(orgDb, eg, type, "ENTREZID")
       )
-    inc <- as.character(path_eg %>% dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(symbol))
+    inc <- as.character(path_eg %>%
+        dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(symbol))
     inc
 }
 
@@ -24,11 +28,14 @@ getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=org.Mm.eg.db, type="SYMBOL
 #' @param GO GO ID
 #' @param orgDb AnnotationDbi that has "GOALL" slot
 #' @param type return type, default to SYMBOL
-getGOGenes <- function(GO, orgDb=org.Mm.eg.db, type="SYMBOL") {
+getGOGenes <- function(GO, orgDb=NULL, type="SYMBOL") {
   if (!requireNamespace("AnnotationDbi")) {
     stop("Needs AnnotationDbi installation")
   }
-  retrieved <- AnnotationDbi::select(org.Mm.eg.db,
-     keytype="GOALL", keys=GO, columns="SYMBOL")
-  retrieved$SYMBOL
+    if (is.null(orgDb)) {
+        stop("Please specify annotation database e.g. org.Mm.eg.db")
+    }
+    retrieved <- AnnotationDbi::select(orgDb,
+        keytype="GOALL", keys=GO, columns="SYMBOL")
+    retrieved$SYMBOL
 }

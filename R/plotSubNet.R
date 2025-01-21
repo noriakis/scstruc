@@ -32,7 +32,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     if (with_hist) {
         if (is.null(spe)) {stop("Please provide SpatialExperiment object")}
         myst <- plotST(spe, label=label)
-        cols <- ggplot_build(myst)$data[[2]] |> dplyr::select(fill, group)
+        cols <- ggplot_build(myst)$data[[2]] |> dplyr::select("fill", "group")
         cols <- cols[!duplicated(cols),]
         alllabels <- factor(myst$data[[4]]) |> levels()
         colvec <- cols$fill |> setNames(alllabels[cols$group])
@@ -42,14 +42,14 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
         filter(.data[[label]] %in% show)
 
     if (!is.null(cell_label)) {
-        qqcat("Subsetting to @{cell_label}\n")
+        cat("Subsetting to ", cell_label, "\n")
         subset_graph <- subset_graph |> 
             filter(.data[[cell_column]] %in% cell_label)
     }
 
     subset_graph <- subset_graph |>  
         filter(
-            from %in% candidate_node_id | to %in% candidate_node_id
+            .data$from %in% candidate_node_id | .data$to %in% candidate_node_id
         )
     if (dim(subset_graph)[1]==0) {stop("No edges present")}
     minc <- subset_graph$coefficient |> min(na.rm=TRUE)
@@ -59,7 +59,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
     plot_subset_g <- tbl_graph(edges=subset_graph)
 
     labels <- plot_subset_g |>
-        activate(edges) |>
+        activate("edges") |>
         pull(!!enquo(label)) |>
         unique()
     if (sort) {labels <- labels |> sort()}
@@ -72,21 +72,21 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
                 curcol <- "black"
             }
             returnplot <- plot_subset_g |>
-            activate(edges) |>
+            activate("edges") |>
             filter(.data[[label]] == !!enquo(x)) |>
-            activate(nodes) |>
+            activate("nodes") |>
             mutate(group = x) |>
             ggraph(layout=layout) +
             geom_node_point(color=curcol, size=node_size) +
             geom_edge_parallel(
-                aes(color=coefficient, width=coefficient, filter= abs(coefficient) > coef_cutoff),
+                aes(color=.data$coefficient, width=.data$coefficient, filter= abs(.data$coefficient) > coef_cutoff),
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed"))+
             ggfx::with_outer_glow(
             geom_edge_parallel(
-                aes(color=coefficient, width=coefficient,
-                filter=edge_name %in% highlight_edge & abs(coefficient) > coef_cutoff),
+                aes(color=.data$coefficient, width=.data$coefficient,
+                filter=.data$edge_name %in% highlight_edge & abs(.data$coefficient) > coef_cutoff),
                 end_cap=circle(2,"mm"),
                 start_cap=circle(2,"mm"),
                 arrow=arrow(length=unit(1.5,"mm"), type="closed")),
@@ -94,7 +94,7 @@ plotSubNet <- function(df, candidate_node_id, sort=FALSE,
             )+
             scale_edge_color_gradient2(low="blue", mid="white", high="red", limits=c(minc, maxc))+
             scale_edge_width(range=c(0.5, 1.5), limits=c(minc, maxc))+
-            geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
+            geom_node_text(aes(label=.data$name), repel=TRUE, bg.colour="white")+
             ggtitle(paste0(x))+ theme_graph()
             if (!is.null(cell_label)) {
                 returnplot <- returnplot + labs(subtitle=paste0("(", cell_label,")"))

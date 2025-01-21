@@ -14,6 +14,7 @@
 #' @param mode average or sum
 #' @param ID SingleCellExperiment rowData column
 #' @param verbose control logging
+#' @importFrom SummarizedExperiment rowData `rowData<-`
 #' @export
 #' 
 superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5, rank=10,
@@ -38,21 +39,21 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
 
     if (pca) {
         pcs <- stats::prcomp(t(GE[genes, ]), rank. = rank)$x
-        SC <- SCimplify_from_embedding(
+        SC <- SuperCell::SCimplify_from_embedding(
           X = pcs, 
           k.knn = k.knn, 
           gamma = gamma
         )
     } else {
-        SC <- SCimplify_from_embedding(
+        SC <- SuperCell::SCimplify_from_embedding(
           X = GE, 
           k.knn = k.knn, 
           gamma = gamma
         )        
     }
-    SC.GE <- supercell_GE(GE, SC$membership, mode=mode)
+    SC.GE <- SuperCell::supercell_GE(GE, SC$membership, mode=mode)
     cat("  ", dim(SC.GE),"\n")
-    ret = SingleCellExperiment(assays=SimpleList("logcounts"=SC.GE))
+    ret = SingleCellExperiment::SingleCellExperiment(assays=S4Vectors::SimpleList("logcounts"=SC.GE))
     rowData(ret) <- rowData(sce)
     return(ret)
 }

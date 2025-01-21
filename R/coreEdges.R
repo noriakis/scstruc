@@ -4,7 +4,7 @@
 #' @export
 coreBootEdges <- function(listOfNets) {
     tblg <- tbl_graph(edges=do.call(rbind, lapply(seq_along(listOfNets), function(x) {
-      avn <- data.frame(igraph::as_edgelist(bnlearn::as.igraph(averaged.network(listOfNets[[x]]$net))))
+      avn <- data.frame(igraph::as_edgelist(bnlearn::as.igraph(bnlearn::averaged.network(listOfNets[[x]]$net))))
       colnames(avn) <- c("from","to")
       df <- merge(avn, listOfNets[[x]]$net, by=c("from","to"))
       if (!is.null(names(listOfNets))) {

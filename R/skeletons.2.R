@@ -25,12 +25,7 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
         y <- data[, nn]
         if (length(unique(y))==1) {return(NULL)}
-        if (algorithm=="glmmTMB") {
-            sign <- .glmmTMB(nodes, nn, data)
-            if (length(sign)==0) {return(NULL)}
-            if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
-            return(sign)
-        } else if (algorithm=="MAST") {
+        if (algorithm=="MAST") {
             sign <- .MASTHurdle(nodes, nn, data)
             if (length(sign)==0) {return(NULL)}
             if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
@@ -74,7 +69,7 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
 
     ## No blacklisting in this version
     constraints <- arcs.to.be.added.2(arcs, nodes)
-    start <- empty.graph(nodes = nodes)
+    start <- bnlearn::empty.graph(nodes = nodes)
     maximize.args[["x"]] <- data
     maximize.args[["start"]] <- start
     maximize.args[["blacklist"]] <- constraints
@@ -90,7 +85,7 @@ skeleton.from.ig <- function(net, data, maximize="hc",
     nodes <- names(V(net))
 
     mb <- lapply(names(V(net)), function(nn) {
-       tmp <- names(neighborhood(net, 1, nn)[[1]])
+       tmp <- names(igraph::neighborhood(net, 1, nn)[[1]])
        tmp[tmp!=nn]
     })
     names(mb) <- nodes
@@ -124,7 +119,7 @@ skeleton.from.ig <- function(net, data, maximize="hc",
 
     ## No blacklisting in this version
     constraints <- arcs.to.be.added.2(arcs, nodes)
-    start <- empty.graph(nodes = nodes)
+    start <- bnlearn::empty.graph(nodes = nodes)
     maximize.args[["x"]] <- data
     maximize.args[["start"]] <- start
     maximize.args[["blacklist"]] <- constraints

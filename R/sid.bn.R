@@ -4,6 +4,7 @@
 #' @param est.bn estimated bn object
 #' @param twoway return the sid(true.bn, est.bn) + sid(est.bn, true.bn) divided by 2
 #' @export
+#' @importFrom igraph as_adjacency_matrix
 sid.bn <- function(true.bn, est.bn, twoway=FALSE) {
   if (!requireNamespace("SID")) {
     stop("Needs installation of SID")

@@ -4,7 +4,7 @@
 \alias{getKEGGPathwayGenes}
 \title{getKEGGPathwayGenes}
 \usage{
-getKEGGPathwayGenes(pid, org = "mmu", orgDb = org.Mm.eg.db, type = "SYMBOL")
+getKEGGPathwayGenes(pid, org = "mmu", orgDb = NULL, type = "SYMBOL")
 }
 \arguments{
 \item{pid}{pathway id in KEGG}

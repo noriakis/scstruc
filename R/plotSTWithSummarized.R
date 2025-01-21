@@ -14,6 +14,11 @@
 #' 
 plotSTWithSummarized <- function(spe, gsv, from_node, to_node, label="label",
 	sample_id=NULL, image_id=NULL) {
+    if (!requireNamespace("SpatialExperimet")) {
+        stop("Needs installation of SpatialExperimet")
+    } else {
+        requireNamespace("SpatialExperimet")
+    }
 	stopifnot(
         is(spe, "SpatialExperiment")
 	)
@@ -25,9 +30,9 @@ plotSTWithSummarized <- function(spe, gsv, from_node, to_node, label="label",
 	        dplyr::select(c("sample_id","image_id","scaleFactor")) |>
 	        dplyr::filter(.data$sample_id==sample_id) |>
 	        dplyr::filter(.data$image_id==image_id) |>
-	        pull(scaleFactor)
+	        pull(.data$scaleFactor)
 	} else {
-		sf <- imgData(spe)[1,]$scaleFactor
+		sf <- SpatialExperimet::imgData(spe)[1,]$scaleFactor
 	}
 
 	img_raster <- imgRaster(spe, sample_id, image_id)

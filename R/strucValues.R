@@ -22,12 +22,15 @@ strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
         return(.strucValuesCoef(spe, bn, labels, exclude_label,
             barcode, assay, verbose, fit.hurdle))
     }
-    gedges <- net |> activate(edges) |> data.frame()
-    gnnames <- net |> activate(nodes) |> pull(name)
+    gedges <- net |> activate("edges") |> data.frame()
+    gnnames <- net |> activate("nodes") |> pull(.data$name)
     gedges$from <- gnnames[gedges$from]
     gedges$to <- gnnames[gedges$to]
-    meta <- colData(spe) |> data.frame()    
-    
+    meta <- colData(spe) |> data.frame()
+    ###
+    # For non-bn object, make unique label
+    ###    
+    label <- unique(labels)
     alllabels <- unique(colData(spe)[[label]])
     alllabels <- alllabels[!alllabels %in% exclude_label]
 
@@ -57,6 +60,9 @@ strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
 }
 
 #' @noRd
+#' @importFrom SummarizedExperiment `colData<-`
+#' @importFrom dplyr group_map across
+#' @importFrom dplyr all_of
 .strucValuesCoef <- function(spe, bn, labels, exclude_label,
     barcode, assay, verbose, fit.hurdle) {
     cat_subtle("Coefficient calculation per specified group: ", paste0(labels, collapse=", "), "\n")

@@ -140,12 +140,19 @@ bnlearn.sid.sym <- function(net1, net2) {
 
 
 #' @noRd
+#' @importFrom igraph as_adj
+#' @description use SID package to compute SID
 SID.sid <- function(trueBn, estBn, sym=FALSE) {
+    if (!requireNamespace("SID")) {
+        stop("Needs installation of SID")
+    } else {
+        requireNamespace("SID")
+    }
     rawadj.t <- as_adj(as.igraph(trueBn))
     rawadj.e <- as_adj(as.igraph(estBn))
-    sid <- structIntervDist(rawadj.t, rawadj.e)$sid
+    sid <- SID::structIntervDist(rawadj.t, rawadj.e)$sid
     if (sym) {
-        sid2 <- structIntervDist(rawadj.e, rawadj.t)$sid
+        sid2 <- SID::structIntervDist(rawadj.e, rawadj.t)$sid
         return((sid + sid2)/2)
     }
     return(sid)
@@ -215,17 +222,20 @@ bn.fit.hurdle <- function(x, data, cdrAdjustment=FALSE) {
 #' @param sel select the number of pathways, sorted by p-value
 #' @param organism organism ID in KEGG, default to hsa
 #' @export
-sel.genes.kegg.ora <- function(genes, orgDb=org.Hs.eg.db, keyType="ENSEMBL", sel=NULL, organism="hsa") {
+sel.genes.kegg.ora <- function(genes, orgDb=NULL, keyType="ENSEMBL", sel=NULL, organism="hsa") {
   if (!requireNamespace("AnnotationDbi")) {
     stop("Needs AnnotationDbi installation")
   }
   if (!requireNamespace("clusterProfiler")) {
     stop("Needs clusterProfiler installation")
   }
+  if (is.null(orgDb)) {
+    stop("Please specify organism database e.g. org.Hs.eg.db")
+  }
   input <- AnnotationDbi::mapIds(orgDb, genes, column="ENTREZID", keytype=keyType, multiVals="first") %>%
     as.character()
   input <- input[!is.na(input)]
-  ora <- enrichKEGG(input, organism=organism)
+  ora <- clusterProfiler::enrichKEGG(input, organism=organism)
   if (!is.null(sel)) {
     cat(ora@result[sel, ]$Description, "\n")
     ora <- ora@result[sel, ]$geneID %>% strsplit("/") %>% unlist()
@@ -336,7 +346,7 @@ bn_fit_to_igraph <- function(graph, preserve=FALSE) {
         return(tmp)
     }
     tmp <- tmp %>% as_tbl_graph()
-    inName <- tmp %N>% pull(name)
+    inName <- tmp %N>% pull(.data$name)
     dinn <-setdiff(names(graph), inName)
     
     if (length(dinn)==0) {return(tmp %>% as.igraph())}
