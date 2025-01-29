@@ -28,9 +28,11 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
 	use_ggfx=TRUE, point_size=2, rep_colour="black", edge_base_colour="grey50",
 	edge_base_width=0.5) {
 	
-	stopifnot(
+
+
+    stopifnot(
         is(spe, "SpatialExperiment")
-	)
+    )
 	
 	if (is.data.frame(ig)) {
 		if (!"from" %in% colnames(ig)) stop("No from column in data frame") 
@@ -52,14 +54,14 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
         
     ## scale factor based on ID
     if (!is.null(sample_id) & !is.null(image_id)) {
-	    sf <- imgData(spe) |> 
+	    sf <- SpatialExperiment::imgData(spe) |> 
 	        data.frame() |>
 	        dplyr::select(c("sample_id","image_id","scaleFactor")) |>
 	        dplyr::filter(.data$sample_id==sample_id) |>
 	        dplyr::filter(.data$image_id==image_id) |>
 	        pull(scaleFactor)
 	} else {
-		sf <- imgData(spe)[1,]$scaleFactor
+		sf <- SpatialExperiment::imgData(spe)[1,]$scaleFactor
 	}
 
 	nodes <- coords |>
@@ -81,11 +83,11 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
         return(plotG)
 	}
 
-	img_raster <- imgRaster(spe, sample_id, image_id)
+	img_raster <- SpatialExperiment::imgRaster(spe, sample_id, image_id)
 	dim_raster <- img_raster |> dim()
 
 	## Obtain raw coordinates
-	raw <- spatialCoords(spe) |> data.frame()
+	raw <- SpatialExperiment::spatialCoords(spe) |> data.frame()
 	if (is.null(point_label)) {
 		raw <- cbind(raw, colData(spe)[,c("in_tissue")]) |>
 		    data.frame() |> `colnames<-`(c("x","y","in_tissue"))
@@ -145,11 +147,11 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
     }
     
     ## Return plot
-    ggraph(plotG, layout="manual", x=x, y=y) +
+    ggraph(plotG, layout="manual", x=.data$x, y=.data$y) +
         annotation_raster(img_raster,
             xmin=0, xmax=dim_raster[1],
             ymin=-1*dim_raster[2], ymax=0)+
-    geom_point(aes(x=x, y=y, fill=!!point_fill),
+    geom_point(aes(x=.data$x, y=.data$y, fill=!!point_fill),
                alpha=0.5, shape=21, color="grey",
                data=raw[raw$in_tissue,])+
     coord_fixed(xlim=c(0,dim_raster[1]), ylim=c(-1*dim_raster[2],0))+

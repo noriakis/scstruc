@@ -4,6 +4,7 @@
 #' @param org organism name
 #' @param orgDb organism database
 #' @param type returned ID type of genes
+#' @importFrom tibble tibble
 #' @export
 getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=NULL, type="SYMBOL") {
     if (!requireNamespace("AnnotationDbi")) {
@@ -12,10 +13,11 @@ getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=NULL, type="SYMBOL") {
     if (is.null(orgDb)) {
         stop("Please specify annotation database e.g. org.Mm.eg.db")
     }
-    path_eg  <- KEGGREST::keggLink("pathway", org) %>% 
-      tibble(pathway = ., eg = sub(paste0(org,":"), "", names(.))) %>%
+    path_eg  <- KEGGREST::keggLink("pathway", org)
+    path_eg <-  tibble::tibble(pathway = path_eg,
+        eg = sub(paste0(org,":"), "", names(path_eg))) %>%
       mutate(
-        symbol = mapIds(orgDb, eg, type, "ENTREZID")
+        symbol = AnnotationDbi::mapIds(orgDb, .data$eg, type, "ENTREZID")
       )
     inc <- as.character(path_eg %>%
         dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(symbol))

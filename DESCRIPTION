@@ -13,7 +13,8 @@ Imports:
     data.table, ggraph, dplyr,
     glmnet, tidygraph, ggplot2,
     pillar, SingleCellExperiment,
-    SummarizedExperiment, S4Vectors
+    SummarizedExperiment, S4Vectors,
+    tibble
 Suggests:
     ncvreg,
     AnnotationDbi,

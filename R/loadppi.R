@@ -56,18 +56,19 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
       graph_from_edgelist(directed = FALSE)
   } else if ("bn" %in% class(edge_names)) {
     ## If BN, considering the undirected edges, simplify
-    g <- bnlearn::as.igraph(edge_names) %>% as.undirected() %>% simplify()
-    enn <- length(E(g))
+    g <- bnlearn::as.igraph(edge_names) %>% 
+        igraph::as.undirected() %>% igraph::simplify()
+    enn <- length(igraph::E(g))
     importantGraph <- g
-  } else if (is.igraph(edge_names)) {
+  } else if (igraph::is.igraph(edge_names)) {
     ## If igraph, simplify
-    importantGraph <- as.undirected(edge_names) %>% simplify()
-    enn <- E(importantGraph) %>% length()
+    importantGraph <- igraph::as.undirected(edge_names) %>% igraph::simplify()
+    enn <- igraph::E(importantGraph) %>% length()
   } else if (is.matrix(edge_names)) {
     ## User-specification warning
     warning("Matrix will be taken care of as is, so multiple rows with same relationships (undirected edges) will be counted as two.")
     enn <- dim(edge_names)[1]
-    importantGraph <- graph_from_edgelist(edge_names, directed=FALSE) %>% simplify()
+    importantGraph <- igraph::graph_from_edgelist(edge_names, directed=FALSE) %>% simplify()
   }
 
     ppis <- loadppi(org=org, database="string")
@@ -80,8 +81,8 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
       return(list("string"=ints, "biogrid"=ints.biogrid))
     }
 
-    inten <- dim(as_edgelist(ints))[1]
-    inten.biogrid <- dim(as_edgelist(ints.biogrid))[1]
+    inten <- dim(igraph::as_edgelist(ints))[1]
+    inten.biogrid <- dim(igraph::as_edgelist(ints.biogrid))[1]
 
     # cat(inten / enn, "\n")
     vec <- c(enn, inten, inten / enn, "string")

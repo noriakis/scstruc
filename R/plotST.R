@@ -15,27 +15,29 @@
 #' # plotST(spe, "in_tissue")
 plotST <- function(spe, label="label",
     sample_id=NULL, image_id=NULL, point_size=1.5) {
+
+
     stopifnot(
         is(spe, "SpatialExperiment")
     )
             
     ## scale factor based on ID
     if (!is.null(sample_id) & !is.null(image_id)) {
-        sf <- imgData(spe) |> 
+        sf <- SpatialExperiment::imgData(spe) |> 
             data.frame() |>
             dplyr::select(c("sample_id","image_id","scaleFactor")) |>
             dplyr::filter(.data$sample_id==sample_id) |>
             dplyr::filter(.data$image_id==image_id) |>
             pull(scaleFactor)
     } else {
-        sf <- imgData(spe)[1,]$scaleFactor
+        sf <- SpatialExperiment::imgData(spe)[1,]$scaleFactor
     }
 
-    img_raster <- imgRaster(spe, sample_id, image_id)
+    img_raster <- SpatialExperiment::imgRaster(spe, sample_id, image_id)
     dim_raster <- img_raster |> dim()
 
     ## Obtain raw coordinates
-    raw <- spatialCoords(spe) |> data.frame()
+    raw <- SpatialExperiment::spatialCoords(spe) |> data.frame()
     raw <- cbind(raw, colData(spe)[,c("in_tissue")],
         colData(spe)[[label]])
     raw <- raw |> `colnames<-`(c("x","y","in_tissue","label"))
@@ -47,11 +49,11 @@ plotST <- function(spe, label="label",
     
     
     ## Return plot
-    ggplot(raw, layout="manual", x=x, y=y) +
+    ggplot(raw, layout="manual", x=.data$x, y=.data$y) +
         annotation_raster(img_raster,
             xmin=0, xmax=dim_raster[1],
             ymin=-1*dim_raster[2], ymax=0)+
-    geom_point(aes(x=x, y=y, fill=label),
+    geom_point(aes(x=.data$x, y=.data$y, fill=.data$label),
                alpha=0.8, shape=21, size=point_size, color="grey20")+
     coord_fixed(xlim=c(0,dim_raster[1]), ylim=c(-1*dim_raster[2],0))
 }

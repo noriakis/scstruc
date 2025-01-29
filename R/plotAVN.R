@@ -51,14 +51,14 @@ plotAVN <- function(str, edge=geom_edge_link,
     	avn <- bnlearn::cextend(avn)
     }
     if (!is.null(data)) {
-        fitted <- bn.fit(avn, data[,names(avn$nodes)])
+        fitted <- bnlearn::bn.fit(avn, data[,names(avn$nodes)])
         avdf <- igraph::as_data_frame(bn_fit_to_igraph(fitted))
     } else {
         ## Find undirected arcs
         avdf <- igraph::as_data_frame(bnlearn::as.igraph(avn))        
     }
     g <- igraph::graph_from_data_frame(merge(avdf, str, by=c("from","to")))
-    V(g)$degree <- igraph::degree(g, mode=degreeMode)
+    igraph::V(g)$degree <- igraph::degree(g, mode=degreeMode)
 
     g <- g %>% as_tbl_graph()
 
@@ -67,11 +67,11 @@ plotAVN <- function(str, edge=geom_edge_link,
         g <- comps[[which.max(lapply(comps, function(x) {d <- data.frame(x) %>% dim(); d[1]}))]]
     }
     if (ew=="direction") {
-        g <- g %E>% mutate(direction1=direction)
+        g <- g %E>% mutate(direction1=.data$direction)
         ew <- "direction1"
     }
     if (ec=="direction") {
-        g <- g %E>% mutate(direction1=direction)
+        g <- g %E>% mutate(direction1=.data$direction)
         ec <- "direction1"
     }
 
@@ -79,7 +79,7 @@ plotAVN <- function(str, edge=geom_edge_link,
         highchar <- paste0(highlightEdges[,1], "->", highlightEdges[,2])
         nl <- g %N>% pull(name)
         g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
-          mutate(highlight=paste0(fromn, "->", ton) %in% highchar)
+          mutate(highlight=paste0(.data$fromn, "->", .data$ton) %in% highchar)
     }
     if (!is.null(nodeAttr)) {
     	g <- g %N>% mutate(nodeAttr=nodeAttr[name])
@@ -106,21 +106,21 @@ plotAVN <- function(str, edge=geom_edge_link,
 
     if (sizeDegree) {
     	if (!is.null(nodeAttr)) {
-	        gg <- gg + geom_node_point(aes(size=degree, color=nodeAttr))		
+	        gg <- gg + geom_node_point(aes(size=.data$degree, color=.data$nodeAttr))		
     	} else {
-	        gg <- gg + geom_node_point(aes(size=degree, color=degree))
+	        gg <- gg + geom_node_point(aes(size=.data$degree, color=.data$degree))
     	}
     } else {
     	if (!is.null(nodeAttr)) {
-	        gg <- gg + geom_node_point(aes(color=nodeAttr))
+	        gg <- gg + geom_node_point(aes(color=.data$nodeAttr))
     	} else {
     		gg <- gg + geom_node_point()
     	}
     }
     if (sizeDegree) {
-        gg <- gg + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")  
+        gg <- gg + geom_node_text(aes(label=.data$name, size=.data$degree), repel=TRUE, bg.colour="white")  
     } else {
-        gg <- gg + geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")
+        gg <- gg + geom_node_text(aes(label=.data$name), repel=TRUE, bg.colour="white")
     }
     gg <- gg + theme_graph()
     gg <- gg + scale_size(range=sizeRange)
