@@ -2,7 +2,7 @@ Package: scstruc
 Version: 0.99.0
 Title: Bayesian network analysis for single-cell transcriptomic data
 Authors@R: person("Noriaki", "Sato", email = "nori@hgc.jp", role = c("cre", "aut"))
-Description: The library infers the gene regulatory network based on Bayesian network structure from single-cell transcriptomic data.
+Description: The library infers the gene regulatory network based on Bayesian network structure from single-cell transcriptomic data. The package evaluates inferred networks based on causal relationships between genes. Marker arc detection is supported based on metadata.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
