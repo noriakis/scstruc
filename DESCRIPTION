@@ -6,7 +6,7 @@ Description: The library infers the gene regulatory network based on Bayesian ne
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
-    R (>= 4.3.0), bnlearn,
+    R (>= 4.4.0), bnlearn,
     igraph, scran
 Imports:
     Rcpp, MAST, methods, pcalg,
