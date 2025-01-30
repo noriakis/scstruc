@@ -27,10 +27,10 @@ Suggests:
     ccdrAlgorithm, KEGGREST,
     JuliaCall, GENIE3, SpatialExperiment
 Remotes:
-    noriakis/ccdrAlgorithm
-    itsrainingdata/sparsebnUtils
-    amcdavid/HurdleNormal
-    GfellerLab/SuperCell
+    github::noriakis/ccdrAlgorithm
+    github::itsrainingdata/sparsebnUtils
+    github::amcdavid/HurdleNormal
+    github::GfellerLab/SuperCell
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
