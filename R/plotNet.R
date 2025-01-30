@@ -40,7 +40,7 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
     if (is.null(data)) {
         g <- net %>% as.igraph() %>% as_tbl_graph()
     } else {
-      g <- bn.fit(net, data) %>% bn_fit_to_igraph() %>% as_tbl_graph()
+      g <- bnlearn::bn.fit(net, data) %>% bn_fit_to_igraph() %>% as_tbl_graph()
       edgeArgs[["mapping"]] <- aes(color=coef)
       edgeArgs[["color"]] <- NULL
     }
@@ -54,9 +54,10 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
         gra <- g %>%  mutate(degree=centrality_degree(mode=degreeMode)) %>%
             ggraph(layout=layout) +
                 do.call(geom, edgeArgs) +
-                geom_node_point(aes(size=degree, color=degree))
+                geom_node_point(aes(size=.data$degree, color=.data$degree))
         if (showText) {
-            gra <- gra + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")
+            gra <- gra + geom_node_text(aes(label=.data$name, size=.data$degree),
+            	repel=TRUE, bg.colour="white")
         }                
         gra <- gra + scale_size(range=sizeRange)+
                 theme_graph()      
@@ -66,20 +67,21 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
         }
         highchar <- paste0(highlightEdges[,1], "->", highlightEdges[,2])
         edgeArgs2 <- edgeArgs
-        edgeArgs[["mapping"]] <- c(edgeArgs[["mapping"]], aes(filter=!highlight))
-        edgeArgs2[["mapping"]] <- c(aes(filter=highlight))
+        edgeArgs[["mapping"]] <- c(edgeArgs[["mapping"]], aes(filter=!.data$highlight))
+        edgeArgs2[["mapping"]] <- c(aes(filter=.data$highlight))
         edgeArgs2[["color"]] <- "tomato"
         edgeArgs2[["width"]] <- highlightEdgeWidth
-        nl <- g %N>% pull(name)
-        g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
-          mutate(highlight=paste0(fromn, "->", ton) %in% highchar)
+        nl <- g %N>% pull(.data$name)
+        g <- g %E>% mutate(fromn = nl[.data$from], ton = nl[.data$to]) %>%
+          mutate(highlight=paste0(.data$fromn, "->", .data$ton) %in% highchar)
         gra <- g %N>%  mutate(degree=centrality_degree(mode=degreeMode)) %>%
             ggraph(layout=layout) +
               do.call(geom, edgeArgs) +
               do.call(geom, edgeArgs2) +
-              geom_node_point(aes(size=degree, color=degree))
+              geom_node_point(aes(size=.data$degree, color=.data$degree))
         if (showText) {
-            gra <- gra + geom_node_text(aes(label=name, size=degree), repel=TRUE, bg.colour="white")
+            gra <- gra + geom_node_text(aes(label=.data$name,
+            	size=.data$degree), repel=TRUE, bg.colour="white")
         }                
         gra <- gra + scale_size(range=sizeRange)+
               theme_graph()

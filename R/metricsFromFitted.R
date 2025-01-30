@@ -73,8 +73,8 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     #     }
     # }
 
-    rawnet <- as.bn(bn_fit_to_igraph(fitted))
-    input <- rbn(fitted, N)
+    rawnet <- bnlearn::as.bn(bn_fit_to_igraph(fitted))
+    input <- bnlearn::rbn(fitted, N)
     alls <- lapply(algos, function(p) {
         cat_subtle(p," ")
         s <- Sys.time()
@@ -111,15 +111,18 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     }
 
     if (genie) {
+    	if (!requireNamespace("GENIE3")) {
+    		stop("Please install GENIE3")
+    	}
         genie.input <- input %>% t()
         s <- Sys.time()
-        gra <- GENIE3(genie.input)
+        gra <- GENIE3::GENIE3(genie.input)
         e <- Sys.time()
         nets <- lapply(genie.threshold, function(th) {
             tmp <- gra
             tmp[tmp < th] <- 0
-            tmp.net <- graph_from_adjacency_matrix(tmp, weighted = TRUE)
-            if (is.dag(tmp.net)) {
+            tmp.net <- igraph::graph_from_adjacency_matrix(tmp, weighted = TRUE)
+            if (igraph::is.dag(tmp.net)) {
                 return(bnlearn::as.bn(tmp.net))
             } else {
                 return(NA)
@@ -175,12 +178,22 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         }
     }
     if (ccdr) {
+	    if (!requireNamespace("ccdrAlgorithm")) {
+	        stop("Needs installation of ccdrAlgorithm")
+	    } else {
+	        requireNamespace("ccdrAlgorithm")
+	    }
+	    if (!requireNamespace("sparsebnUtils")) {
+	        stop("Needs installation of sparsebnUtils")
+	    } else {
+	        requireNamespace("sparsebnUtils")
+	    }
         s <- Sys.time()
-        ccdr <- ccdr.run(sparsebnData(input, type="continuous"),
+        ccdr <- ccdrAlgorithm::ccdr.run(sparsebnUtils::sparsebnData(input, type="continuous"),
             lambdas.length=lambdas.length)
         e <- Sys.time()
         for (i in ccdr) {
-            alls[[paste0("ccdr_",round(i$lambda,3))]] <- list(to_bn(i)$edges,
+            alls[[paste0("ccdr_",round(i$lambda,3))]] <- list(sparsebnUtils::to_bn(i)$edges,
                                                as.numeric(e-s, unit="secs"))
         }    
     } 
@@ -197,7 +210,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         fv <- 2*(pre*rec)/(pre+rec)
 
         if (ppi) {
-            numppi <- intersectPpi(cur_net %>% as.igraph() %>% as_edgelist(),
+            numppi <- intersectPpi(cur_net %>% as.igraph() %>% igraph::as_edgelist(),
                 org=org)
         } else {
             numppi <- NA
@@ -219,7 +232,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         }
         c(
             x, s0, edges,
-            KL(bn.fit(cur_net, input), fitted),
+            bnlearn::KL(bnlearn::bn.fit(cur_net, input), fitted),
             BIC(cur_net, input),
             bnlearn::shd(cur_net, rawnet),
             tp, fp, fn, tp/s0, pre, rec, fv , sid.val.sym, numppi, tim

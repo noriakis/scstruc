@@ -11,7 +11,7 @@ obtainSubNetMatrix <- function(df, spe, func="sum", useAssay="logcounts") {
 	all_nodes <- unique(c(df$from, df$to))
 	mat <- do.call(rbind, lapply(all_nodes, function(x) {
 	    subset_graph <- df |> filter(
-	        from %in% x | to %in% x
+	        .data$from %in% x | .data$to %in% x
 	    )
 	    subset_nodes <- unique(c(subset_graph$from, subset_graph$to))
 	    in_net <- logc[subset_nodes, ]

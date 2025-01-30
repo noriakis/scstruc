@@ -27,8 +27,6 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
 	point_label="ground_truth", cell_cluster_label=NULL, directed=TRUE,
 	use_ggfx=TRUE, point_size=2, rep_colour="black", edge_base_colour="grey50",
 	edge_base_width=0.5) {
-	
-
 
     stopifnot(
         is(spe, "SpatialExperiment")
@@ -40,7 +38,7 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
 	} else {
         if (!"igraph" %in% class(ig)) {stop("please provide igraph object")}	
 	}
-    coords <- spatialCoords(spe)
+    coords <- SpatialExperiment::spatialCoords(spe)
     
     ## Check duplicate rows
     coords <- coords[!duplicated(coords), ] |> data.frame() |> `colnames<-`(c("x","y"))
@@ -59,20 +57,20 @@ plotSTNet <- function(spe, ig, label="label", edge_width=NULL, edge_color=NULL,
 	        dplyr::select(c("sample_id","image_id","scaleFactor")) |>
 	        dplyr::filter(.data$sample_id==sample_id) |>
 	        dplyr::filter(.data$image_id==image_id) |>
-	        pull(scaleFactor)
+	        pull(.data$scaleFactor)
 	} else {
 		sf <- SpatialExperiment::imgData(spe)[1,]$scaleFactor
 	}
 
 	nodes <- coords |>
 	    group_by(label) |>
-	    summarise(x=mean(x), y=mean(y)) |> 
+	    summarise(x=mean(.data$x), y=mean(.data$y)) |> 
 	    mutate(name=label) |>
-	    mutate(y=-1*y) |> 
-	    mutate(x=x*sf, y=y*sf)
+	    mutate(y=-1*.data$y) |> 
+	    mutate(x=.data$x*sf, y=.data$y*sf)
 	if (!is.null(cell_cluster_label)) {
 		nodes <- nodes |>
-		    mutate(cell_cluster_label=cell_cluster_label[name])
+		    mutate(cell_cluster_label=cell_cluster_label[.data$name])
 	}
 	
 	if (!is.data.frame(ig)) {

@@ -77,12 +77,12 @@ plotAVN <- function(str, edge=geom_edge_link,
 
     if (!is.null(highlightEdges)) {
         highchar <- paste0(highlightEdges[,1], "->", highlightEdges[,2])
-        nl <- g %N>% pull(name)
-        g <- g %E>% mutate(fromn = nl[from], ton = nl[to]) %>%
+        nl <- g %N>% pull(.data$name)
+        g <- g %E>% mutate(fromn = nl[.data$from], ton = nl[.data$to]) %>%
           mutate(highlight=paste0(.data$fromn, "->", .data$ton) %in% highchar)
     }
     if (!is.null(nodeAttr)) {
-    	g <- g %N>% mutate(nodeAttr=nodeAttr[name])
+    	g <- g %N>% mutate(nodeAttr=nodeAttr[.data$name])
     }
 
     gg <- ggraph(g, layout=layout)

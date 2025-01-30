@@ -25,15 +25,16 @@ markerCoefs <- function(coef_mat, classif_label="group",
 		cell_label <- coef_mat[[cell_column]] |> unique()
 	}
     mydata <- coef_mat |>
-        dplyr::mutate(edge_name=paste0(from,"->",to)) |>
+        dplyr::mutate(edge_name=paste0(.data$from,"->",.data$to)) |>
         dplyr::filter(.data[[cell_column]] %in% cell_label) |>
-        tidyr::pivot_wider(id_cols=edge_name,
-            values_from=coefficient,
+        tidyr::pivot_wider(id_cols="edge_name",
+            values_from="coefficient",
             names_from=sample_column) |>
         data.frame()
     row.names(mydata) <- mydata$edge_name
     mydata$edge_name <- NULL
-    mydata <- mydata |> t() |> data.frame(check.names=FALSE)
+    mydata <- mydata |> t() |>
+        data.frame(check.names=FALSE)
 
     group_dic <- coef_mat[,c(sample_column, classif_label)]
     group_dic <- group_dic[!duplicated(group_dic),]
@@ -50,9 +51,6 @@ markerCoefs <- function(coef_mat, classif_label="group",
     if (xgboost) {
         if (!requireNamespace("xgboost")) {
             stop("Needs xgboost installation")
-        } else {
-            requireNamespace("xgboost")
-
         }
         trueLabel <- unique(as.character(mydata$classif_label))[2]
         cat_subtle("True label will be: ", trueLabel, "\n")
@@ -64,20 +62,18 @@ markerCoefs <- function(coef_mat, classif_label="group",
         xgboostArgs[["data"]] <- mydata %>% as.matrix()
         xgboostArgs[["label"]] <- vec
         res <- do.call(xgboost::xgboost, xgboostArgs)
-        importance <- xgb.importance(feature_names = colnames(mydata), model = res)
+        importance <- xgboost::xgb.importance(feature_names = colnames(mydata), model = res)
         return(list("xgboost"=res, "importance"=importance, "data"=mydata))
     } else {
         if (!requireNamespace("Boruta")) {
             stop("Needs Boruta installation")
-        } else {
-            requireNamespace("Boruta")
         }
 
         mydata[is.na(mydata)] <- 0
         cat_subtle("Performing Boruta algorithm ...\n")
-        brt <- Boruta(classif_label ~ ., data=mydata)
+        brt <- Boruta::Boruta(classif_label ~ ., data=mydata)
         if (tentative_fix) {
-            brt_fixed <- TentativeRoughFix(brt)
+            brt_fixed <- Boruta::TentativeRoughFix(brt)
         } else {
             brt_fixed <- brt
         }

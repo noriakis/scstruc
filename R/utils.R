@@ -9,6 +9,9 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     # library(JuliaCall)
     # julia_setup()
     ###
+    if (!requireNamespace("JuliaCall")) {
+    	stop("This function needs JuliaCall")
+    }
     if (!dir.exists(tmp)) {
         if (verbose) {
             cat("Creating ", tmp, "\n")
@@ -16,22 +19,22 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         dir.create(tmp)
     }
     write.table(t(data), paste0(tmp,"/data.txt"), quote=FALSE)
-    julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
+    JuliaCall::julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
                       NetworkInference_HOME,'"))'))
-    julia_eval("using NetworkInference")
-    julia_eval("using CSV")
-    julia_eval("using Tables")
-    julia_eval("algorithm = PIDCNetworkInference()")
-    julia_eval(paste0('dataset_name = string("', paste0(tmp,"/data.txt"), '")'))
-    julia_eval("@time genes = get_nodes(dataset_name);")
-    julia_eval("@time network = InferredNetwork(algorithm, genes);")
+    JuliaCall::julia_eval("using NetworkInference")
+    JuliaCall::julia_eval("using CSV")
+    JuliaCall::julia_eval("using Tables")
+    JuliaCall::julia_eval("algorithm = PIDCNetworkInference()")
+    JuliaCall::julia_eval(paste0('dataset_name = string("', paste0(tmp,"/data.txt"), '")'))
+    JuliaCall::julia_eval("@time genes = get_nodes(dataset_name);")
+    JuliaCall::julia_eval("@time network = InferredNetwork(algorithm, genes);")
     for (th in thresholds) {
         if (verbose) {
             cat("Outputting", th, "\n")
         }
-        julia_eval(paste0('adjacency_matrix, labels_to_ids, ids_to_labels = get_adjacency_matrix(network,', th,')'))
-        julia_eval(paste0('output_name = string("', tmp, "/data-",th,".csv", '")'))
-        julia_eval("CSV.write(output_name, Tables.table(adjacency_matrix), writeheader=false)")
+        JuliaCall::julia_eval(paste0('adjacency_matrix, labels_to_ids, ids_to_labels = get_adjacency_matrix(network,', th,')'))
+        JuliaCall::julia_eval(paste0('output_name = string("', tmp, "/data-",th,".csv", '")'))
+        JuliaCall::julia_eval("CSV.write(output_name, Tables.table(adjacency_matrix), writeheader=false)")
     }
     results <- list()
     bics <- list()

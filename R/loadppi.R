@@ -53,7 +53,7 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
       enn <- length(edge_names)
       importantGraph <- do.call(rbind,
                             edge_names %>% unique() %>% strsplit("->")) %>%
-      graph_from_edgelist(directed = FALSE)
+      igraph::graph_from_edgelist(directed = FALSE)
   } else if ("bn" %in% class(edge_names)) {
     ## If BN, considering the undirected edges, simplify
     g <- bnlearn::as.igraph(edge_names) %>% 
@@ -68,7 +68,7 @@ intersectPpi <- function(edge_names, org="mm", return_net=FALSE) {
     ## User-specification warning
     warning("Matrix will be taken care of as is, so multiple rows with same relationships (undirected edges) will be counted as two.")
     enn <- dim(edge_names)[1]
-    importantGraph <- igraph::graph_from_edgelist(edge_names, directed=FALSE) %>% simplify()
+    importantGraph <- igraph::graph_from_edgelist(edge_names, directed=FALSE) %>% igraph::simplify()
   }
 
     ppis <- loadppi(org=org, database="string")

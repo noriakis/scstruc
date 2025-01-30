@@ -28,7 +28,7 @@ plotST <- function(spe, label="label",
             dplyr::select(c("sample_id","image_id","scaleFactor")) |>
             dplyr::filter(.data$sample_id==sample_id) |>
             dplyr::filter(.data$image_id==image_id) |>
-            pull(scaleFactor)
+            pull(.data$scaleFactor)
     } else {
         sf <- SpatialExperiment::imgData(spe)[1,]$scaleFactor
     }

@@ -1,5 +1,9 @@
 markerNetwork <- function(calcmat, spe, label="label", positive_label="1",
     tentative_fix=TRUE) {
+    if (!requireNamespace("Boruta")) {
+        stop("Needs Boruta installation")
+    }
+
     X <- calcmat |> t() |> data.frame(check.names = FALSE)
     if ("barcode_id" %in% colnames(colData(spe))) {
         Y <- colData(spe)[[label]] |>
@@ -12,9 +16,9 @@ markerNetwork <- function(calcmat, spe, label="label", positive_label="1",
     X[["resp"]] <- ifelse(Y==positive_label, 1, 0)
     X <- X[!is.na(X[["resp"]]),]
 
-    brt <- Boruta(resp ~ ., data=X)
+    brt <- Boruta::Boruta(resp ~ ., data=X)
     if (tentative_fix) {
-        brt_fixed <- TentativeRoughFix(brt)
+        brt_fixed <- Boruta::TentativeRoughFix(brt)
     } else {
         brt_fixed <- brt
     }

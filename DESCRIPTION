@@ -16,29 +16,16 @@ Imports:
     SummarizedExperiment, S4Vectors,
     tibble
 Suggests:
-    ncvreg,
-    AnnotationDbi,
-    Matrix,
-    cowplot,
-    ggfx,
-    ggkegg,
-    patchwork,
-    tidyr,
-    Boruta,
-    testthat (>= 3.0.0),
-    L0Learn,
-    clusterProfiler,
-    xgboost,
-    knitr,
-    SID,
-    HurdleNormal,
-    scuttle,
-    SuperCell,
-    BiocStyle,
-    sparsebnUtils,
-    ccdrAlgorithm,
-    KEGGREST,
-    SpatialExperiment
+    ncvreg, AnnotationDbi, Matrix,
+    cowplot, ggfx, ggkegg,
+    patchwork, tidyr, Boruta,
+    testthat (>= 3.0.0), L0Learn,
+    clusterProfiler, xgboost,
+    knitr, SID, HurdleNormal,
+    scuttle, SuperCell,
+    BiocStyle, sparsebnUtils,
+    ccdrAlgorithm, KEGGREST,
+    JuliaCall, GENIE3, SpatialExperiment
 Remotes:
     noriakis/ccdrAlgorithm
     itsrainingdata/sparsebnUtils

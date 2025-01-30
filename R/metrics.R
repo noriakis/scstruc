@@ -44,7 +44,8 @@ metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE, data=NUL
         inn <- length(cur_net$nodes)
 
         if (!is.null(data)) {
-            kl <- KL(bn.fit(cur_net, data), bn.fit(reference,data))
+            kl <- bnlearn::KL(bnlearn::bn.fit(cur_net, data),
+            	bnlearn::bn.fit(reference,data))
             bic <- BIC(cur_net, data)
         } else {
             kl <- NA

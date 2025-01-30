@@ -20,7 +20,7 @@ getKEGGPathwayGenes <- function(pid, org="mmu", orgDb=NULL, type="SYMBOL") {
         symbol = AnnotationDbi::mapIds(orgDb, .data$eg, type, "ENTREZID")
       )
     inc <- as.character(path_eg %>%
-        dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(symbol))
+        dplyr::filter(.data$pathway == paste0("path:", pid)) %>% pull(.data$symbol))
     inc
 }
 

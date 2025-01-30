@@ -20,10 +20,10 @@ ggraph.compare <- function(nets, lyt="kk") {
             as_tbl_graph() %E>% mutate(group=x)})
     concat <- Reduce(graph_join, nets)
     ggraph(concat, layout=lyt) +
-        geom_edge_parallel(aes(color=group),
+        geom_edge_parallel(aes(color=.data$group),
                            arrow=arrow(type="closed", length = unit(1,"mm")),
                            start_cap=circle(2,"mm"), end_cap=circle(2,"mm"))+
         geom_node_point() +
-        geom_node_text(aes(label=name), repel=TRUE, bg.colour="white")+
+        geom_node_text(aes(label=.data$name), repel=TRUE, bg.colour="white")+
         theme_graph()
 }

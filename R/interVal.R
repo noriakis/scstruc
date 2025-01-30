@@ -12,6 +12,8 @@
 #' @param output output relevant data to the directory
 #' @return summarized statistics, bn object of A0, and statistics for all the subsamples
 #' @export
+#' @importFrom igraph intersection
+#' @importFrom bnlearn as.bn
 #' @examples
 #' data(gaussian.test)
 #' interVal(head(gaussian.test, n=50), ss=10)
@@ -37,14 +39,14 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
         }
 		.getStruc(data, algos[al], algorithm.args=algorithm.args[[al]], verbose=verbose)
 	})
-	A0 <- Reduce(intersection, lapply(bns, function(x) {
+	A0 <- Reduce(igraph::intersection, lapply(bns, function(x) {
         if (verbose) {
             cat("Inferred network:\n")
             print(x)
         }
     	as.igraph(x)
 	}))
-	A0.bn <- as.bn(A0)
+	A0.bn <- bnlearn::as.bn(A0)
     if (!is.null(output)) {
         save(A0.bn, file=paste0(output, "/A0.rda"))
         save(bns, file=paste0(output, "/all-bns.rda"))
@@ -97,8 +99,9 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
     if (!is.null(output)) {
         write.table(long.res, file=paste0(output, "/raw-results.txt"), sep="\t")
     }
-    sum.stat <- long.res %>% group_by(AlgoNum) %>% summarise(SHD.stat=mean(SHD), SID.stat=mean(SID),
-        en=mean(EdgeNumber))
+    sum.stat <- long.res %>% group_by(.data$AlgoNum) %>% 
+        summarise(SHD.stat=mean(.data$SHD), SID.stat=mean(.data$SID),
+        en=mean(.data$EdgeNumber))
     # sum.stat <- apply(subsample.res, 1, function(x) mean(as.numeric(x)))
     if (returnA0) {
         return(list("A0"=A0.bn, "stat"=sum.stat, "raw.stat"=long.res))

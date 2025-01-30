@@ -20,15 +20,17 @@ getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
     }
     args[["pid"]] <- pathID
     pway <- do.call(ggkegg::pathway, args)
-    gs <- pway %N>% dplyr::filter(type=="gene")
+    gs <- pway %N>% dplyr::filter(.data$type=="gene")
     if (largestComponents) {
         comps <- gs %>% to_components()
         ind <- which.max(lapply(comps, function(x) {dim(x %N>% data.frame())[1]}))
         gs <- comps[[ind]]      
     }
-    nname <- gs %N>% data.frame() %>% dplyr::pull(graphics_name) %>% strsplit(",") %>% sapply("[",1) %>% strsplit("\\.\\.\\.") %>% sapply("[", 1)
-    ig <- gs %E>% mutate(fromn = nname[from], ton=nname[to]) %>% data.frame() %>% mutate(from=fromn, to=ton) %>%
-        dplyr::select(-fromn) %>% dplyr::select(-ton) %>% igraph::graph_from_data_frame(directed=TRUE) %>% simplify()
+    nname <- gs %N>% data.frame() %>% dplyr::pull(.data$graphics_name) %>% strsplit(",") %>% sapply("[",1) %>% strsplit("\\.\\.\\.") %>% sapply("[", 1)
+    ig <- gs %E>% mutate(fromn = nname[.data$from], ton=nname[.data$to]) %>% 
+        data.frame() %>% mutate(from=.data$fromn, to=.data$ton) %>%
+        dplyr::select(-"fromn") %>% dplyr::select(-"ton") %>%
+        igraph::graph_from_data_frame(directed=TRUE) %>% igraph::simplify()
 
 
     if (removeCycle) {
@@ -38,13 +40,13 @@ getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
       if (length(es)==0) {
 
       } else {
-        cat_subtle("Removing ", paste0(as_ids(es), collapse=", "), "\n")
-        ig <- delete_edges(ig, es)
+        cat_subtle("Removing ", paste0(igraph::as_ids(es), collapse=", "), "\n")
+        ig <- igraph::delete_edges(ig, es)
       }
 
     }
     if (bn) {
-      as.bn(ig)
+      bnlearn::as.bn(ig)
     } else {
       ig
     }
