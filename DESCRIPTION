@@ -31,7 +31,6 @@ Remotes:
     github::itsrainingdata/sparsebnUtils,
     github::amcdavid/HurdleNormal,
     github::GfellerLab/SuperCell
-
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
