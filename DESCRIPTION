@@ -24,13 +24,12 @@ Suggests:
     knitr, SID, HurdleNormal,
     scuttle, SuperCell,
     BiocStyle, sparsebnUtils,
-    ccdrAlgorithm, KEGGREST,
+    ccdrAlgorithm, KEGGREST, SuperCell,
     JuliaCall, GENIE3, SpatialExperiment
 Remotes:
     github::noriakis/ccdrAlgorithm,
     github::itsrainingdata/sparsebnUtils,
     github::amcdavid/HurdleNormal,
-    github::GfellerLab/SuperCell
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
