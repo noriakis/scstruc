@@ -1,5 +1,6 @@
 #' Performs PIDC inference based on Julia implementation, using JuliaCall
 #' You should have already done `julia_setup` in JuliaCall
+#' Also, we need `CSV` packages installed beforehand to interact with R environment.
 #' @noRd
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),

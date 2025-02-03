@@ -13,7 +13,7 @@
 #' @export
 #' @importFrom dplyr filter select
 #' @importFrom igraph feedback_arc_set
-getKEGGedges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
+getKEGGEdges <- function(pathID, args=list(), largestComponents=TRUE, bn=TRUE,
   removeCycle=FALSE) {
     if (!requireNamespace("ggkegg")) {
         stop("Needs ggkegg. Please install from Bioconductor.")
