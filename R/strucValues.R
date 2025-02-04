@@ -101,8 +101,11 @@ strucValues <- function(spe, labels, bn=NULL, net=NULL, exclude_label=NA,
 	                c(from, gene, tmp_coef[from], group_name)
 	            }))
 	        }
-	    })) |> data.frame() |> `colnames<-`(c("from","to","coefficient", labels))
-	    all_genes_edges$coefficient <- all_genes_edges$coefficient |> as.numeric()
+	    })) |> data.frame()
+        if (dim(all_genes_edges)[1]!=0) {
+            colnames(all_genes_edges) <- c("from","to","coefficient", labels)
+            all_genes_edges$coefficient <- all_genes_edges$coefficient |> as.numeric()            
+        }
 	    return(all_genes_edges)
 	}
 	coefs <- meta |> group_by(across(all_of(labels))) |>
