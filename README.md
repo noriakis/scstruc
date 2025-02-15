@@ -3,9 +3,11 @@
 
 # scstruc
 
-The package for analysing the gene regulatory network based on the
-Bayesian network structure of single-cell transcriptomics data. The
-function works with `SingleCellExperiment`.
+The package for analysing the gene regulatory network based on Bayesian
+network structure of single-cell transcriptomics data. The function
+works primarily with `SingleCellExperiment`. Multiple algorithms
+tailored for single-cell transcriptomics data are prepared. The inferred
+networks are validated based on the causal relationships between genes.
 
 <!-- badges: start -->
 
@@ -20,15 +22,9 @@ Using `devtools`:
 devtools::install_github("noriakis/scstruc")
 ```
 
-For using the CCDr algorithm in the latest R version, please install
-`ccdrAlgorithm` package from the following repository, which removes the
-`||` usage error.
-
-``` r
-devtools::install_github("noriakis/ccdrAlgorithm")
-```
-
 ## Examples
+
+Based on `SingleCellExperiment`, the network is inferred and plotted.
 
 ``` r
 library(scran)
@@ -42,9 +38,10 @@ gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 plotNet(gs$net, gs$data, showText=FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="3600" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="3600" style="display: block; margin: auto;" />
 
-Using the bootstrapping, the averaged network is obtained.
+Using bootstrapping, the averaged network is obtained. This time, `L1MB`
+algorithm with the selection of neighbors based on BIC is used.
 
 ``` r
 library(glmnet)
@@ -54,4 +51,4 @@ gs2 <- scstruc(sce, included_genes, algorithm="glmnet_BIC", boot=TRUE,
 plotAVN(gs2$net, sizeRange=c(1,3))
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="2400" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="2400" style="display: block; margin: auto;" />
