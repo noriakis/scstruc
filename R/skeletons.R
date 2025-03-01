@@ -244,18 +244,18 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
 #' @noRd
 #' @importFrom MAST zlm
 hurdle.bic <- function(node, parents, data, args) {
-    if (args$cdrAdjustment) {
+    if (isTRUE(args$cdrAdjustment)) {
         cdr <- rowSums(data>0)
         data[["cdr"]] <- scale(cdr)
     }
     if (length(parents)==0) {
-        if (args$cdrAdjustment) {
+        if (isTRUE(args$cdrAdjustment)) {
             mod <- paste0(node, " ~ cdr")
         } else {
             mod <- paste0(node, " ~ 1")
         }
     } else {
-        if (args$cdrAdjustment) {
+        if (isTRUE(args$cdrAdjustment)) {
             mod <- paste0(node, "~", paste0(parents, collapse=" + "), " + cdr")
         } else {
             mod <- paste0(node, "~", paste0(parents, collapse=" + "))
@@ -265,8 +265,7 @@ hurdle.bic <- function(node, parents, data, args) {
     fit <- MAST::zlm(as.formula(mod), sca=data)
     if (is.null(fit$cont)) return(-Inf)
     bic.sum <- -1 * (BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$cont)) + 
-        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))
-    
+        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))    
     return(bic.sum)
 }
 
@@ -320,107 +319,3 @@ hurdle.aic <- function(node, parents, data, args) {
     return(aic.sum)
 
 }
-
-# #' skeleton.reg.2
-# #' 
-# #' Two-stage approach for penalized regression-based structure learning.
-# #' Currently, this function is experimental as it uses non-exported functions in `bnlearn`.
-# #' 
-# #' @param data data for the inference, features in column
-# #' @param algorithm algorithm name in penalized regression
-# #' @param whitelist whitelisting arcs
-# #' @param blacklist blacklisting arcs
-# #' @param nFolds CV parameter, default to 5
-# #' @param verbose control logging
-# #' @param s effective only in CV-based lambda selection, lambda.min or lambda.1se
-# #' @param maximize which score-function to use in maximization phase
-# #' @param maximize.args maximization arguments
-# #' @param returnArcs return the undirected network in igraph format
-# #' @export
-# skeleton.reg.2 <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
-#     nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list(),
-#     returnArcs=FALSE) {
-#     if (verbose) {
-#         cat_subtle("Algorithm: ", algorithm, "\n")
-#         cat_subtle("Input for structure learning: n ", dim(data)[1], " p ", dim(data)[2], "\n")
-#     }
-#     nodes <- colnames(data)
-#     penFun <- dplyr::case_when(
-#         algorithm=="glmnet_BIC" ~ ".glmnetBIC",
-#         algorithm=="plasso" ~ ".plasso",
-#         algorithm=="glmnet_CV" ~ ".glmnetCV",
-#         algorithm=="MCP_CV" ~ ".ncvregCV",
-#         algorithm=="SCAD_CV" ~ ".ncvregCV",
-#         algorithm=="L0L2_CV" ~ ".L0LXCV",
-#         algorithm=="L0L1_CV" ~ ".L0LXCV",
-#         algorithm=="L0_CV" ~ ".L0CV"
-#     )
-
-#     mb <- sapply(nodes, function(nn) {
-#         if (verbose) {cat_subtle(" ", nn)}
-#         X <- data[, setdiff(nodes, nn)] %>% as.matrix()
-#         y <- data[, nn]
-#         if (length(unique(y))==1) {return(NULL)}
-#         if (algorithm=="glmmTMB") {
-#             sign <- .glmmTMB(nodes, nn, data)
-#             if (length(sign)==0) {return(NULL)}
-#             if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
-#             return(sign)
-#         } else if (algorithm=="MAST") {
-#             sign <- .MASTHurdle(nodes, nn, data)
-#             if (length(sign)==0) {return(NULL)}
-#             if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
-#             return(sign)
-#         } else {
-#             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
-#                 "nFolds"=nFolds, "algorithm"=algorithm, "s"=s))            
-#             if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
-#             if (length(included_var_index)==0) {return(NULL)}
-#             return(colnames(X)[included_var_index])
-#         }
-#     })
-
-#     names(mb) <- nodes
-
-#     ## Neighbors
-#     mb <- lapply(nodes, function(nn) {
-#         candidate.neighbours <- mb[[nn]]
-#         if (length(candidate.neighbours) == 0) {
-#             return(list(mb = character(0), nbr = character(0)))
-#         }
-#         return(list(mb = mb[[nn]], nbr = candidate.neighbours))
-#     })
-#     names(mb) <- nodes
-#     for (node in nodes)
-#       mb[[node]]$mb <- bnlearn:::fake.markov.blanket(mb, node)
-
-#     mb <- bnlearn:::bn.recovery(mb, nodes = nodes)
-
-#     # arcs <- bnlearn:::nbr2arcs(mb)
-
-#     arcs <- do.call(rbind, lapply(names(mb), function(node) {
-#         candidate <- mb[[node]]$nbr
-#         cbind(rep(node, length(candidate)), candidate)
-#     }))
-#     arcs <- arcs[!duplicated(arcs),]
-
-#     if (returnArcs) {
-#         return(igraph::graph_from_edgelist(arcs))
-#     }
-
-#     # res <- list(learning = list("method"="scstruc",
-#     #     "blacklist"=list(blacklist)),
-#     #     nodes = bnlearn:::cache.structure(names(mb), arcs = arcs),
-#     #     arcs = arcs, blacklist=blacklist)
-
-#     constraints <- bnlearn:::arcs.to.be.added(arcs,
-#         nodes, whitelist = blacklist)
-#     start <- empty.graph(nodes = nodes)
-#     maximize.args[["x"]] <- data
-#     maximize.args[["start"]] <- start
-#     maximize.args[["blacklist"]] <- constraints
-#     struc_res <- do.call(maximize, maximize.args)
-#     # hc_res <- hc(data, start=start, blacklist=constraints)
-#     return(struc_res)
-# }
-

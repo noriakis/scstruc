@@ -3,7 +3,7 @@
 #' @noRd
 skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
     nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list(),
-    returnArcs=FALSE) {
+    returnArcs=FALSE, lambda=0.1) {
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, "\n")
         cat_subtle("Input for structure learning: n ", dim(data)[1], " p ", dim(data)[2], "\n")
@@ -30,7 +30,17 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
             if (length(sign)==0) {return(NULL)}
             if (verbose) {cat_subtle(" candidate: ", length(sign), "\n")}
             return(sign)
-        } else {
+        } else if (algorithm == "plasso") {
+        	###
+        	# For precision lasso, we need to specify a fixed lambda
+        	# value in inference
+        	###
+            included_var_index <- do.call(penFun, list("X"=X, "y"=y,
+                "nFolds"=nFolds, "algorithm"=algorithm, "s"=s, "lambda"=lambda))            
+            if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
+            if (length(included_var_index)==0) {return(NULL)}
+            return(colnames(X)[included_var_index])
+        }
             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
                 "nFolds"=nFolds, "algorithm"=algorithm, "s"=s))            
             if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
