@@ -73,6 +73,37 @@
             ###
             algorithm.args[["data"]] <- input
             net <- do.call(pidc.using.julia, algorithm.args)
+        } else if (algorithm=="genie3") {
+            ###
+            # Bootstrap is not supported
+            # Returning multiple thresholded networks
+            ###
+            nets <- list()
+        	genie.threshold <- seq(0,1,0.1)
+	        genie.input <- input %>% t()
+	        gra <- GENIE3::GENIE3(genie.input)
+	        nets <- lapply(genie.threshold, function(th) {
+	            tmp <- gra
+	            tmp[tmp < th] <- 0
+	            tmp.net <- igraph::graph_from_adjacency_matrix(tmp, weighted = TRUE)
+	            if (igraph::is.dag(tmp.net)) {
+	                return(bnlearn::as.bn(tmp.net))
+	            } else {
+	                return(NA)
+	            }
+	        })
+	        names(nets) <- genie.threshold
+    	    if (sum(unlist(lapply(nets, function(net) {is.na(net)}))) == length(genie.threshold)) {
+        	    cat_subtle("GENIE3 All threshold results in non-DAG\n")
+        	} else {
+	            for (nn in names(nets)) {
+	                genie.net <- nets[[nn]]
+	                if (is(genie.net, "bn")) {
+	                    nets[[paste0("GENIE3_",nn)]] <- genie.net
+	                }
+	            }
+	        }
+	        return(nets)
         } else {
             if (verbose) {
                 cat_subtle("Using default bnlearn algorithm: ", algorithm, " \n")

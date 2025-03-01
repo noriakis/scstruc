@@ -40,7 +40,7 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
             if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
             if (length(included_var_index)==0) {return(NULL)}
             return(colnames(X)[included_var_index])
-        }
+        } else {
             included_var_index <- do.call(penFun, list("X"=X, "y"=y,
                 "nFolds"=nFolds, "algorithm"=algorithm, "s"=s))            
             if (verbose) {cat_subtle(" candidate: ", length(included_var_index), "\n")}
