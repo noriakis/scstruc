@@ -57,7 +57,7 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
     }
     CNP <- dim(A0.bn$arcs)[1]
     if (CNP < 15) {
-        message("CNP below 15, the results might not be reliable.")
+        message("Connected node pairs below 15, the results might not be reliable.")
     }
 	subsample.res <- lapply(seq_len(r), function(cr) {
         if (verbose) {cat_subtle("Subsample: ", cr, ", Sample size: ", ss, "\n")}

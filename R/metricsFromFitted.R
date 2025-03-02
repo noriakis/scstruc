@@ -239,7 +239,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         )
     })) %>% data.frame()
     res <- res %>%  `colnames<-`(c("algo","s0","edges","KL","BIC","SHD","TP",
-        "FP","FN","TPR","Precision","Recall","Fvalue","SID","PPI","time")) %>%
+        "FP","FN","TPR","Precision","Recall","F1","SID","PPI","time")) %>%
         mutate_at(2:ncol(res), as.numeric)
     res <- res %>% mutate(BICnorm = (BIC - min(BIC)) / (max(BIC) - min(BIC)))
     res$N <- N

@@ -110,7 +110,6 @@ glmnetBICpath <- function(data, nn) {
 
 #' @noRd
 .plasso <- function(X, y, lambda=0.1, nFolds=NULL, algorithm=NULL, s=NULL) {
-    cat_subtle("Precision lasso lambda: ", lambda, "\n")
     fit <- plasso_fit(X %>% as.matrix(), y, lambda=lambda, maxIter=100, gamma=0.5, eps=1e-6)
     ## The last coefficient is intercept
     included_var_index <- which(fit[1:(length(fit)-1)]!=0)
@@ -243,6 +242,7 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
 #' Custom score function for bnlearn, using hurdle model.
 #' @noRd
 #' @importFrom MAST zlm
+#' @export
 hurdle.bic <- function(node, parents, data, args) {
     if (isTRUE(args$cdrAdjustment)) {
         cdr <- rowSums(data>0)

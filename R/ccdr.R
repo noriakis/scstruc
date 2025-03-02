@@ -13,10 +13,10 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
     if (is.null(algorithm.args[["bestScore"]])) {
         pickBest <- TRUE
     } else {
-        if (!algorithm.args[["bestScore"]]) {
-            pickBest <- FALSE
-        } else {
+        if (isTRUE(algorithm.args[["bestScore"]])) {
             pickBest <- TRUE
+        } else {
+            pickBest <- FALSE
         }
     }
     algorithm.args[["bestScore"]] <- NULL

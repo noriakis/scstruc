@@ -7,7 +7,7 @@
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, " selected\n")        
     }
-    if (boot) {
+    if (isTRUE(boot)) {
         cat_subtle("Bootstrapping specified\n")
         if (is.null(m)) {
             m = nrow(input)
@@ -41,6 +41,34 @@
             }
             if (verbose) {cat_subtle("\n")}
             return(custom.strength(perRun, nodes))
+        } else if (algorithm=="pidc") {
+            nodes <- names(input)
+            algorithm.args[["m"]] <- NULL
+            algorithm.args[["R"]] <- NULL
+            if (is.null(algorithm.args[["thresholds"]])) {
+                algorithm.args[["thresholds"]] <- seq(0.1, 0.4, 0.1)
+            }
+            perRun <- list()
+            for (r in seq_len(R)) {
+                if (verbose) {cat_subtle(r)}
+                resampling = sample(nrow(input), m, replace = TRUE)
+                replicate = input[resampling, , drop = FALSE]
+                algorithm.args[["data"]] <- replicate
+                algorithm.args[["bestBIC"]] <- FALSE
+                repnet <- do.call(pidc.using.julia, algorithm.args)
+                perRun[[r]] <- repnet
+            }
+            if (verbose) {cat_subtle("\n")} 
+            ## Average per threshold
+            customs <- lapply(algorithm.args[["thresholds"]], function(tmpth) {
+                tmpboot <- lapply(seq_len(R), function(tmpr) {
+                    perRun[[tmpr]][[as.character(tmpth)]]
+                })
+                custom.strength(tmpboot, nodes)
+            })
+            names(customs) <- as.character(algorithm.args[["thresholds"]])
+            return(customs)
+            # return(custom.strength(perRun, nodes))
         } else {
             algorithm.args[["algorithm"]] <- algorithm
             return(do.call(boot.strength, algorithm.args))
@@ -68,11 +96,8 @@
             net <- do.call(skeleton.reg, algorithm.args)
             return(net)    
         } else if (algorithm=="pidc") {
-            ###
-            # Bootstrap is not supported
-            ###
             algorithm.args[["data"]] <- input
-            net <- do.call(pidc.using.julia, algorithm.args)
+            net <- do.call(pidc.using.julia, algorithm.args)                
         } else if (algorithm=="genie3") {
             ###
             # Bootstrap is not supported
@@ -103,6 +128,7 @@
 	                }
 	            }
 	        }
+            nets[["original"]] <- gra
 	        return(nets)
         } else {
             if (verbose) {

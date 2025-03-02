@@ -62,7 +62,7 @@ metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE, data=NUL
     })) %>% data.frame()
     res <- res %>%  `colnames<-`(c("algo","referenceNode", "InferenceNode",
         "s0","edges","SHD","TP",
-        "FP","FN","TPR","Precision","Recall","Fvalue","SID","KL","BIC")) %>%
+        "FP","FN","TPR","Precision","Recall","F1","SID","KL","BIC")) %>%
         mutate_at(2:ncol(res), as.numeric)
     # res <- res %>% mutate(BICnorm = (BIC - min(BIC)) / (max(BIC) - min(BIC)))
     return(res)
