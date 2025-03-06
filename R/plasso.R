@@ -5,7 +5,7 @@ NULL
 #' @noRd
 plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
 	eps=1e-6, maxIter=100, gamma=0.5, lr=1e-6, tol=1e-5, mu=1e-2) {
-	## Generate lambdas using sparsebnUtils
+	## Generate lambdas using sparsebnUtils if not provided
     if (!is.matrix(X)) {stop("X must be matrix")}
 	rlam <- 1e-2
 	nn <- nrow(X)
@@ -14,10 +14,12 @@ plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
     } else {
         requireNamespace("sparsebnUtils")
     }
-	lambdas <- sparsebnUtils::generate.lambdas(lambda.max = sqrt(nn),
-       lambdas.ratio = rlam,
-       lambdas.length = as.integer(lambdas.length),
-       scale = "log")
+    if (is.null(lambdas)) {
+		lambdas <- sparsebnUtils::generate.lambdas(lambda.max = sqrt(nn),
+	       lambdas.ratio = rlam,
+	       lambdas.length = as.integer(lambdas.length),
+	       scale = "log")    	
+    }
 	all_res <- lapply(lambdas, function(l) {
 		fit <- plasso_fit(X, y,
 			maxIter=maxIter, lambda=l, gamma=gamma, eps=eps)
@@ -25,6 +27,7 @@ plasso.fit <- function(X, y, lambdas=NULL, lambdas.length=10, P=NULL,
 		pred <- plasso.predict(X, fit)
 		## Remove intercept
 		list("coef"=tmp_coef,
+			"raw.fitted"=fit,
 			"suppsize"=length(which(tmp_coef!=0)),
 			"pred"=pred)
 	})
