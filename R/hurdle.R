@@ -2,12 +2,13 @@
 #' @importFrom data.table :=
 #' @importFrom bnlearn hc
 #' @importFrom igraph V
+#' @param bn `bn` or `ges`
 #' @param cdrAdjustment if TRUE, perform cellular detection rate adjustment based on the count of zero per gene.
 #' This will apply to graphical model inference in `fitHurdle` and scoring function in HC phase.
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
 	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=bnlearn::hc,
-	onlyBn=TRUE, parallel=TRUE) {
+	onlyBn=TRUE, parallel=TRUE, maximize="bn") {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -53,18 +54,41 @@
 
 	# bl <- bnlearn:::arcs.to.be.added(arcs, V(g)$name)
 	bl <- arcs.to.be.added.2(arcs, V(g)$name)
+    if (maximize == "bn") {
+        if (is.null(score)) {
+            net <- maximizeFun(data[,inc_node_undir],
+                debug=debug, blacklist=bl)
+        } else {
+            net <- maximizeFun(data[,inc_node_undir],
+                 blacklist=bl, debug=debug,
+                 score="custom-score", fun=score,
+                 args=list("cdrAdjustment"=cdrAdjustment))
+        }
+        retl[["bn"]] <- net
+        retl[["data"]] <- data[, inc_node_undir]        
+    } else {
+        data.filt <- data[,inc_node_undir]
+        bl.mat <- matrix(0, nrow=ncol(data.filt),
+            ncol=ncol(data.filt))
+        row.names(bl.mat) <- inc_node_undir
+        colnames(bl.mat) <- inc_node_undir
+        for (row in seq_len(nrow(bl))) {
+            i <- bl[row, 1]; j <- bl[row, 2]
+            bl.mat[i, j] <- 1
+        }
+        args <- list()
+        score <- new(pcalg::.__C__GaussL0penObsScore, data=data.filt)
+        args[["score"]] <- score
+        args[["iterate"]] <- TRUE
+        args[["fixedGaps"]] <- bl.mat
+        ges.fit <- do.call(pcalg::ges, args)
 
-	if (is.null(score)) {
-		net <- maximizeFun(data[,inc_node_undir],
-			debug=debug, blacklist=bl)
-	} else {
-		net <- maximizeFun(data[,inc_node_undir],
-	         blacklist=bl, debug=debug,
-	         score="custom-score", fun=score,
-	         args=list("cdrAdjustment"=cdrAdjustment))
-	}
-	retl[["bn"]] <- net
-	retl[["data"]] <- data[, inc_node_undir]
+        g <- ges.fit$repr$weight.mat()
+        ig <- igraph::graph_from_adjacency_matrix(g, mode="directed",weighted = TRUE, diag=TRUE)
+        net <- bnlearn::as.bn(ig)
+        retl[["bn"]] <- net
+        retl[["data"]] <- data.filt
+    }
 	if (onlyBn) {
 		return(net)
 	} else {
