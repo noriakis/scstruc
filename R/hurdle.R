@@ -79,7 +79,7 @@
         args <- list()
         score <- new(pcalg::.__C__GaussL0penObsScore, data=data.filt)
         args[["score"]] <- score
-        args[["iterate"]] <- TRUE
+        # args[["iterate"]] <- TRUE
         args[["fixedGaps"]] <- bl.mat
         ges.fit <- do.call(pcalg::ges, args)
 

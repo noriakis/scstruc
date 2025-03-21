@@ -10,7 +10,7 @@ ges.pcalg <- function(data, args=NULL) {
 	}
 	score <- new(pcalg::.__C__GaussL0penObsScore, data=data)
 	args[["score"]] <- score
-	args[["iterate"]] <- TRUE
+	# args[["iterate"]] <- TRUE
 	ges.fit <- do.call(pcalg::ges, args)
 
 	g <- ges.fit$repr$weight.mat()
