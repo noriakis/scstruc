@@ -150,14 +150,37 @@ skeleton.from.ig <- function(net, data, maximize="hc",
     if (returnArcs) {
         return(igraph::graph_from_edgelist(arcs))
     }
-
     ## No blacklisting in this version
     constraints <- arcs.to.be.added.2(arcs, nodes)
-    start <- bnlearn::empty.graph(nodes = nodes)
-    maximize.args[["x"]] <- data
-    maximize.args[["start"]] <- start
-    maximize.args[["blacklist"]] <- constraints
-    struc_res <- do.call(maximize, maximize.args)
-    # hc_res <- hc(data, start=start, blacklist=constraints)
-    return(struc_res)
+
+	if (maximize != "ges") {
+	    start <- bnlearn::empty.graph(nodes = nodes)
+	    maximize.args[["x"]] <- data
+	    maximize.args[["start"]] <- start
+	    maximize.args[["blacklist"]] <- constraints
+	    struc_res <- do.call(maximize, maximize.args)
+	    # hc_res <- hc(data, start=start, blacklist=constraints)
+	    return(struc_res)    	
+    } else {
+        bl.mat <- matrix(0, nrow=ncol(data),
+            ncol=ncol(data))
+        row.names(bl.mat) <- nodes
+        colnames(bl.mat) <- nodes
+        for (row in seq_len(nrow(constraints))) {
+            i <- constraints[row, 1]; j <- constraints[row, 2]
+            bl.mat[i, j] <- 1
+        }
+        args <- list()
+        score <- new(pcalg::.__C__GaussL0penObsScore, data=data)
+        args[["score"]] <- score
+        args[["iterate"]] <- TRUE
+        args[["fixedGaps"]] <- bl.mat
+        ges.fit <- do.call(pcalg::ges, args)
+        print(bl.mat)
+        g <- ges.fit$repr$weight.mat()
+        ig <- igraph::graph_from_adjacency_matrix(g,
+        	mode="directed",weighted = TRUE, diag=TRUE)
+        struc_res <- bnlearn::as.bn(ig)
+    	return(struc_res)
+    }
 }

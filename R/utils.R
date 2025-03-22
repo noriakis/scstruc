@@ -4,7 +4,7 @@
 #' @noRd
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
-    bestBIC=TRUE, verbose=FALSE) {
+    bestBIC=TRUE, verbose=FALSE, maximize="hc") {
     ###
     # Needs to setup Julia environment beforehand
     # library(JuliaCall)
@@ -54,7 +54,8 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         ###
         # Inference part
         ###
-        bn <- skeleton.from.ig(net, data %>% data.frame())
+        bn <- skeleton.from.ig(net, data %>% data.frame(),
+        	maximize=maximize)
         results[[as.character(th)]] <- bn
         bic <- bnlearn::score(bn, data)
         bics[[as.character(th)]] <- bic
