@@ -214,7 +214,6 @@ bn.fit.hurdle <- function(x, data, cdrAdjustment=FALSE) {
         res
     }) %>% setNames(names(x$nodes))
     class(fits) <- c(class(fits), "bn.fit", "bn.fit.gnet")
-    print(fits)
     return(fits)
 }
 

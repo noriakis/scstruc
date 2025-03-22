@@ -152,7 +152,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
             cat_subtle("GES ", tim, "\n")
             alls[[paste0("GES")]] <- list(net, tim)
             
-        }, error= function(e) print(e))
+        }, error= function(e) message(e))
     }
     
     if (lingam) {
@@ -163,7 +163,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
             tim <- as.numeric(e-s, unit="secs")
             cat_subtle("LiNGAM ", tim, "\n")
             alls[[paste0("LiNGAM")]] <- list(net, tim)
-        }, error = function(e) print(e))
+        }, error = function(e) message(e))
     }
 
 

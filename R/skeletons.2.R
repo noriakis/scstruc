@@ -102,7 +102,6 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
         args[["iterate"]] <- TRUE
         args[["fixedGaps"]] <- bl.mat
         ges.fit <- do.call(pcalg::ges, args)
-        print(bl.mat)
         g <- ges.fit$repr$weight.mat()
         ig <- igraph::graph_from_adjacency_matrix(g,
         	mode="directed",weighted = TRUE, diag=TRUE)
@@ -176,7 +175,6 @@ skeleton.from.ig <- function(net, data, maximize="hc",
         args[["iterate"]] <- TRUE
         args[["fixedGaps"]] <- bl.mat
         ges.fit <- do.call(pcalg::ges, args)
-        print(bl.mat)
         g <- ges.fit$repr$weight.mat()
         ig <- igraph::graph_from_adjacency_matrix(g,
         	mode="directed",weighted = TRUE, diag=TRUE)
