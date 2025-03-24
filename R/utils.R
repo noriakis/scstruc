@@ -19,22 +19,25 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         }
         dir.create(tmp)
     }
-    write.table(t(data), paste0(tmp,"/data.txt"), quote=FALSE)
+    ts.now <- gsub(":","_", gsub(" ", "_",as.character(Sys.time())))
+    data.path <- paste0(tmp,"/data_",ts.now,".txt")
+    write.table(t(data), data.path, quote=FALSE)
     JuliaCall::julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
                       NetworkInference_HOME,'"))'))
     JuliaCall::julia_eval("using NetworkInference")
     JuliaCall::julia_eval("using CSV")
     JuliaCall::julia_eval("using Tables")
     JuliaCall::julia_eval("algorithm = PIDCNetworkInference()")
-    JuliaCall::julia_eval(paste0('dataset_name = string("', paste0(tmp,"/data.txt"), '")'))
+    JuliaCall::julia_eval(paste0('dataset_name = string("', data.path, '")'))
     JuliaCall::julia_eval("@time genes = get_nodes(dataset_name);")
     JuliaCall::julia_eval("@time network = InferredNetwork(algorithm, genes);")
     for (th in thresholds) {
         if (verbose) {
             cat("Outputting", th, "\n")
         }
+        output.path <- paste0(tmp,"/data_",ts.now,"_",th,".csv")
         JuliaCall::julia_eval(paste0('adjacency_matrix, labels_to_ids, ids_to_labels = get_adjacency_matrix(network,', th,')'))
-        JuliaCall::julia_eval(paste0('output_name = string("', tmp, "/data-",th,".csv", '")'))
+        JuliaCall::julia_eval(paste0('output_name = string("',output.path, '")'))
         JuliaCall::julia_eval("CSV.write(output_name, Tables.table(adjacency_matrix), writeheader=false)")
     }
     results <- list()
@@ -43,7 +46,8 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         if (verbose) {
             cat("Inference ", th, "\n")
         }
-        mat <- read.table(paste0(tmp, "/data-", th, ".csv"), sep=",")
+        output.path <- paste0(tmp,"/data_",ts.now,"_",th,".csv")
+        mat <- read.table(output.path, sep=",")
         mat[mat=="true"] <- 1
         mat[mat=="false"] <- 0
         
