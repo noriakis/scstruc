@@ -2,8 +2,8 @@
 #' 
 #' @description Calculate and return metrics
 #' 
-#' @param inferred named list of bn object
 #' @param reference reference bn object
+#' @param inferred named list of bn object
 #' @param sid_sym symmetric version of sid will be computed
 #' @param SID.cran use implementation in package SID
 #' @param data if provided, calculate KL
@@ -31,9 +31,6 @@ metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE, data=NUL
         if (SID.cran) {
             sid.val <- SID.sid(reference, cur_net, sid_sym)
         } else {
-            ###
-            # bnlearn implementation
-            ###
             if (sid_sym) {
                 sid.val <- (bnlearn::sid(reference, cur_net) + bnlearn::sid(cur_net, reference))/2
             } else {
