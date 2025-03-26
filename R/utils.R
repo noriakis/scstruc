@@ -1,6 +1,9 @@
 #' Performs PIDC inference based on Julia implementation, using JuliaCall
 #' You should have already done `julia_setup` in JuliaCall
 #' Also, we need `CSV` packages installed beforehand to interact with R environment.
+#' @param data data to be used for the inference (n x p)
+#' @param tmp tmporary directory storing networks and data used for the inference
+#' If not exists, the function creates directory.
 #' @noRd
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
@@ -22,6 +25,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     ts.now <- gsub(":","_", gsub(" ", "_",as.character(Sys.time())))
     data.path <- paste0(tmp,"/data_",ts.now,".txt")
     write.table(t(data), data.path, quote=FALSE)
+    net.path <- paste0(tmp,"/net_",ts.now,".txt")
     JuliaCall::julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
                       NetworkInference_HOME,'"))'))
     JuliaCall::julia_eval("using NetworkInference")
@@ -31,6 +35,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     JuliaCall::julia_eval(paste0('dataset_name = string("', data.path, '")'))
     JuliaCall::julia_eval("@time genes = get_nodes(dataset_name);")
     JuliaCall::julia_eval("@time network = InferredNetwork(algorithm, genes);")
+    JuliaCall::julia_eval(paste0('write_network_file("',net.path,'", network)'))
     for (th in thresholds) {
         if (verbose) {
             cat("Outputting", th, "\n")
