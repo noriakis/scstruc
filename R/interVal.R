@@ -48,8 +48,8 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
 	}))
 	A0.bn <- bnlearn::as.bn(A0)
     if (!is.null(output)) {
-        save(A0.bn, file=paste0(output, "/A0.rda"))
-        save(bns, file=paste0(output, "/all-bns.rda"))
+        saveRDS(A0.bn, file=paste0(output, "/A0.rds"))
+        saveRDS(bns, file=paste0(output, "/all-bns.rds"))
     }
     if (verbose) {
         cat("Inferred A0:\n")
