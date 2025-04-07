@@ -1,3 +1,30 @@
+#' calc.auprc
+#' calculate the AUPRC based on reference BN and inferred network.
+#' The function assumes the directed network.
+#' @importFrom yardstick pr_auc
+#' @param ref.bn reference bn object
+#' @param str inferred strength or weight (three-column with from, to, and target column)
+#' @param target target column name
+#' @export
+calc.auprc <- function(ref.bn, str, target="strength") {
+    adj <- as.igraph(ref.bn) %>%
+        as_adj(type="both") %>%
+        as.matrix()
+    diag(adj) <- NA
+    ref.bn.el <- reshape2::melt(adj, na.rm=TRUE) %>%
+        `colnames<-`(c("from","to","correct"))
+    ref.dim <- dim(ref.bn.el)[1]
+    
+    str.dim <- dim(str)[1]
+    if (str.dim != ref.dim) {
+        stop("Dimension mismatches")
+    }
+    merged <- merge(ref.bn.el, str, by=c("from","to"), all=TRUE) %>%
+        mutate(correct=factor(correct))
+    yardstick::pr_auc(merged, correct, !!target, event_level="second")
+}
+
+
 #' Performs PIDC inference based on Julia implementation, using JuliaCall
 #' You should have already done `julia_setup` in JuliaCall
 #' Also, we need `CSV` packages installed beforehand to interact with R environment.

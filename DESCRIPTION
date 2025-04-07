@@ -22,7 +22,7 @@ Suggests:
     testthat (>= 3.0.0), L0Learn,
     clusterProfiler, xgboost,
     knitr, SID, HurdleNormal,
-    scuttle, SuperCell,
+    scuttle, SuperCell, yardstick,
     BiocStyle, sparsebnUtils,
     ccdrAlgorithm, KEGGREST, SuperCell,
     JuliaCall, GENIE3, SpatialExperiment
