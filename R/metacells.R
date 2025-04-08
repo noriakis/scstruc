@@ -3,7 +3,7 @@
 #' @description Return the metacell abundance matrix
 #' Should provide SingleCellExperiment with logcounts data filled.
 #' 
-#' @param sce sce object
+#' @param sce sce object or matrix (pxn)
 #' @param rank rank to be used in prcomp
 #' @param pca use PCA or not
 #' @param prop if genes are not specified, `getTopHVGs` will run based on 
@@ -51,12 +51,14 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
           gamma = gamma
         )
     } else {
-        SC <- SuperCell::SCimplify_from_embedding(
+    	###
+    	# n.var.genes is default
+    	###
+        SC <- SuperCell::SCimplify(
           X = GE, 
           k.knn = k.knn, 
           gamma = gamma
         )
-        GE <- t(GE)
     }
     SC.GE <- SuperCell::supercell_GE(GE, SC$membership, mode=mode)
     cat("  SuperCell dimension:", dim(SC.GE),"\n")
