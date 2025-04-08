@@ -31,11 +31,17 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
         t <- Matrix::t
     }
     if (is.null(genes)) {
-        genes <- getTopHVGs(sce, prop=prop)
+    	if (!is.matrix(sce)) {
+	        genes <- getTopHVGs(sce, prop=prop)		
+    	}
     }
-
-    GE <- sce@assays@data$logcounts
-    row.names(GE) <- rowData(sce)[[ID]]
+    
+    if (is.matrix(sce)) {
+    	GE <- sce
+    } else {
+	    GE <- sce@assays@data$logcounts
+	    row.names(GE) <- rowData(sce)[[ID]]    	
+    }
 
     if (pca) {
         pcs <- stats::prcomp(t(GE[genes, ]), rank. = rank)$x
@@ -49,10 +55,14 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
           X = GE, 
           k.knn = k.knn, 
           gamma = gamma
-        )        
+        )
+        GE <- t(GE)
     }
     SC.GE <- SuperCell::supercell_GE(GE, SC$membership, mode=mode)
-    cat("  ", dim(SC.GE),"\n")
+    cat("  SuperCell dimension:", dim(SC.GE),"\n")
+    if (is.matrix(sce)) {
+    	return(SC.GE)
+    }
     ret = SingleCellExperiment::SingleCellExperiment(assays=S4Vectors::SimpleList("logcounts"=SC.GE))
     rowData(ret) <- rowData(sce)
     return(ret)
