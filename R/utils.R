@@ -31,10 +31,11 @@ calc.auprc <- function(ref.bn, str, target="strength") {
 #' @param data data to be used for the inference (n x p)
 #' @param tmp tmporary directory storing networks and data used for the inference
 #' If not exists, the function creates directory.
+#' @param return_net return the raw network output, ignored if bestBIC is TRUE
 #' @noRd
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
-    bestBIC=TRUE, verbose=FALSE, maximize="hc") {
+    bestBIC=TRUE, verbose=FALSE, maximize="hc", return_net=FALSE) {
     ###
     # Needs to setup Julia environment beforehand
     # library(JuliaCall)
@@ -53,6 +54,10 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     data.path <- paste0(tmp,"/data_",ts.now,".txt")
     write.table(t(data), data.path, quote=FALSE)
     net.path <- paste0(tmp,"/net_",ts.now,".txt")
+    ###
+    # Use CSV for the interaction
+    ###
+    JuliaCall::julia_eval('using Pkg; Pkg.add("CSV"); Pkg.add("Tables")')
     JuliaCall::julia_eval(paste0('Pkg.develop(PackageSpec(path = "',
                       NetworkInference_HOME,'"))'))
     JuliaCall::julia_eval("using NetworkInference")
@@ -102,7 +107,12 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         }
         return(results[[names(results)[which.max(bics)]]])
     } else {
-        return(results)
+    	if (isTRUE(return_net)) {
+    		rawnet <- read.table(net.path, sep="\t")
+    		return(list("results"=results, "net"=rawnet))
+    	} else {
+	        return(results)		
+    	}
     }
 
 }
