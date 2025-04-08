@@ -1,4 +1,4 @@
-#' calc.auprc
+#' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.
 #' @importFrom yardstick pr_auc
@@ -24,7 +24,7 @@ calc.auprc <- function(ref.bn, str, target="strength") {
     yardstick::pr_auc(merged, correct, !!target, event_level="second")
 }
 
-
+#' @title pidc.using.julia
 #' Performs PIDC inference based on Julia implementation, using JuliaCall
 #' You should have already done `julia_setup` in JuliaCall
 #' Also, we need `CSV` packages installed beforehand to interact with R environment.
@@ -117,7 +117,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
 
 }
 
-
+#' internal function loading GRNBoost2 results and check DAG
 #' @noRd
 load.grnboost2 <- function(filename, minmax=TRUE,
                            thresholds=seq(0, 1, 0.1)) {
@@ -408,7 +408,8 @@ bn_fit_to_igraph <- function(graph, preserve=FALSE) {
 #' 
 #' bn_fit_to_df
 #' 
-#' This function coverts the bn.fit object to data.frame
+#' This function coverts the bn.fit object to data.frame.
+#' Only the fitted parameters are retained and nodes not in the fitted object will not be included.
 #' 
 #' @param fitted bn.fit object
 #' @export
