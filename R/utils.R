@@ -7,7 +7,7 @@
 #' @param target target column name
 #' @export
 calc.auprc <- function(ref.bn, str, target="strength") {
-    adj <- as.igraph(ref.bn) %>%
+    adj <- bnlearn::as.igraph(ref.bn) %>%
         as_adj(type="both") %>%
         as.matrix()
     diag(adj) <- NA
