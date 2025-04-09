@@ -10,7 +10,8 @@ bn_fit_to_df(fitted)
 \item{fitted}{bn.fit object}
 }
 \description{
-This function coverts the bn.fit object to data.frame
+This function coverts the bn.fit object to data.frame.
+Only the fitted parameters are retained and nodes not in the fitted object will not be included.
 }
 \examples{
 data(gaussian.test)

@@ -18,7 +18,7 @@ superCellMat(
 )
 }
 \arguments{
-\item{sce}{sce object}
+\item{sce}{sce object or matrix (pxn)}
 
 \item{genes}{subset of the genes to use in PCA (`getTopHVGs`, etc)}
 
