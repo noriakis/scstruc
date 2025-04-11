@@ -118,6 +118,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
 }
 
 #' internal function loading GRNBoost2 results and check DAG
+#' The importance is min-max normalized
 #' @noRd
 load.grnboost2 <- function(filename, minmax=TRUE,
                            thresholds=seq(0, 1, 0.1)) {

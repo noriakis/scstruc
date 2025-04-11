@@ -22,6 +22,11 @@ Using `devtools`:
 devtools::install_github("noriakis/scstruc")
 ```
 
+## Documentation
+
+The documentation is available [here](https://noriakis.github.io/software/scstruc).
+
+
 ## Examples
 
 Based on `SingleCellExperiment`, the network is inferred and plotted.
