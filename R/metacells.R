@@ -33,7 +33,11 @@ superCellMat <- function(sce, genes=NULL, prop=0.2, pca=TRUE, gamma=10, k.knn=5,
     if (is.null(genes)) {
     	if (!is.matrix(sce)) {
 	        genes <- getTopHVGs(sce, prop=prop)		
-    	}
+    	} else {
+            if (isTRUE(pca)) {
+                stop("Please specify genes manually in case of the matrix input")
+            }
+        }
     }
     
     if (is.matrix(sce)) {

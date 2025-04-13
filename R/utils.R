@@ -1,3 +1,21 @@
+#' add.dropout
+#' Like Splat and SERGIO, add dropout to matrix
+#' @export
+#' @return binary matrix indicating which cell to be zero-ed out
+add.dropout <- function(mat, shape=6.5, q=.65) {
+    if (any(mat<0)) {mat <- abs(mat)}
+    mat.log <- log(mat+1)
+    log.point <- as.numeric(quantile(as.matrix(mat.log), q))
+    div.2 <- 1 / (1 + exp(-1*shape*(mat.log-log.point)))
+    bin.mat <- matrix(0, nrow=nrow(mat.log),ncol=ncol(mat.log))
+    for (i in seq_len(nrow(mat.log))) {
+        for (j in seq_len(ncol(mat.log))) {
+            bin.mat[i,j] <- rbinom(n=1,size=1,prob=div.2[i,j])
+        }
+    }
+    return(bin.mat)
+}
+
 #' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.

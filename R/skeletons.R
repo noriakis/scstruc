@@ -265,7 +265,7 @@ hurdle.bic <- function(node, parents, data, args) {
     fit <- MAST::zlm(as.formula(mod), sca=data)
     if (is.null(fit$cont)) return(-Inf)
     bic.sum <- -1 * (BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$cont)) + 
-        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))    
+        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))
     return(bic.sum)
 }
 
