@@ -81,7 +81,8 @@ pcalg.boot <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
         if (removeAllZero) {
 	        replicate = replicate[, apply(replicate, 2, function(x) sum(x))!=0, drop=FALSE]
         }
-        run <- fun(replicate, args)
+        args[["data"]] <- replicate
+        run <- do.call(fun, args)
         perRun[[r]] <- run
     }
     if (return.all) {

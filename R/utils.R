@@ -25,6 +25,44 @@ calc.fv <- function(comp) {
 }
 
 
+#' @title plot.prc
+#' Plot the PRC based on reference BN and inferred network.
+#' The function assumes the directed network.
+#' @importFrom yardstick pr_auc
+#' @param ref.bn reference bn object
+#' @param str list of inferred strength or weight (three-column with from, to, and target column)
+#' @param target target column name (must be same in all the str)
+#' @param onlyData return only the data
+#' @export
+plot.prc <- function(ref.bn, strs, target="strength", onlyData=FALSE) {
+    adj <- bnlearn::as.igraph(ref.bn) %>%
+        as_adj(type="both") %>%
+        as.matrix()
+    diag(adj) <- NA
+    ref.bn.el <- reshape2::melt(adj, na.rm=TRUE) %>%
+        `colnames<-`(c("from","to","correct"))
+    ref.dim <- dim(ref.bn.el)[1]
+    
+    for.plot <- do.call(rbind, lapply(names(strs), function(nstr) {
+        str <- strs[[nstr]]
+        str.dim <- dim(str)[1]
+        if (str.dim != ref.dim) {
+            stop("Dimension mismatches")
+        }
+        merged <- merge(ref.bn.el, str, by=c("from","to"), all=TRUE) %>%
+            mutate(correct=factor(correct))
+        yardstick::pr_curve(merged, correct, !!target, event_level="second") %>%
+        mutate(algorithm=nstr)       
+    }))
+    if (onlyData){
+        return(for.plot)
+    }
+    for.plot %>%
+        ggplot(aes(x=recall, y=precision, group=algorithm, color=algorithm)) + geom_line()
+
+}
+
+
 #' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.
