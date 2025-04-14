@@ -3,7 +3,7 @@
 #' @noRd
 skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=NULL,
     nFolds=5, verbose=FALSE, s="lambda.min", maximize="hc", maximize.args=list(),
-    returnArcs=FALSE, lambda=0.1) {
+    returnArcs=FALSE, lambda=0.1, sf="GaussL0penObsScore") {
     if (verbose) {
         cat_subtle("Algorithm: ", algorithm, "\n")
         cat_subtle("Input for structure learning: n ", dim(data)[1], " p ", dim(data)[2], "\n")
@@ -97,7 +97,7 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
             bl.mat[i, j] <- 1
         }
         args <- list()
-        score <- new(pcalg::.__C__GaussL0penObsScore, data=data)
+        score <- new(sf, data=data)
         args[["score"]] <- score
         args[["iterate"]] <- TRUE
         args[["fixedGaps"]] <- bl.mat

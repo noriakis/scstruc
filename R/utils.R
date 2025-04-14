@@ -16,6 +16,15 @@ add.dropout <- function(mat, shape=6.5, q=.65) {
     return(bin.mat)
 }
 
+#' @noRd
+calc.fv <- function(comp) {
+    tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
+    pre <- tp/(tp+fp); rec <- tp/(tp+fn)
+    fv <- 2*(pre*rec)/(pre+rec)
+    return(fv)
+}
+
+
 #' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.

@@ -1,14 +1,15 @@
 #' ges.pcalg
 #' Perform Greedy Equivalent Search implemented in pcalg
 #' @param data data
+#' @param sf score name
 #' @param args arguments to pcalg::ges
 #' @export
 #' @importFrom pcalg ges
-ges.pcalg <- function(data, args=NULL) {
+ges.pcalg <- function(data, sf="GaussL0penObsScore", args=NULL) {
 	if (is.null(args)) {
 		args <- list()
 	}
-	score <- new(pcalg::.__C__GaussL0penObsScore, data=data)
+	score <- new(sf, data=data)
 	args[["score"]] <- score
 	# args[["iterate"]] <- TRUE
 	ges.fit <- do.call(pcalg::ges, args)
@@ -135,3 +136,159 @@ pcalg.boot.future <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
 	st <- custom.strength(perRun, nodes)
     return(st)
 }
+
+
+#' @noRd
+#' uses DataScore class to return sum of BIC of 
+#' continous and discrete part of hurdle model.
+#' Intercept is TRUE by default.
+#' Only the `glm` can be used.
+#' @importFrom sfsmisc is.whole
+setRefClass("HurdleScore", contains = "Score",
+        methods = list(
+            #' Constructor
+            initialize = function(data = matrix(1, 1, 1),
+                                  targets = list(integer(0)),
+                                  target.index = rep(as.integer(1), nrow(data)),
+                                  nodes = colnames(data),
+                                  ...) {
+                
+                p <- ncol(data)
+                .pardag.class <<- "GaussParDAG"
+                pp.dat$intercept <<- TRUE
+                
+                pp.dat$targets <<- targets
+                pp.dat$target.index <<- target.index
+                pp.dat$data <<- data
+                pp.dat$vertex.count <<- ncol(data)
+                
+                .nodes <<- nodes
+                ## Store list of index vectors of "non-interventions": for each vertex k,
+                ## store the indices of the data points for which k has NOT been intervened
+                A <- !targets2mat(pp.dat$vertex.count, pp.dat$targets, pp.dat$target.index)
+                pp.dat$non.int <<- lapply(seq_len(ncol(A)), function(i) which(A[, i]))
+                # apply() cannot be used since we need a list, not a matrix.
+                pp.dat$data.count <<- as.integer(colSums(A))
+                pp.dat$total.data.count <<- as.integer(nrow(data))
+                
+                ## Declare scores as not decomposable "by default"
+                decomp <<- TRUE
+                
+                ## No C++ scoring object by default
+                c.fcn <<- "none"
+                
+                ## R function objects
+                pp.dat$local.score <<- function(vertex, parents) local.score(vertex, parents)
+                pp.dat$global.score <<- function(edges) global.score(vertex, parents)
+                pp.dat$local.fit <<- function(vertex, parents) local.fit(vertex, parents)
+                pp.dat$global.fit <<- function(edges) global.fit(vertex, parents)
+            },
+            #' Yields a vector of node names
+            getNodes = function() {
+                .nodes
+            },
+            
+            #' Yields the number of nodes
+            node.count = function() {
+                length(.nodes)
+            },
+            
+            #' Checks whether a vertex is valid
+            #' @param vertex vector of vertex indices
+            validate.vertex = function(vertex) {
+                if (length(vertex) > 0) {
+                    stopifnot(all(is.whole(vertex)))
+                    min.max <- range(vertex)
+                    stopifnot(1 <= min.max[1] && min.max[2] <= node.count())
+                }
+            },
+            
+            #' Checks whether a vector is a valid list of parents
+            validate.parents = function(parents) {
+                validate.vertex(parents)
+                stopifnot(anyDuplicated(parents) == 0L)
+            },
+            
+            #' Creates an instance of the corresponding ParDAG class
+            # create.dag = function() {
+            #     new(.pardag.class, nodes = .nodes)
+            # },
+            
+            #' Getter and setter function for the targets
+            getTargets = function() {
+                pp.dat$targets
+            },
+            
+            setTargets = function(targets) {
+                pp.dat$targets <<- lapply(targets, sort)
+            },
+            
+            #' Creates a list of options for the C++ functions for the internal
+            #' calculation of scores and MLEs
+            c.fcn.options = function(DEBUG.LEVEL = 0) {
+                list(DEBUG.LEVEL = DEBUG.LEVEL)
+            },
+            local.score = function(vertex, parents, ...) {
+                
+                ## Check validity of arguments
+                validate.vertex(vertex)
+                validate.parents(parents)
+                yn <- colnames(pp.dat$data)[vertex]
+                
+                # cat(yn,"\n")
+                
+                if (length(parents) != 0) {
+                    xn <- colnames(pp.dat$data)[parents]
+                    fm <- as.formula(paste0(yn ,"~",paste0(xn, collapse="+")))
+                    dfm <- as.formula(paste0(yn ,">0~",paste0(xn, collapse="+")))
+
+                } else {
+                    fm <- as.formula(paste0(yn ,"~ 1"))
+                    dfm <- as.formula(paste0(yn ,">0~1"))
+                }
+                glf <- glm(dfm, data=pp.dat$data, family="binomial")
+                lf <- lm(fm, data=pp.dat$data,subset=yn>0)
+                sc <- -1 * (BIC(lf)+BIC(glf))
+                
+                ## Return local score
+                return(sc)
+                },
+            
+            #' Calculates the local MLE for a vertex and its parents
+            #'
+            #' @param   vertex      vertex whose parameters shall be fitted
+            #' @param   parents     parents of the vertex
+            #' @param   ...             ignored; for compatibility with the base class
+            local.fit = function(vertex, parents, ...) {
+                validate.vertex(vertex)
+                validate.parents(parents)
+                yn <- colnames(pp.dat$data)[vertex]
+                if (length(parents) != 0) {
+                    xn <- colnames(pp.dat$data)[parents]
+                    fm <- as.formula(paste0(yn ,"~",paste0(xn, collapse="+")))
+                    dfm <- as.formula(paste0(yn ,">0~",paste0(xn, collapse="+")))
+                    glf <- glm(dfm, data=pp.dat$data, family="binomial")
+                    lf <- lm(fm, data=pp.dat$data,subset=yn>0)
+                } else {
+                    fm <- as.formula(paste0(yn ,"~ 1"))
+                    dfm <- as.formula(paste0(yn ,">0~1"))
+                    glf <- glm(dfm, data=pp.dat$data, family="binomial")
+                    lf <- lm(fm, data=pp.dat$data,subset=yn>0)
+                }
+                sigma2 <- sum(lf$model[[yn]]^2)
+                beta <-lf$coefficients
+                
+                ## Calculate regression coefficients
+                if (length(parents) + pp.dat$intercept != 0) {
+                    qrZ <- lf$qr
+                    sigma2 <- sigma2 - sum((lf$model[[yn]] %*% qr.Q(qrZ))^2)
+                }
+                return(c(sigma2/pp.dat$data.count[vertex], beta))
+            }, ## local.fit()
+            global.fit = function(dag, ...) {
+                in.edge <- dag$.in.edges
+                lapply(1:pp.dat$vertex.count,
+                       function(i) local.fit(i, in.edge[[i]], ...))
+            }
+        )
+)
