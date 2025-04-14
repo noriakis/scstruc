@@ -38,7 +38,7 @@ plotNet <- function(net, data=NULL, layout="kk", geom=geom_edge_link,
     }
   
     if (is.null(data)) {
-        g <- net %>% as.igraph() %>% as_tbl_graph()
+        g <- net %>% bnlearn::as.igraph() %>% as_tbl_graph()
     } else {
       g <- bnlearn::bn.fit(net, data) %>% bn_fit_to_igraph() %>% as_tbl_graph()
       edgeArgs[["mapping"]] <- aes(color=coef)
