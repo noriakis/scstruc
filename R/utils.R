@@ -1,6 +1,10 @@
 #' add.dropout
 #' Like Splat and SERGIO, add dropout to matrix
 #' @export
+#' @param mat mat (nxp)
+#' @param shape shape parameter
+#' @param q quantile parameter
+#' @importFrom stats quantile rbinom
 #' @return binary matrix indicating which cell to be zero-ed out
 add.dropout <- function(mat, shape=6.5, q=.65) {
     if (any(mat<0)) {mat <- abs(mat)}
@@ -25,16 +29,17 @@ calc.fv <- function(comp) {
 }
 
 
-#' @title plot.prc
+#' @title prc.plot
 #' Plot the PRC based on reference BN and inferred network.
 #' The function assumes the directed network.
 #' @importFrom yardstick pr_auc
 #' @param ref.bn reference bn object
-#' @param str list of inferred strength or weight (three-column with from, to, and target column)
+#' @param strs list of inferred strength or weight (three-column with from, to, and target column)
 #' @param target target column name (must be same in all the str)
 #' @param onlyData return only the data
+#' @importFrom reshape2 melt
 #' @export
-plot.prc <- function(ref.bn, strs, target="strength", onlyData=FALSE) {
+prc.plot <- function(ref.bn, strs, target="strength", onlyData=FALSE) {
     adj <- bnlearn::as.igraph(ref.bn) %>%
         as_adj(type="both") %>%
         as.matrix()

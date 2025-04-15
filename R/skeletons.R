@@ -240,8 +240,11 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
 # }#MY.BIC
 
 #' Custom score function for bnlearn, using hurdle model.
-#' @noRd
 #' @importFrom MAST zlm
+#' @param node candidate node
+#' @param parents parents of the nodes
+#' @param data data used for scoring
+#' @param args other arguments
 #' @export
 hurdle.bic <- function(node, parents, data, args) {
     if (isTRUE(args$cdrAdjustment)) {

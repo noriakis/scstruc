@@ -7,6 +7,13 @@ Like Splat and SERGIO, add dropout to matrix}
 \usage{
 add.dropout(mat, shape = 6.5, q = 0.65)
 }
+\arguments{
+\item{mat}{mat (nxp)}
+
+\item{shape}{shape parameter}
+
+\item{q}{quantile parameter}
+}
 \value{
 binary matrix indicating which cell to be zero-ed out
 }

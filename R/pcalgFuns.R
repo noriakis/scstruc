@@ -139,15 +139,15 @@ pcalg.boot.future <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
 }
 
 
-#' @noRd
+
+#' @title HurdleScore
 #' uses DataScore class to return sum of BIC of 
 #' continous and discrete part of hurdle model.
 #' Intercept is TRUE by default.
 #' Only the `glm` can be used.
-#' @importFrom sfsmisc is.whole
+#' @noRd
 setRefClass("HurdleScore", contains = "Score",
         methods = list(
-            #' Constructor
             initialize = function(data = matrix(1, 1, 1),
                                   targets = list(integer(0)),
                                   target.index = rep(as.integer(1), nrow(data)),
@@ -184,18 +184,17 @@ setRefClass("HurdleScore", contains = "Score",
                 pp.dat$local.fit <<- function(vertex, parents) local.fit(vertex, parents)
                 pp.dat$global.fit <<- function(edges) global.fit(vertex, parents)
             },
-            #' Yields a vector of node names
+
             getNodes = function() {
                 .nodes
             },
             
-            #' Yields the number of nodes
+
             node.count = function() {
                 length(.nodes)
             },
             
-            #' Checks whether a vertex is valid
-            #' @param vertex vector of vertex indices
+
             validate.vertex = function(vertex) {
                 if (length(vertex) > 0) {
                     stopifnot(all(is.whole(vertex)))
@@ -204,18 +203,13 @@ setRefClass("HurdleScore", contains = "Score",
                 }
             },
             
-            #' Checks whether a vector is a valid list of parents
+
             validate.parents = function(parents) {
                 validate.vertex(parents)
                 stopifnot(anyDuplicated(parents) == 0L)
             },
             
-            #' Creates an instance of the corresponding ParDAG class
-            # create.dag = function() {
-            #     new(.pardag.class, nodes = .nodes)
-            # },
-            
-            #' Getter and setter function for the targets
+
             getTargets = function() {
                 pp.dat$targets
             },
@@ -224,8 +218,7 @@ setRefClass("HurdleScore", contains = "Score",
                 pp.dat$targets <<- lapply(targets, sort)
             },
             
-            #' Creates a list of options for the C++ functions for the internal
-            #' calculation of scores and MLEs
+
             c.fcn.options = function(DEBUG.LEVEL = 0) {
                 list(DEBUG.LEVEL = DEBUG.LEVEL)
             },
@@ -255,11 +248,6 @@ setRefClass("HurdleScore", contains = "Score",
                 return(sc)
                 },
             
-            #' Calculates the local MLE for a vertex and its parents
-            #'
-            #' @param   vertex      vertex whose parameters shall be fitted
-            #' @param   parents     parents of the vertex
-            #' @param   ...             ignored; for compatibility with the base class
             local.fit = function(vertex, parents, ...) {
                 validate.vertex(vertex)
                 validate.parents(parents)
