@@ -5,10 +5,12 @@
 \title{ges.pcalg
 Perform Greedy Equivalent Search implemented in pcalg}
 \usage{
-ges.pcalg(data, args = NULL)
+ges.pcalg(data, sf = "GaussL0penObsScore", args = NULL)
 }
 \arguments{
 \item{data}{data}
+
+\item{sf}{score name}
 
 \item{args}{arguments to pcalg::ges}
 }

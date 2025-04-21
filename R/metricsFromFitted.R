@@ -73,7 +73,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     #     }
     # }
 
-    rawnet <- bnlearn::as.bn(bn_fit_to_igraph(fitted))
+    rawnet <- bnlearn::bn.net(fitted)
     input <- bnlearn::rbn(fitted, N)
     alls <- lapply(algos, function(p) {
         cat_subtle(p," ")

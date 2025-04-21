@@ -1,3 +1,73 @@
+#' add.dropout
+#' Like Splat and SERGIO, add dropout to matrix
+#' @export
+#' @param mat mat (nxp)
+#' @param shape shape parameter
+#' @param q quantile parameter
+#' @importFrom stats quantile rbinom
+#' @return binary matrix indicating which cell to be zero-ed out
+add.dropout <- function(mat, shape=6.5, q=.65) {
+    if (any(mat<0)) {mat <- abs(mat)}
+    mat.log <- log(mat+1)
+    log.point <- as.numeric(quantile(as.matrix(mat.log), q))
+    div.2 <- 1 / (1 + exp(-1*shape*(mat.log-log.point)))
+    bin.mat <- matrix(0, nrow=nrow(mat.log),ncol=ncol(mat.log))
+    for (i in seq_len(nrow(mat.log))) {
+        for (j in seq_len(ncol(mat.log))) {
+            bin.mat[i,j] <- rbinom(n=1,size=1,prob=div.2[i,j])
+        }
+    }
+    return(bin.mat)
+}
+
+#' @noRd
+calc.fv <- function(comp) {
+    tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
+    pre <- tp/(tp+fp); rec <- tp/(tp+fn)
+    fv <- 2*(pre*rec)/(pre+rec)
+    return(fv)
+}
+
+
+#' @title prc.plot
+#' Plot the PRC based on reference BN and inferred network.
+#' The function assumes the directed network.
+#' @importFrom yardstick pr_auc
+#' @param ref.bn reference bn object
+#' @param strs list of inferred strength or weight (three-column with from, to, and target column)
+#' @param target target column name (must be same in all the str)
+#' @param onlyData return only the data
+#' @importFrom reshape2 melt
+#' @export
+prc.plot <- function(ref.bn, strs, target="strength", onlyData=FALSE) {
+    adj <- bnlearn::as.igraph(ref.bn) %>%
+        as_adj(type="both") %>%
+        as.matrix()
+    diag(adj) <- NA
+    ref.bn.el <- reshape2::melt(adj, na.rm=TRUE) %>%
+        `colnames<-`(c("from","to","correct"))
+    ref.dim <- dim(ref.bn.el)[1]
+    
+    for.plot <- do.call(rbind, lapply(names(strs), function(nstr) {
+        str <- strs[[nstr]]
+        str.dim <- dim(str)[1]
+        if (str.dim != ref.dim) {
+            stop("Dimension mismatches")
+        }
+        merged <- merge(ref.bn.el, str, by=c("from","to"), all=TRUE) %>%
+            mutate(correct=factor(correct))
+        yardstick::pr_curve(merged, correct, !!target, event_level="second") %>%
+        mutate(algorithm=nstr)       
+    }))
+    if (onlyData){
+        return(for.plot)
+    }
+    for.plot %>%
+        ggplot(aes(x=recall, y=precision, group=algorithm, color=algorithm)) + geom_line()
+
+}
+
+
 #' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.
@@ -118,6 +188,7 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
 }
 
 #' internal function loading GRNBoost2 results and check DAG
+#' The importance is min-max normalized
 #' @noRd
 load.grnboost2 <- function(filename, minmax=TRUE,
                            thresholds=seq(0, 1, 0.1)) {

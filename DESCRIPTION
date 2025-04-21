@@ -14,7 +14,7 @@ Imports:
     glmnet, tidygraph, ggplot2,
     pillar, SingleCellExperiment,
     SummarizedExperiment, S4Vectors,
-    tibble
+    tibble, yardstick, reshape2
 Suggests:
     ncvreg, AnnotationDbi, Matrix,
     cowplot, ggfx, ggkegg,
@@ -22,9 +22,9 @@ Suggests:
     testthat (>= 3.0.0), L0Learn,
     clusterProfiler, xgboost,
     knitr, SID, HurdleNormal,
-    scuttle, SuperCell, yardstick,
+    scuttle, SuperCell,
     BiocStyle, sparsebnUtils,
-    ccdrAlgorithm, KEGGREST, SuperCell,
+    ccdrAlgorithm, KEGGREST,
     JuliaCall, GENIE3, SpatialExperiment
 Remotes:
     github::noriakis/ccdrAlgorithm,

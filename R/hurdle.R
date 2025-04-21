@@ -8,7 +8,7 @@
 .Hurdle <- function(data, score=NULL, debug=FALSE,
 	skeleton=NULL, hurdle.args=list(), removeAllZero=FALSE,
 	noMessages=TRUE, cdrAdjustment=FALSE, maximizeFun=bnlearn::hc,
-	onlyBn=TRUE, parallel=TRUE, maximize="bn") {
+	onlyBn=TRUE, parallel=TRUE, maximize="bn", sf="GaussL0penObsScore") {
 
 	# cat("Using score", as.character(score), "\n")
 
@@ -77,7 +77,7 @@
             bl.mat[i, j] <- 1
         }
         args <- list()
-        score <- new(pcalg::.__C__GaussL0penObsScore, data=data.filt)
+        score <- new(sf, data=data.filt)
         args[["score"]] <- score
         # args[["iterate"]] <- TRUE
         args[["fixedGaps"]] <- bl.mat

@@ -240,8 +240,11 @@ skeleton.reg.boot <- function(data, algorithm="glmnet_CV",
 # }#MY.BIC
 
 #' Custom score function for bnlearn, using hurdle model.
-#' @noRd
 #' @importFrom MAST zlm
+#' @param node candidate node
+#' @param parents parents of the nodes
+#' @param data data used for scoring
+#' @param args other arguments
 #' @export
 hurdle.bic <- function(node, parents, data, args) {
     if (isTRUE(args$cdrAdjustment)) {
@@ -265,7 +268,7 @@ hurdle.bic <- function(node, parents, data, args) {
     fit <- MAST::zlm(as.formula(mod), sca=data)
     if (is.null(fit$cont)) return(-Inf)
     bic.sum <- -1 * (BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$cont)) + 
-        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))    
+        BIC.zlm.bayesglm(llk.zlm.bayesglm(fit$disc)))
     return(bic.sum)
 }
 
