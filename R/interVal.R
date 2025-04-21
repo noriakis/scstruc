@@ -18,7 +18,7 @@
 #' data(gaussian.test)
 #' interVal(head(gaussian.test, n=50), ss=10)
 interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
-    r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=FALSE,
+    r=10, ss=100, verbose=FALSE, returnA0=TRUE, symmetrize=FALSE, SID.cran=TRUE,
     output=NULL) {
     if (!is.null(output)) {
         write.table(data, file=paste0(output, "/raw-data.txt"), sep="\t")

@@ -13,7 +13,7 @@ interVal(
   verbose = FALSE,
   returnA0 = TRUE,
   symmetrize = FALSE,
-  SID.cran = FALSE,
+  SID.cran = TRUE,
   output = NULL
 )
 }
