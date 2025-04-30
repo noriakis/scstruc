@@ -88,7 +88,7 @@ pcalg.boot <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
     if (return.all) {
         return(perRun)
     }
-	st <- custom.strength(perRun, nodes)
+	st <- bnlearn::custom.strength(perRun, nodes)
     return(st)
 }
 
@@ -134,7 +134,7 @@ pcalg.boot.future <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
     if (return.all) {
         return(perRun)
     }
-	st <- custom.strength(perRun, nodes)
+	st <- bnlearn::custom.strength(perRun, nodes)
     return(st)
 }
 

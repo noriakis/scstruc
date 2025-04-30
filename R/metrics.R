@@ -22,7 +22,7 @@ metrics <- function(reference, inferred, sid_sym=FALSE, SID.cran=FALSE, data=NUL
         cur_net <- inferred[[x]]
         s0 <- dim(reference$arcs)[1]
         edges <- dim(cur_net$arcs)[1]
-        comp <- bnlearn::compare(cur_net, reference)
+        comp <- bnlearn::compare(target=reference, current=cur_net)
 
         tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
         pre <- tp/(tp+fp); rec <- tp/(tp+fn)

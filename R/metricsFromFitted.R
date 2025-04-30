@@ -204,7 +204,7 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         tim <- alls[[x]][[2]]
         s0 <- dim(rawnet$arcs)[1]
         edges <- dim(cur_net$arcs)[1]
-        comp <- bnlearn::compare(cur_net, rawnet)
+        comp <- bnlearn::compare(target=rawnet, current=cur_net)
         tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
         pre <- tp/(tp+fp); rec <- tp/(tp+fn)
         fv <- 2*(pre*rec)/(pre+rec)
