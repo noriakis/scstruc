@@ -69,6 +69,9 @@ scstruc <- function(spe, candidateGenes, label=NULL,
         cat_subtle("label column name not specified, defaulting to `label`\n")
         label <- "label"
     }
+    if (algorithm=="ZiGDAG" & useAssay!="counts") {
+    	message("ZiGDAG expects count data")
+    }
     if (is.null(input)) {
         input <- .getInput(spe, candidateGenes, label, labelName, useAssay, clusterLabel, verbose,
             changeSymbol, symbolColumn, zeroFilt, rmNeg)

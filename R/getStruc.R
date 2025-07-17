@@ -76,6 +76,18 @@
     } else {
         if (algorithm=="ccdr") {
             return(ccdr(input, algorithm, algorithm.args, verbose))         
+        } else if (algorithm=="ZiGDAG") {
+        	## Choi et al. 2023. JMLR.
+		    if (!requireNamespace("ZiGDAG")) {
+		        stop("Needs installation of ZiGDAG")
+		    }
+		    input.matrix <- as.matrix(input)
+		    zig.res <- linear.zigdag(input.matrix,
+		    	ghpd = "hyper.poisson", method = "hc")
+		    adj <- zig.res$est$E
+		    row.names(adj) <- colnames(input)
+		    colnames(adj) <- colnames(input)
+		    return(bnlearn::as.bn(graph_from_adjacency_matrix(adj)))
         } else if (algorithm == "Hurdle") {
             algorithm.args[["data"]] <- input
             return(do.call(.Hurdle, algorithm.args))
