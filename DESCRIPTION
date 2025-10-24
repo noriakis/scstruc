@@ -14,7 +14,7 @@ Imports:
     glmnet, tidygraph, ggplot2,
     pillar, SingleCellExperiment,
     SummarizedExperiment, S4Vectors,
-    tibble, yardstick, reshape2
+    tibble, yardstick, reshape2, OmnipathR
 Suggests:
     ncvreg, AnnotationDbi, Matrix,
     cowplot, ggfx, ggkegg,
