@@ -8,7 +8,15 @@ This function takes the pathway name in SignaLink and
 2. Identify and remove minimal feedback arc set (make DAG)
 3. Takes the largest components in the graph}
 \usage{
-extractDAGfromOmnipath(pathway_name, target_source = "AND")
+extractDAGfromOmnipath(
+  genes = NULL,
+  pathway_name = NULL,
+  target_source = "AND",
+  mfas = TRUE
+)
+}
+\arguments{
+\item{mfas}{force DAG}
 }
 \description{
 extractDAGfromOmnipath
