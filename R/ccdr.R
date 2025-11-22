@@ -23,7 +23,9 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
     dat <- sparsebnUtils::sparsebnData(input %>% as.matrix(), type = "continuous")
     algorithm.args[["data"]] <- dat
     if (is.null(algorithm.args[["lambdas.length"]]) & is.null(algorithm.args[["lambdas"]])) {
-        cat_subtle("Setting `lambdas.length` to 10\n")
+        if (isTRUE(verbose)) {
+            cat_subtle("Setting `lambdas.length` to 10\n")
+        }
         algorithm.args[["lambdas.length"]] = 10
     }
     ccdr.res <- do.call(ccdrAlgorithm::ccdr.run, algorithm.args)
@@ -35,7 +37,9 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
     }) %>% unlist()
 
     if (pickBest) {
-        cat_subtle("Returning best scored network only, specify algorithm.args=list(bestScore=FALSE) to return all the network\n")
+        if (isTRUE(verbose)) {
+            cat_subtle("Returning best scored network only, specify algorithm.args=list(bestScore=FALSE) to return all the network\n")
+        }
         bestind <- names(which.max(lapply(bn.res, function(tt) {
             bnlearn::score(tt,  data.frame(input, check.names=FALSE)[names(tt$nodes), ])
         })))
@@ -45,7 +49,9 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
             return(bn.res[bestind])
         }
     } else {
-        cat_subtle("Returning the bn per lambda from result of ccdr.run\n")
+        if (isTRUE(verbose)) {
+            cat_subtle("Returning the bn per lambda from result of ccdr.run\n")
+        }
         return(bn.res)                
     }
 }

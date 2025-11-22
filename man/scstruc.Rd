@@ -5,7 +5,7 @@
 \title{scstruc}
 \usage{
 scstruc(
-  spe,
+  sce,
   candidateGenes,
   label = NULL,
   labelName = NULL,
@@ -28,7 +28,7 @@ scstruc(
 )
 }
 \arguments{
-\item{spe}{SingleCellExperiment, SpatialExpetiment object}
+\item{sce}{SingleCellExperiment, SpatialExpetiment object}
 
 \item{candidateGenes}{candidate genes to be used.}
 
@@ -56,7 +56,7 @@ If you use CCDr algorithm, the \code{bn} object is returned.}
 
 \item{symbolColumn}{if changeSymbol is TRUE, use `symbolColumn` in rowData of the input object.}
 
-\item{input}{default to NULL, if specified use this input matrix for inference.}
+\item{input}{default to NULL, if specified use this input matrix for inference, ignoring the `sce`.}
 
 \item{zeroFilt}{parameter to filter the genes with many zeros.
 Genes with the sum of zero expression cells <= the number of all cells * `zeroFilt`

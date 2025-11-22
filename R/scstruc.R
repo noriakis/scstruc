@@ -12,7 +12,8 @@
 #' \code{bn}: bn object
 #' if \code{ccdr}, the list of network for multiple lambdas will be returned
 #' 
-#' @param spe SingleCellExperiment, SpatialExpetiment object
+#' @param sce SingleCellExperiment, SpatialExpetiment object
+#' @param input default to NULL, if specified use this input matrix for inference, ignoring the `sce`.
 #' @param candidateGenes candidate genes to be used.
 #' @param label label column name
 #' @param labelName label name used to subset the cells
@@ -22,7 +23,6 @@
 #' @param algorithm.args list of algorithm arguments
 #' @param clusterLabel (experimental) aggregate the count across this cluster to speed up computation
 #' @param useAssay use assay, default to logcounts
-#' @param input default to NULL, if specified use this input matrix for inference.
 #' @param rmNeg remove genes with all negative abundances
 #' @param zeroFilt parameter to filter the genes with many zeros.
 #' Genes with the sum of zero expression cells <= the number of all cells * `zeroFilt`
@@ -56,7 +56,7 @@
 #' gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 #' gs.glmnet <- scstruc(sce, included_genes, changeSymbol=FALSE, algorithm="glmnet_BIC")
 #' @export
-scstruc <- function(spe, candidateGenes, label=NULL,
+scstruc <- function(sce, candidateGenes, label=NULL,
     labelName=NULL, algorithm="mmhc",
 	algorithm.args=list(), returnBn=TRUE,
     returnData=TRUE, clusterLabel=NULL,
@@ -70,10 +70,10 @@ scstruc <- function(spe, candidateGenes, label=NULL,
         label <- "label"
     }
     if (algorithm=="ZiGDAG" & useAssay!="counts") {
-    	message("ZiGDAG expects count data")
+    	message("ZiGDAG expects count data.")
     }
     if (is.null(input)) {
-        input <- .getInput(spe, candidateGenes, label, labelName, useAssay, clusterLabel, verbose,
+        input <- .getInput(sce, candidateGenes, label, labelName, useAssay, clusterLabel, verbose,
             changeSymbol, symbolColumn, zeroFilt, rmNeg)
     }
     if (returnOnlyData) {

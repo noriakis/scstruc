@@ -8,7 +8,9 @@
         cat_subtle("Algorithm: ", algorithm, " selected\n")        
     }
     if (isTRUE(boot)) {
-        cat_subtle("Bootstrapping specified\n")
+        if (isTRUE(verbose)) {
+            cat_subtle("Bootstrapping specified: R=", R, "\n")
+        }
         if (is.null(m)) {
             m = nrow(input)
         }
@@ -17,7 +19,9 @@
         algorithm.args[["m"]] <- m
 
         if (algorithm=="ccdr") {
-            cat_subtle("Returning the list of bn.strength\n")
+            if (isTRUE(verbose)) {
+                cat_subtle("Returning the list of bn.strength per lambda\n")
+            }
             return(do.call(scstruc::ccdr.boot, algorithm.args))
         } else if (algorithm=="Hurdle") {
             return(do.call(hurdle.boot, algorithm.args))

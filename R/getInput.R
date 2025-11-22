@@ -47,12 +47,12 @@
         as.matrix() |> t() |>
         data.frame(check.names=FALSE)        
     }
-    if (dim(input)[1]==1) {stop("Only one gene is available")}
     if (verbose) {
         cat_subtle("Dimension of the input: n ", dim(input)[1], ", p ", dim(input)[2], "\n")
     }
     if (dim(input)[2]==0) {stop("No genes remained")}
     if (dim(input)[1]==0) {stop("No samples remained")}
+    ## By default, no zero-based filtering is performed.
     input <- input[, apply(input==0, 2, function(x) sum(x) <= nrow(input) * zeroFilt)]
     if (rmNeg) {
         input <- removeAllNegative(input)
