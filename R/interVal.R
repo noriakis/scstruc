@@ -1,6 +1,6 @@
 #' @title interVal
 #' @description Performs `Intersection-Validation` approach to the data.
-#' @param data data (row names as genes and columns as samples)
+#' @param data data
 #' @param algos algorithms to be evaluated.
 #' @param algorithm.args list of lists to be passed to algos
 #' @param r number of iteration
@@ -70,7 +70,7 @@ interVal <- function(data, algos=c("hc","mmhc"), algorithm.args=NULL,
 
         if (!is.null(output)) {
             write.table(tmp, file=paste0(output, "/subsample-data-",cr,".txt"), sep="\t")
-            save(tmp, file=paste0(output, "/subsample-inf-net-",cr,".rda"))
+            save(inf.nets, file=paste0(output, "/subsample-inf-net-",cr,".rda"))
         }
         lapply(seq_along(inf.nets), function(tmpnetnum) {
             tmpnet <- inf.nets[[tmpnetnum]]

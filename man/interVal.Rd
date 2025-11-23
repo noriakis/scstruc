@@ -18,7 +18,7 @@ interVal(
 )
 }
 \arguments{
-\item{data}{data (row names as genes and columns as samples)}
+\item{data}{data}
 
 \item{algos}{algorithms to be evaluated.}
 

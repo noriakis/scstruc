@@ -32,7 +32,7 @@
 
     tryCatch({
         fit <- cv.glmnet(X %>% as.matrix(), y,
-            alpha=1, family="gaussian", nFolds=nFolds,
+            alpha=1, family="gaussian", nfolds=nFolds,
             standardize=standardize)
         numcoef <- coef(fit, s=s)[,1]
         numcoef <- numcoef[2:length(numcoef)]
@@ -187,7 +187,7 @@ glmnetBICpath <- function(data, nn) {
     } else {
         model = paste(nn, "~", paste(pred, collapse = "+"))
     }
-    fit <- MAST::zlm(as.formula(model), data=data)
+    fit <- MAST::zlm(as.formula(model), sca=data)
     if (is.null(fit$cont)) {return(NULL)}
     res <- summary.glm(fit$cont)
     tbl <- data.frame(coefficients(res))

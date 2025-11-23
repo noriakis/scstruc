@@ -93,50 +93,50 @@ pcalg.boot <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
 }
 
 
-#' @title pcalg.boot.future
-#' 
-#' @description
-#' Bootstrap-based arc strength calculation based on LiNGAM and GES.
-#' The future.lapply will be used in this function.
-#' 
-#' @param data data (row: sample, column: gene)
-#' @param R replicate number
-#' @param m sampling number
-#' @param return.all return all the network in bootstrapping
-#' @param verbose control verbosity
-#' @param removeAllZero remove all zero genes per replicate
-#' @param fun pcalg functions, lingam or ges
-#' @param args args to be passed to the main function of pcalg
-#' @export
-#' @return bn.strength 
-pcalg.boot.future <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
-    verbose=FALSE, return.all=FALSE, fun="ges", args=NULL) {
-	if (fun=="ges") {
-		fun <- ges.pcalg
-	} else {
-		fun <- lingam.pcalg
-	}
-    nodes = names(data)
+# #' @title pcalg.boot.future
+# #' 
+# #' @description
+# #' Bootstrap-based arc strength calculation based on LiNGAM and GES.
+# #' The future.lapply will be used in this function.
+# #' 
+# #' @param data data (row: sample, column: gene)
+# #' @param R replicate number
+# #' @param m sampling number
+# #' @param return.all return all the network in bootstrapping
+# #' @param verbose control verbosity
+# #' @param removeAllZero remove all zero genes per replicate
+# #' @param fun pcalg functions, lingam or ges
+# #' @param args args to be passed to the main function of pcalg
+# #' @export
+# #' @return bn.strength 
+# pcalg.boot.future <- function(data, R=200, m=nrow(data), removeAllZero=FALSE,
+#     verbose=FALSE, return.all=FALSE, fun="ges", args=NULL) {
+# 	if (fun=="ges") {
+# 		fun <- ges.pcalg
+# 	} else {
+# 		fun <- lingam.pcalg
+# 	}
+#     nodes = names(data)
     
-    perRun <- future_lapply(seq_len(R), function(r) {
-        if (verbose) {
-            cat_subtle("R: ", r, "\n")
-        }
-        resampling = sample(nrow(data), m, replace = TRUE)
-        # generate the r-th bootstrap sample.
-        replicate = data[resampling, , drop = FALSE]
-        if (removeAllZero) {
-	        replicate = replicate[, apply(replicate, 2, function(x) sum(x))!=0, drop=FALSE]
-        }
-        run <- fun(replicate, args)
-        return(run)
-    })
-    if (return.all) {
-        return(perRun)
-    }
-	st <- bnlearn::custom.strength(perRun, nodes)
-    return(st)
-}
+#     perRun <- future_lapply(seq_len(R), function(r) {
+#         if (verbose) {
+#             cat_subtle("R: ", r, "\n")
+#         }
+#         resampling = sample(nrow(data), m, replace = TRUE)
+#         # generate the r-th bootstrap sample.
+#         replicate = data[resampling, , drop = FALSE]
+#         if (removeAllZero) {
+# 	        replicate = replicate[, apply(replicate, 2, function(x) sum(x))!=0, drop=FALSE]
+#         }
+#         run <- fun(replicate, args)
+#         return(run)
+#     })
+#     if (return.all) {
+#         return(perRun)
+#     }
+# 	st <- bnlearn::custom.strength(perRun, nodes)
+#     return(st)
+# }
 
 
 

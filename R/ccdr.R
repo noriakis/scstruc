@@ -40,9 +40,17 @@ ccdr <- function(input, algorithm, algorithm.args, verbose) {
         if (isTRUE(verbose)) {
             cat_subtle("Returning best scored network only, specify algorithm.args=list(bestScore=FALSE) to return all the network\n")
         }
-        bestind <- names(which.max(lapply(bn.res, function(tt) {
-            bnlearn::score(tt,  data.frame(input, check.names=FALSE)[names(tt$nodes), ])
-        })))
+        scores <- sapply(bn.res, function(tt) {
+            dat <- data.frame(input, check.names=FALSE)[,names(tt$nodes) ,drop=FALSE]
+            all.zero <- apply(dat == 0, 2, sum) == nrow(dat)
+            sc <- bnlearn::score(tt,  dat, by.node=TRUE)
+            sc <- sc[!all.zero]
+            sum(sc)
+        })
+        if (isTRUE(verbose)) {
+            print(scores)
+        }
+        bestind <- names(bn.res)[scores == max(scores)]
         if (length(bestind)==1) {
             return(bn.res[[bestind]])
         } else {
