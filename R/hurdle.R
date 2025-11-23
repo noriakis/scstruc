@@ -148,28 +148,6 @@
 	    nn
 	}) %>% setNames(nodes)
 
-    ## Neighbors
-    # mb <- lapply(nodes, function(nn) {
-    #     candidate.neighbours <- mb[[nn]]
-    #     if (length(candidate.neighbours) == 0) {
-    #         return(list(mb = character(0), nbr = character(0)))
-    #     }
-    #     return(list(mb = mb[[nn]], nbr = candidate.neighbours))
-    # })
-    # names(mb) <- nodes
-    # for (node in nodes)
-    #   mb[[node]]$mb <- bnlearn:::fake.markov.blanket(mb, node)
-    # mb <- bnlearn:::bn.recovery(mb, nodes = nodes)
-
-    # arcs <- bnlearn:::nbr2arcs(mb)
-
-
-    # res <- list(learning = list("method"="scstruc",
-    #     "blacklist"=list(blacklist)),
-    #     nodes = bnlearn:::cache.structure(names(mb), arcs = arcs),
-    #     arcs = arcs, blacklist=blacklist)
-    # constraints <- bnlearn:::arcs.to.be.added(res$arcs,
-    #     nodes, whitelist = res$learning$blacklist)
     mb <- lapply(names(mb), function(node) {
         if (length(mb[[node]])!=0) {
             list(nbr=mb[[node]], mb=mb[[node]])
@@ -180,8 +158,9 @@
 
     for (node in nodes) {
         ## Corresponding to fake.markov.blanket
-        dif <- setdiff(unique(lapply(mb[[node]]$nbr, function(current) {mb[[current]]$nbr}) %>% unlist(),
-            mb[[node]]$nbr), node)
+        dif <- setdiff(unique(c(lapply(mb[[node]]$nbr,
+        	function(current) {mb[[current]]$nbr}) %>% unlist(),
+            mb[[node]]$nbr)), node)
         mb[[node]]$mb <- dif
     }
 

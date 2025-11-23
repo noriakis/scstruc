@@ -60,8 +60,9 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
 
     for (node in nodes) {
         ## Corresponding to fake.markov.blanket
-        dif <- setdiff(unique(lapply(mb[[node]]$nbr, function(current) {mb[[current]]$nbr}) %>% unlist(),
-            mb[[node]]$nbr), node)
+        dif <- setdiff(unique(c(lapply(mb[[node]]$nbr,
+            function(current) {mb[[current]]$nbr}) %>% unlist(),
+            mb[[node]]$nbr)), node)
         mb[[node]]$mb <- dif
     }
 
@@ -133,8 +134,9 @@ skeleton.from.ig <- function(net, data, maximize="hc",
 
     for (node in nodes) {
         ## Corresponding to fake.markov.blanket
-        dif <- setdiff(unique(lapply(mb[[node]]$nbr, function(current) {mb[[current]]$nbr}) %>% unlist(),
-            mb[[node]]$nbr), node)
+        dif <- setdiff(unique(c(lapply(mb[[node]]$nbr,
+            function(current) {mb[[current]]$nbr}) %>% unlist(),
+            mb[[node]]$nbr)), node)
         mb[[node]]$mb <- dif
     }
 
@@ -153,6 +155,7 @@ skeleton.from.ig <- function(net, data, maximize="hc",
     constraints <- arcs.to.be.added.2(arcs, nodes)
 
 	if (maximize != "ges") {
+        ## Use HC
 	    start <- bnlearn::empty.graph(nodes = nodes)
 	    maximize.args[["x"]] <- data
 	    maximize.args[["start"]] <- start
@@ -161,6 +164,7 @@ skeleton.from.ig <- function(net, data, maximize="hc",
 	    # hc_res <- hc(data, start=start, blacklist=constraints)
 	    return(struc_res)    	
     } else {
+        ## Use GES (pcalg)
         bl.mat <- matrix(0, nrow=ncol(data),
             ncol=ncol(data))
         row.names(bl.mat) <- nodes
