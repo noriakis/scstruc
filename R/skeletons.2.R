@@ -72,7 +72,14 @@ skeleton.reg <- function(data, algorithm="glmnet_CV", whitelist=NULL, blacklist=
         candidate <- mb[[node]]$nbr
         cbind(rep(node, length(candidate)), candidate)
     }))
-    arcs <- arcs[!duplicated(arcs),]
+    if (is.null(arcs) || length(arcs) == 0) {
+        if (returnArcs) {
+            return(igraph::make_empty_graph(n = length(nodes), directed = FALSE) %>%
+                igraph::set_vertex_attr("name", value = nodes))
+        }
+        return(bnlearn::empty.graph(nodes = nodes))
+    }
+    arcs <- arcs[!duplicated(arcs), , drop = FALSE]
 
     if (returnArcs) {
         return(igraph::graph_from_edgelist(arcs))

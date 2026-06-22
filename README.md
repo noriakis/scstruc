@@ -43,6 +43,20 @@ gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 plotNet(gs$net, gs$data, showText=FALSE)
 ```
 
+If you start from a `Seurat` object, convert it to `SingleCellExperiment`
+before running `scstruc`.
+
+``` r
+library(Seurat)
+library(SeuratObject)
+library(scstruc)
+
+seu <- NormalizeData(seu)
+sce <- as.SingleCellExperiment(seu)
+included_genes <- sample(row.names(sce), 100)
+gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
+```
+
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="3600" style="display: block; margin: auto;" />
 
 Using bootstrapping, the averaged network is obtained. This time, `L1MB`

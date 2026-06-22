@@ -10,13 +10,28 @@ This function takes the pathway name in SignaLink and
 \usage{
 extractDAGfromOmnipath(
   genes = NULL,
+  organism = "mouse",
   pathway_name = NULL,
   target_source = "AND",
-  mfas = TRUE
+  mfas = TRUE,
+  upstream_steps = 0
 )
 }
 \arguments{
+\item{genes}{gene symbols used to subset the network}
+
+\item{pathway_name}{pathway name in SignaLink}
+
+\item{target_source}{whether to subset by source/target pathway or genes using
+`AND` or `OR`}
+
 \item{mfas}{force DAG}
+
+\item{upstream_steps}{non-negative integer. If `genes` is specified, include
+genes up to this many directed upstream steps before subsetting}
+}
+\value{
+list of igraph object and omitted arcs
 }
 \description{
 extractDAGfromOmnipath

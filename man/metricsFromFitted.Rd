@@ -62,14 +62,15 @@ if the feature abundances are all negative. In this case, these scores will be o
 \item{ccdr}{perform comparison with CCDr algorithm with lambda length specified in 
 `lambdas.length` argument.}
 
-\item{return_net}{return list of whole BN}
+\item{return_net}{return inferred networks; when available, raw strength matrices
+are also returned as `strength`}
 
 \item{lingam}{perform lingam evaluation}
 
 \item{genie}{test genie3 for the comparison}
 
-\item{genie.threshold}{genie3 threshold value. The weight has no statistical meanings,
-so the value should be chosen carefully.}
+\item{genie.threshold}{genie3 quantile threshold value. For each value `q`,
+edges with weight below `quantile(weight, q)` are removed.}
 
 \item{lambdas.length}{lambda length in CCDr algorithm}
 
@@ -90,6 +91,7 @@ edges: edge number in inferred graph
 p: node number in original graph
 N: sample number
 SHD: structural hamming distance
+AUPRC: area under the precision-recall curve
 SID: structural intervention distance (if specified)
 time: time needed in structure learning (sec)
 

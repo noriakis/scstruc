@@ -9,13 +9,14 @@ metrics(reference, inferred, sid_sym = FALSE, SID.cran = FALSE, data = NULL)
 \arguments{
 \item{reference}{reference bn object}
 
-\item{inferred}{named list of bn object}
+\item{inferred}{named list of inferred networks. Each element may be a bn object,
+adjacency matrix, or edge list with score column.}
 
 \item{sid_sym}{symmetric version of sid will be computed}
 
 \item{SID.cran}{use implementation in package SID}
 
-\item{data}{if provided, calculate KL}
+\item{data}{if provided, calculate KL, BIC, and AUPRC when possible}
 }
 \value{
 data.frame storing evaluation results

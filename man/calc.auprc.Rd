@@ -6,14 +6,16 @@
 calculate the AUPRC based on reference BN and inferred network.
 The function assumes the directed network.}
 \usage{
-calc.auprc(ref.bn, str, target = "strength")
+calc.auprc(ref, str, target = "strength", mode = "directed")
 }
 \arguments{
-\item{ref.bn}{reference bn object}
+\item{ref}{reference bn object or adjacency matrix}
 
 \item{str}{inferred strength or weight (three-column with from, to, and target column)}
 
 \item{target}{target column name}
+
+\item{mode}{directed or undirected}
 }
 \description{
 calc.auprc

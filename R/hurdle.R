@@ -29,7 +29,9 @@
 			hurdle.args[["fixed"]] <- covariates
 		}
 		hurdle.args[["parallel"]] <- parallel
-		suppressMessages(hurdle <- do.call(HurdleNormal::fitHurdle, hurdle.args))
+		# suppressMessages(hurdle <- do.call(HurdleNormalFast::fitHurdle, hurdle.args))
+        suppressMessages(hurdle <- do.call(HurdleNormal::fitHurdle, hurdle.args))
+
 	} else {
 		hurdle <- skeleton
 	}

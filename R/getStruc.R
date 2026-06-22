@@ -50,7 +50,7 @@
             algorithm.args[["m"]] <- NULL
             algorithm.args[["R"]] <- NULL
             if (is.null(algorithm.args[["thresholds"]])) {
-                algorithm.args[["thresholds"]] <- seq(0.1, 0.4, 0.1)
+                algorithm.args[["thresholds"]] <- seq(0.6, 0.9, 0.1)
             }
             perRun <- list()
             for (r in seq_len(R)) {

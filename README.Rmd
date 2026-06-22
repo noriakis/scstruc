@@ -57,6 +57,20 @@ gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
 plotNet(gs$net, gs$data, showText=FALSE)
 ```
 
+If you start from a `Seurat` object, convert it to `SingleCellExperiment`
+before running `scstruc`.
+
+```{r eval=FALSE}
+library(Seurat)
+library(SeuratObject)
+library(scstruc)
+
+seu <- NormalizeData(seu)
+sce <- as.SingleCellExperiment(seu)
+included_genes <- sample(row.names(sce), 100)
+gs <- scstruc(sce, included_genes, changeSymbol=FALSE)
+```
+
 Using bootstrapping, the averaged network is obtained. This time, `L1MB` algorithm with the selection of neighbors based on BIC is used.
 
 ```{r message=FALSE, warning=FALSE, fig.width=8, fig.height=8}

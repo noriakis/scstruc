@@ -28,70 +28,140 @@ calc.fv <- function(comp) {
     return(fv)
 }
 
-
-#' @title prc.plot
-#' Plot the PRC based on reference BN and inferred network.
-#' The function assumes the directed network.
-#' @importFrom yardstick pr_auc
-#' @param ref.bn reference bn object
-#' @param strs list of inferred strength or weight (three-column with from, to, and target column)
-#' @param target target column name (must be same in all the str)
-#' @param onlyData return only the data
-#' @importFrom reshape2 melt
-#' @export
-prc.plot <- function(ref.bn, strs, target="strength", onlyData=FALSE) {
-    adj <- bnlearn::as.igraph(ref.bn) %>%
-        as_adj(type="both") %>%
-        as.matrix()
-    diag(adj) <- NA
-    ref.bn.el <- reshape2::melt(adj, na.rm=TRUE) %>%
-        `colnames<-`(c("from","to","correct"))
-    ref.dim <- dim(ref.bn.el)[1]
-    
-    for.plot <- do.call(rbind, lapply(names(strs), function(nstr) {
-        str <- strs[[nstr]]
-        str.dim <- dim(str)[1]
-        if (str.dim != ref.dim) {
-            stop("Dimension mismatches")
-        }
-        merged <- merge(ref.bn.el, str, by=c("from","to"), all=TRUE) %>%
-            mutate(correct=factor(correct))
-        yardstick::pr_curve(merged, correct, !!target, event_level="second") %>%
-        mutate(algorithm=nstr)       
-    }))
-    if (onlyData){
-        return(for.plot)
-    }
-    for.plot %>%
-        ggplot(aes(x=recall, y=precision, group=algorithm, color=algorithm)) + geom_line()
-
-}
-
-
 #' @title calc.auprc
 #' calculate the AUPRC based on reference BN and inferred network.
 #' The function assumes the directed network.
 #' @importFrom yardstick pr_auc
-#' @param ref.bn reference bn object
+#' @param ref reference bn object or adjacency matrix
 #' @param str inferred strength or weight (three-column with from, to, and target column)
 #' @param target target column name
+#' @param mode directed or undirected
 #' @export
-calc.auprc <- function(ref.bn, str, target="strength") {
-    adj <- bnlearn::as.igraph(ref.bn) %>%
-        as_adj(type="both") %>%
-        as.matrix()
-    diag(adj) <- NA
-    ref.bn.el <- reshape2::melt(adj, na.rm=TRUE) %>%
-        `colnames<-`(c("from","to","correct"))
-    ref.dim <- dim(ref.bn.el)[1]
-    
-    str.dim <- dim(str)[1]
-    if (str.dim != ref.dim) {
-        stop("Dimension mismatches")
+calc.auprc <- function(ref, str, target = "strength", mode="directed") {
+  score_sym = "max"
+  if (is.matrix(str)) {
+    if (is.null(rownames(str)) || is.null(colnames(str))) {
+      stop("When `str` is an adjacency matrix, it must have rownames and colnames.")
     }
-    merged <- merge(ref.bn.el, str, by=c("from","to"), all=TRUE) %>%
-        mutate(correct=factor(correct))
-    yardstick::pr_auc(merged, correct, !!target, event_level="second")
+    str <- tibble::tibble(
+      from = rep(rownames(str), times = ncol(str)),
+      to   = rep(colnames(str), each  = nrow(str)),
+      !!rlang::sym(target) := as.numeric(as.vector(str))
+    ) %>%
+      dplyr::filter(.data$from != .data$to)
+  } else {
+    needed_cols <- c("from", "to", target)
+    if (!all(needed_cols %in% colnames(str))) {
+      stop("`str` must contain columns: ", paste(needed_cols, collapse = ", "))
+    }
+  }
+
+
+  ## Process reference
+  ref_adj <- NULL
+  if (inherits(ref, "bn") || inherits(ref, "bn.fit")) {
+    ref_adj <- bnlearn::amat(ref)
+  } else if (is.matrix(ref)) {
+    if (is.null(rownames(ref)) || is.null(colnames(ref))) {
+      stop("Adjacency matrix must have rownames and colnames.")
+    }
+    ref_adj <- if (is.numeric(ref)) ref else suppressWarnings(matrix(as.numeric(ref),
+                     nrow = nrow(ref), dimnames = dimnames(ref)))
+    ref_adj[is.na(ref_adj)] <- 0
+    ref_adj[ref_adj != 0] <- 1
+  } else {
+    stop("`ref` must be a bnlearn bn/bn.fit object or a numeric adjacency matrix.")
+  }
+
+  nodes <- colnames(ref_adj)
+  if (!identical(nodes, rownames(ref_adj))) {
+    stop("Row and column names of reference adjacency must match.")
+  }
+
+  if (mode == "directed") {
+    diag(ref_adj) <- NA
+    ref_df <- tibble::tibble(
+      from = rep(rownames(ref_adj), times = ncol(ref_adj)),
+      to   = rep(colnames(ref_adj), each  = nrow(ref_adj)),
+      correct = as.vector(ref_adj)
+    ) %>% dplyr::filter(!is.na(.data$correct))
+    ref_df$correct <- as.integer(ref_df$correct != 0)
+  } else {
+    ref_ud <- pmax(ref_adj, t(ref_adj))
+    diag(ref_ud) <- NA
+    keep <- upper.tri(ref_ud, diag = FALSE)
+    ref_df <- tibble::tibble(
+      from = rownames(ref_ud)[row(ref_ud)[keep]],
+      to   = colnames(ref_ud)[col(ref_ud)[keep]],
+      correct = as.integer(ref_ud[keep] != 0)
+    )
+  }
+
+  ## Process estimate
+  if (mode == "undirected") {
+      str_use <- dplyr::filter(str, .data$from %in% nodes & .data$to %in% nodes,
+        .data$from != .data$to)
+      sc <- suppressWarnings(as.numeric(str_use[[target]]))
+
+      S <- matrix(NA, length(nodes), length(nodes), dimnames = list(nodes, nodes))
+      if (nrow(str_use) > 0) {
+        S[cbind(str_use$from, str_use$to)] <- sc
+      }
+
+      A <- S; B <- t(S)
+      if (score_sym == "max") {
+        S_ud <- pmax(A, B, na.rm = TRUE)
+      } else if (score_sym == "sum") {
+        S_ud <- ifelse(is.na(A) & is.na(B), NA, 
+                       (ifelse(is.na(A), 0, A) + ifelse(is.na(B), 0, B)))
+      } else {
+        denom <- (!is.na(A)) + (!is.na(B))
+        num <- ifelse(is.na(A), 0, A) + ifelse(is.na(B), 0, B)
+        S_ud <- ifelse(denom == 0, NA, num / denom)
+      }
+
+      diag(S_ud) <- NA
+      keep <- upper.tri(S_ud, diag = FALSE)
+
+      str_sub <- tibble::tibble(
+        from = rownames(S_ud)[row(S_ud)[keep]],
+        to   = colnames(S_ud)[col(S_ud)[keep]],
+        !!rlang::sym(target) := S_ud[keep]
+      )
+  } else {
+    str_sub <- dplyr::filter(str, .data$from %in% nodes & .data$to %in% nodes)
+    if (!is.numeric(str_sub[[target]])) {
+      suppressWarnings(str_sub[[target]] <- as.numeric(str_sub[[target]]))
+    }
+    if (all(is.na(str_sub[[target]]))) {
+      stop("`str[[target]]` is not a usable numeric vector.")
+    }
+  }
+  merged <- dplyr::left_join(
+    ref_df,
+    dplyr::select(str_sub, dplyr::all_of(c("from","to", target))),
+    by = c("from", "to")
+  )
+
+  if (anyNA(merged[[target]])) {
+    merged[[target]][is.na(merged[[target]])] <- 0
+  }
+
+  merged$correct <- factor(merged$correct, levels = c(0, 1), labels = c("0", "1"))
+
+  res <- yardstick::pr_auc(
+    merged,
+    correct,
+    !!rlang::sym(target),
+    event_level = "second"
+  )
+
+   curve <- yardstick::pr_curve(merged,
+    correct,     !!rlang::sym(target), event_level="second")
+    
+    plt <- curve %>%
+        ggplot(aes(x=recall, y=precision)) + geom_line()
+  return(list("auprc"=res, "df"=merged, "plot"=plt, "curve"=curve))
 }
 
 #' @title pidc.using.julia
@@ -104,7 +174,7 @@ calc.auprc <- function(ref.bn, str, target="strength") {
 #' @param return_net return the raw network output, ignored if bestBIC is TRUE
 #' @noRd
 pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
-    NetworkInference_HOME, thresholds=seq(0.1, 0.4, 0.1),
+    NetworkInference_HOME, thresholds=seq(0.6, 0.9, 0.1),
     bestBIC=TRUE, verbose=FALSE, maximize="hc", return_net=FALSE) {
     ###
     # Needs to setup Julia environment beforehand
@@ -138,14 +208,29 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
     JuliaCall::julia_eval("@time genes = get_nodes(dataset_name);")
     JuliaCall::julia_eval("@time network = InferredNetwork(algorithm, genes);")
     JuliaCall::julia_eval(paste0('write_network_file("',net.path,'", network)'))
+    rawnet <- read.table(net.path, sep="\t", stringsAsFactors=FALSE)
+    colnames(rawnet) <- c("from", "to", "weight")
+    nodes <- colnames(data)
+    raw_adj <- matrix(0, nrow=length(nodes), ncol=length(nodes), dimnames=list(nodes, nodes))
+    rawnet <- rawnet[rawnet$from %in% nodes & rawnet$to %in% nodes & rawnet$from != rawnet$to, , drop=FALSE]
+    if (nrow(rawnet) > 0) {
+        raw_adj[cbind(rawnet$from, rawnet$to)] <- rawnet$weight
+        raw_adj[cbind(rawnet$to, rawnet$from)] <- rawnet$weight
+    }
     for (th in thresholds) {
         if (verbose) {
             cat("Outputting", th, "\n")
         }
         output.path <- paste0(tmp,"/data_",ts.now,"_",th,".csv")
-        JuliaCall::julia_eval(paste0('adjacency_matrix, labels_to_ids, ids_to_labels = get_adjacency_matrix(network,', th,')'))
-        JuliaCall::julia_eval(paste0('output_name = string("',output.path, '")'))
-        JuliaCall::julia_eval("CSV.write(output_name, Tables.table(adjacency_matrix), writeheader=false)")
+        cutoff <- stats::quantile(rawnet$weight, probs=th, na.rm=TRUE)
+        kept <- rawnet[rawnet$weight >= cutoff, , drop=FALSE]
+        kept <- kept[kept$from %in% nodes & kept$to %in% nodes & kept$from != kept$to, , drop=FALSE]
+        adj <- matrix(FALSE, nrow=length(nodes), ncol=length(nodes), dimnames=list(nodes, nodes))
+        if (nrow(kept) > 0) {
+            adj[cbind(kept$from, kept$to)] <- TRUE
+        }
+        adj <- adj | t(adj)
+        utils::write.table(adj, file=output.path, sep=",", col.names=FALSE, row.names=FALSE, quote=FALSE)
     }
     results <- list()
     bics <- list()
@@ -168,18 +253,26 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
         bn <- skeleton.from.ig(net, data %>% data.frame(),
         	maximize=maximize)
         results[[as.character(th)]] <- bn
-        bic <- bnlearn::score(bn, data)
-        bics[[as.character(th)]] <- bic
+
+        all.zero <- apply(data == 0, 2, sum) == nrow(data)
+        bic <- bnlearn::score(bn, data, by.node=TRUE)
+        bic <- bic[!all.zero]
+
+        bics[[as.character(th)]] <- sum(bic)
     }
     if (bestBIC) {
+        best_name <- names(results)[which.max(bics)]
         if (verbose) {
-            cat("Best BIC is ", names(results)[which.max(bics)], "\n")
+            print(bics)
+            cat("Best BIC is ", best_name, "\n")
         }
-        return(results[[names(results)[which.max(bics)]]])
+        if (isTRUE(return_net)) {
+            return(list("results"=results[[best_name]], "net"=rawnet, "raw_adj"=raw_adj, "best_threshold"=best_name))
+        }
+        return(results[[best_name]])
     } else {
     	if (isTRUE(return_net)) {
-    		rawnet <- read.table(net.path, sep="\t")
-    		return(list("results"=results, "net"=rawnet))
+    		return(list("results"=results, "net"=rawnet, "raw_adj"=raw_adj))
     	} else {
 	        return(results)		
     	}
@@ -188,10 +281,10 @@ pidc.using.julia <- function(data, tmp="./scstruc_pidc_tmp",
 }
 
 #' internal function loading GRNBoost2 results and check DAG
-#' The importance is min-max normalized
+#' The importance is min-max normalized and thresholded by quantile
 #' @noRd
-load.grnboost2 <- function(filename, minmax=TRUE,
-                           thresholds=seq(0, 1, 0.1)) {
+load.grnboost2 <- function(filename, minmax=FALSE,
+                           thresholds=c(0.9, 0.95, 0.975, 0.99, 0.995)) {
     minmaxFn <- function(x, na.rm = TRUE) {
         return((x- min(x)) /(max(x)-min(x)))
     }
@@ -200,22 +293,32 @@ load.grnboost2 <- function(filename, minmax=TRUE,
         df$importance <- minmaxFn(df$importance)
     } else {
     }
+
+    usable_scores <- df$importance[is.finite(df$importance) & df$importance > 0]
+    if (!length(usable_scores)) {
+        return(setNames(as.list(rep(NA, length(thresholds))), paste0("GRNBoost2_q", thresholds)))
+    }
+    cuts <- stats::quantile(usable_scores, probs=thresholds, na.rm=TRUE)
     g <- igraph::graph_from_data_frame(df[, c("TF","target","importance")])
-    adj <- as_adj(g, attr="importance")
-    lapply(thresholds, function(th) {
-        adj[adj<th] <- 0
+    adj0 <- as_adj(g, attr="importance")
+    mynet <- lapply(seq_along(thresholds), function(i) {
+        cutoff <- cuts[[i]]
+        adj <- adj0
+        adj[adj <= cutoff] <- 0
         tmpg <- igraph::graph_from_adjacency_matrix(adj, weighted=TRUE)
-        
         if (igraph::is_dag(tmpg)) {
             if (length(V(tmpg))!=0) {
                 return(bnlearn::as.bn(tmpg))
             } else {
-                return(NA)
+                return(tmpg)
             }
         } else {
-            return(NA)
+            ## If not DAG, return adjacency matrix
+            return(as.matrix(adj))
         }
-    }) %>% setNames(paste0("GRNBoost2_",thresholds))
+    }) %>% setNames(paste0("GRNBoost2_q", thresholds))
+    mynet[["GRNBoost2"]] <- as.matrix(adj0)
+    return(mynet)
 }
 
 #' @noRd
@@ -510,4 +613,49 @@ getCyclinGenes <- function(sce, id="Symbol", title=FALSE) {
 
     cyclin.genes <- rownames(sce)[cyclin.genes]
     return(cyclin.genes)
+}
+
+#' This will make strength adjacency matrix
+#' @noRd
+strength_to_adj <- function(df) {
+    nodes <- sort(unique(c(df$from, df$to)))
+    adj_directed <- df %>%
+        select(from, to, strength) %>%
+        tidyr::pivot_wider(names_from = to, values_from = strength, values_fill = 0) %>%
+        right_join(tibble(from = nodes), by = "from") %>%
+        dplyr::arrange(from) %>%
+        tibble::column_to_rownames("from") %>%
+        as.matrix()    
+    missing_cols <- setdiff(nodes, colnames(adj_directed))
+    if (length(missing_cols) > 0) {
+        adj_directed <- cbind(adj_directed, matrix(0, nrow(adj_directed), length(missing_cols),
+                                                   dimnames = list(rownames(adj_directed), missing_cols)))
+    }
+    adj_directed <- adj_directed[, nodes, drop = FALSE]
+    adj_undirected <- pmax(adj_directed, t(adj_directed))
+    diag(adj_undirected) <- 0
+    return(list("directed"=adj_directed, "undirected"=adj_undirected))
+}
+
+#' This will create strength-weighted adjacency matrix for DAG
+#' @noRd
+adj_weighted_from_dag <- function(dag, df, weight_mode = c("strength", "strength*direction")) {
+    weight_mode <- match.arg(weight_mode)
+    nodes <- nodes(dag)
+    M <- matrix(0, nrow = length(nodes), ncol = length(nodes),
+                dimnames = list(nodes, nodes))
+    arcs_dag <- arcs(dag)
+    df2 <- df %>% select(from, to, strength, direction)
+    
+    for (i in seq_len(nrow(arcs_dag))) {
+        fr <- arcs_dag[i, 1]; to <- arcs_dag[i, 2]
+        row <- df2 %>% filter(from == fr, to == to) %>% slice(1)
+        if (nrow(row) == 1) {
+            w <- if (weight_mode == "strength") row$strength else row$strength * row$direction
+            M[fr, to] <- w
+        } else {
+            M[fr, to] <- 0
+        }
+    }
+    M
 }

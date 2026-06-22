@@ -13,6 +13,7 @@
 #' p: node number in original graph
 #' N: sample number
 #' SHD: structural hamming distance
+#' AUPRC: area under the precision-recall curve
 #' SID: structural intervention distance (if specified)
 #' time: time needed in structure learning (sec)
 #' 
@@ -36,11 +37,12 @@
 #' Also, `database` and `org` argument should be specified based on the node name.
 #' @param org passed to `intersectPpi` function
 #' @param genie test genie3 for the comparison
-#' @param genie.threshold genie3 threshold value. The weight has no statistical meanings,
-#' so the value should be chosen carefully.
+#' @param genie.threshold genie3 quantile threshold value. For each value `q`,
+#' edges with weight below `quantile(weight, q)` are removed.
 #' @param sid compute SID
 #' @param sid_sym compute symmetrized version of SID
-#' @param return_net return list of whole BN
+#' @param return_net return inferred networks; when available, raw strength matrices
+#' are also returned as `strength`
 #' @param return_data return data
 #' @param SID.cran use package SID for calculation of SID
 #' @param ges perform ges evaluation
@@ -120,7 +122,8 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         e <- Sys.time()
         nets <- lapply(genie.threshold, function(th) {
             tmp <- gra
-            tmp[tmp < th] <- 0
+            cutoff <- stats::quantile(tmp, probs = th, na.rm = TRUE)
+            tmp[tmp < cutoff] <- 0
             tmp.net <- igraph::graph_from_adjacency_matrix(tmp, weighted = TRUE)
             if (igraph::is.dag(tmp.net)) {
                 return(bnlearn::as.bn(tmp.net))
@@ -129,15 +132,16 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
             }
         })
         names(nets) <- genie.threshold
+        tim <- as.numeric(e-s, unit="secs")
+        alls[["GENIE3"]] <- list(NULL, tim, gra)
         if (sum(unlist(lapply(nets, function(net) {is.na(net)}))) == length(genie.threshold)) {
             cat_subtle("GENIE3 All threshold results in non-DAG\n")
         } else {
-            tim <- as.numeric(e-s, unit="secs")
             cat_subtle("GENIE3 ", tim, "\n")
             for (nn in names(nets)) {
                 genie.net <- nets[[nn]]
                 if (is(genie.net, "bn")) {
-                    alls[[paste0("GENIE3_",nn)]] <- list(genie.net, tim)
+                    alls[[paste0("GENIE3_q", nn)]] <- list(genie.net, tim, gra)
                 }
             }
         }
@@ -202,20 +206,49 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
     res <- do.call(rbind, lapply(names(alls), function(x) {
         cur_net <- alls[[x]][[1]]
         tim <- alls[[x]][[2]]
+        cur_strength <- if (length(alls[[x]]) >= 3) alls[[x]][[3]] else NULL
         s0 <- dim(rawnet$arcs)[1]
-        edges <- dim(cur_net$arcs)[1]
-        comp <- bnlearn::compare(target=rawnet, current=cur_net)
-        tp <- comp$tp; fp <- comp$fp; fn <- comp$fn
-        pre <- tp/(tp+fp); rec <- tp/(tp+fn)
-        fv <- 2*(pre*rec)/(pre+rec)
+        is_net_available <- is(cur_net, "bn")
 
-        if (ppi) {
+        if (is_net_available) {
+            edges <- dim(cur_net$arcs)[1]
+            comp <- bnlearn::compare(target=rawnet, current=cur_net)
+            tp <- comp$tp
+            fp <- comp$fp
+            fn <- comp$fn
+            pre <- tp/(tp+fp)
+            rec <- tp/(tp+fn)
+            fv <- 2*(pre*rec)/(pre+rec)
+            kl.val <- bnlearn::KL(bnlearn::bn.fit(cur_net, input), fitted)
+            bic.val <- BIC(cur_net, input)
+            shd.val <- bnlearn::shd(cur_net, rawnet)
+        } else {
+            edges <- NA
+            tp <- NA
+            fp <- NA
+            fn <- NA
+            pre <- NA
+            rec <- NA
+            fv <- NA
+            kl.val <- NA
+            bic.val <- NA
+            shd.val <- NA
+        }
+
+        auprc.val <- tryCatch({
+            score_input <- if (is.matrix(cur_strength)) cur_strength else bnlearn::amat(cur_net)
+            as.numeric(calc.auprc(rawnet, score_input)$auprc$.estimate[[1]])
+        }, error = function(e) {
+            NA
+        })
+
+        if (ppi && is_net_available) {
             numppi <- intersectPpi(cur_net %>% as.igraph() %>% igraph::as_edgelist(),
                 org=org)
         } else {
             numppi <- NA
         }
-        if (sid) {
+        if (sid && is_net_available) {
             if (SID.cran) {
                 sid.val.sym <- SID.sid(rawnet, cur_net, sid_sym)
             } else {
@@ -232,14 +265,14 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
         }
         c(
             x, s0, edges,
-            bnlearn::KL(bnlearn::bn.fit(cur_net, input), fitted),
-            BIC(cur_net, input),
-            bnlearn::shd(cur_net, rawnet),
-            tp, fp, fn, tp/s0, pre, rec, fv , sid.val.sym, numppi, tim
+            kl.val,
+            bic.val,
+            shd.val,
+            tp, fp, fn, tp/s0, pre, rec, fv, auprc.val, sid.val.sym, numppi, tim
         )
     })) %>% data.frame()
     res <- res %>%  `colnames<-`(c("algo","s0","edges","KL","BIC","SHD","TP",
-        "FP","FN","TPR","Precision","Recall","F1","SID","PPI","time")) %>%
+        "FP","FN","TPR","Precision","Recall","F1","AUPRC","SID","PPI","time")) %>%
         mutate_at(2:ncol(res), as.numeric)
     res <- res %>% mutate(BICnorm = (BIC - min(BIC)) / (max(BIC) - min(BIC)))
     res$N <- N
@@ -247,11 +280,22 @@ metricsFromFitted <- function(fitted, N, algos=c("glmnet_CV"),
 
     netList <- lapply(alls, function(x) x[[1]])
     names(netList) <- names(alls)
+    strengthList <- lapply(alls, function(x) {
+        if (length(x) >= 3) {
+            x[[3]]
+        } else {
+            NULL
+        }
+    })
+    names(strengthList) <- names(alls)
 
     returns <- list()
     returns[["metrics"]] <- res
     if (return_net) {
         returns[["net"]] <- netList
+        if (any(vapply(strengthList, Negate(is.null), logical(1)))) {
+            returns[["strength"]] <- strengthList
+        }
     }
     if (return_data) {
         returns[["data"]] <- input
